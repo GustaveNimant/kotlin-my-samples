@@ -1,0 +1,15 @@
+mfs/.ipms/blocks
+mfs/.ipms/config
+mfs/.ipms/bin/ipms
+config.sh
+*.sw*
+.jekyll-cache
+.gradle/
+_site
+_ipfs
+_perl5
+*~
+[a-zA-Z]
+[a-zA-Z].*
+*.jar
+.#*
