@@ -3,6 +3,10 @@
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
 
+fun notYetImplemented(fun_nam:String){
+    throw Exception("function $fun_nam is not yet implemented")
+}
+
 fun functionName():String {
     val sta = Thread.currentThread().stackTrace[2]
     val str = sta.getMethodName()
@@ -31,7 +35,7 @@ fun read_input(caller:String):String {
 	
     val str = readLine().toString()
 
-    exiting(here)
+    exiting(here+" with str = $str")
     return str
 }
 
@@ -49,8 +53,11 @@ fun ipms_api (files_stat:String, mfs_path:String, hash_equal:String, caller:Stri
     val here = functionName()
     entering(here, caller)
 
+    println ("$here: files_stat is $files_stat");
     println ("$here: mfs_path is $mfs_path");
+    println ("$here: hash_equal is $hash_equal");
 
+    notYetImplemented(here)
     val result = "Not yet translated"
 
     exiting(here)
@@ -60,7 +67,8 @@ fun ipms_api (files_stat:String, mfs_path:String, hash_equal:String, caller:Stri
 fun ipms_local_mutable_resolve (mfs_path:String, caller:String):String {
     val here = functionName()
     entering(here, caller)
-
+    println ("$here: input mfs_path is '$mfs_path'");
+    
     mfs_path.replace ("^mfs:", "")
     println ("$here: mfs_path is $mfs_path");
 
@@ -74,21 +82,12 @@ fun ipms_local_mutable_resolve (mfs_path:String, caller:String):String {
     return result
 }
 
-fun main(args: Array<String>) {
+fun hashOfPath (str:String, caller:String):String {
     val here = functionName()
-    entering(here,"top")
-
-    var hash = ""
+    entering(here, caller)
+    println ("$here: input str is '$str'");
     
-    println("$here: enter \"phone number\" ex: \"phone: 123-456-7890\"")
-    println("$here: enter a file name")
-    println("example : emilea@mfs:/my/files/some_file.txt")
-    println("example : 127.0.0.1:8080/ipfs/my/files/some_file.txt")	
-    println("example : nickname@ipms:/my/files/some_file.txt")
-    println("example : ipms/nickname/my/files/some_file.txt")	
-    println("example : peeridkey@mfs:/mfspath")	
-
-    val str = readInput(here)
+    var hash = ""
 
     if (Regex("""\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6}""").containsMatchIn(str)) {
         println("$here: '$str' is an email address")
@@ -127,7 +126,7 @@ fun main(args: Array<String>) {
     else if (Regex("""(\w+)\@mfs:(/.*)""").containsMatchIn(str)) {
         println("$here: '$str' is a who@mfs file using keys")
     }
-    else if (Regex("""(^(?:self@)?(?:mfs:|/files)(/.*)""").containsMatchIn(str)) {
+    else if (Regex("""(^(?:self@)?(?:mfs:|/files)(/.*))""").containsMatchIn(str)) {
         println("$here: '$str' is local mutable address of type:")
 	println(" . self@mfs:/mfspath")
 	println(" . mfs:/mfspath")
@@ -139,6 +138,31 @@ fun main(args: Array<String>) {
     else {	
     	 println("$here: '$str' is unknown")
     }
+
+    return hash	
+    exiting(here)
+}
+
+fun main(args: Array<String>) {
+    val here = functionName()
+    entering(here,"top")
+
+    println("$here: enter \"phone number\" ex: \"phone: 123-456-7890\"")
+    println("$here: enter a file name")
+    println("example : emilea@mfs:/my/files/some_file.txt")
+    println("example : 127.0.0.1:8080/ipfs/my/files/some_file.txt")	
+    println("example : nickname@ipms:/my/files/some_file.txt")
+    println("example : ipms/nickname/my/files/some_file.txt")	
+    println("example : peeridkey@mfs:/mfspath")	
+    println("example : self@mfs:/mfspath")
+    println("example : mfs:/mfspath")
+    println("example : /files/mfspath (webui)")
+
+    val path = readInput(here)
+
+    var hash = hashOfPath(path, here)
+
+    println("$here : hash = $hash")
 
     exiting(here)
 }
