@@ -1,4 +1,4 @@
-/* https://kotlinlang.org/docs/reference/basic-syntax.html */
+// https://grokonez.com/kotlin/kotlin-encode-decode-fileimage-base64
 
 package com.javasampleapproach.kotlin.base64
  

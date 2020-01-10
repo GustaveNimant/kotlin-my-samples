@@ -1,5 +1,8 @@
-/* https://kotlinlang.org/docs/reference/basic-syntax.html */
-
+package com.javasampleapproach.kotlin.base64
+ 
+import java.io.File
+import java.util.Base64
+ 
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
 
@@ -29,6 +32,7 @@ fun exiting(here:String):Unit {
     level = level - 1	
 }
 
+// ---------- end of header ----------
 fun read_input(caller:String):String {
     val here = functionName()
     entering(here, caller)
