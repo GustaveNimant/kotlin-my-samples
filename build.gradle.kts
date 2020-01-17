@@ -6,7 +6,13 @@
  */
 
 plugins {
-    id("base")
+   `java-library`
+   kotlin("jvm") version "1.3.61"
+   id("base")
+}
+
+dependencies {
+	     implementation(kotlin("stdlib"))
 }
 
 tasks.create<Copy>("copy") {

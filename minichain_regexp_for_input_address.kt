@@ -1,5 +1,10 @@
 /* https://kotlinlang.org/docs/reference/basic-syntax.html */
 
+package com.javasampleapproach.kotlin.base64
+ 
+import java.io.File
+import java.util.Base64
+ 
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
 
@@ -29,6 +34,7 @@ fun exiting(here:String):Unit {
     level = level - 1	
 }
 
+// ---------- end of header ----------
 fun read_input(caller:String):String {
     val here = functionName()
     entering(here, caller)
@@ -148,7 +154,6 @@ fun main(args: Array<String>) {
     entering(here,"top")
 
     println("$here: enter \"phone number\" ex: \"phone: 123-456-7890\"")
-    println("$here: enter a file name")
     println("example : emilea@mfs:/my/files/some_file.txt")
     println("example : 127.0.0.1:8080/ipfs/my/files/some_file.txt")	
     println("example : nickname@ipms:/my/files/some_file.txt")
@@ -157,6 +162,7 @@ fun main(args: Array<String>) {
     println("example : self@mfs:/mfspath")
     println("example : mfs:/mfspath")
     println("example : /files/mfspath (webui)")
+    println("$here: enter a file name")
 
     val path = readInput(here)
 

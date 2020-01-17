@@ -1,7 +1,7 @@
 CC=kotlinc
 
+run = $(basename $(arg))
 all: $(run)
-	echo doing $(run)
 
 $(run): $(run).jar
 	java -jar $^
@@ -11,6 +11,7 @@ $(run): $(run).jar
 
 clean:
 	rm -rf *.jar
+	rm *~
 
 mrproper: clean
 	rm -rf $(run)
