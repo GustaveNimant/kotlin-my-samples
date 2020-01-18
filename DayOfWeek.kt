@@ -1,5 +1,7 @@
 // export CLASSPATH=/usr/share/java/commons-codec.jar
 // https://kotlinlang.org/docs/reference/enum-classes.html
+// https://www.baeldung.com/kotlin-enum
+// https://www.tutorialkart.com/kotlin/enum-classes-in-kotlin/
 
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
@@ -51,25 +53,34 @@ fun readInput(caller:String):String {
 }
 
 fun main(args: Array<String>) {
-    val here = functionName()
-    entering(here,"top")
 
-    val wai = ProtocolState.valueOf("WAITING")
-    
-    println("$here : ProtocolState "+wai)
-    println("$here : signal is "+wai.signal())
-    exiting(here)
-}
+    println(Months.January)                            //prints January
+    println("values().size are "+Months.values().size) //prints 3
+    println("valueOf is "+Months.valueOf("March"))     //prints March
+    println("values are :")
 
-   enum class ProtocolState {
-    	 WAITING {
-         override fun signal() = TALKING
-    	 },
-
-    	 TALKING {
-         override fun signal() = WAITING
-    	 };
-
-    abstract fun signal(): ProtocolState
+    for (enum in Months.values()) {
+        println(enum.name)
     }
 
+    println("throws exception:")
+    println(Months.valueOf("Mar")) //throws java.lang.IllegalArgumentException: No enum constant Months.Mar
+}
+
+enum class DayOfWeek(val dayNumber: Int) {
+  MONDAY(1),
+  TUESDAY(2),
+  WEDNESDAY(3),
+  THURSDAY(4),
+  FRIDAY(5),
+  SATURDAY(6),
+  SUNDAY(7)
+
+  private int dayNumber;
+   private DayOfWeek(int dayNumber) {
+      this.dayNumber = dayNumber;
+   }
+   public int getDayNumber() {
+      return dayNumber;
+   }
+}
