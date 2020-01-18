@@ -4,7 +4,7 @@ run = $(basename $(arg))
 all: $(run)
 
 $(run): $(run).jar
-	java -jar $^
+	java -ea -jar $^
 
 %.jar: %.kt
 	$(CC) $< -include-runtime -d $@ 
