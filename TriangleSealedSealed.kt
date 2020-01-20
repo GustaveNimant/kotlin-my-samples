@@ -66,7 +66,7 @@ sealed class Triangle () {
 	    fun isIsoceles (ab: Segment, ac: Segment): Boolean {
 		return ab.length() == ac.length()
      		}
-} 
+	} 
 
     }
 
@@ -118,14 +118,14 @@ fun main(args: Array<String>) {
 
     fun printOfTriangle (t:Triangle) =
     	when (t) {
-	  is Triangle.TriangleIsoceles -> println ("\nTriangle Isisoceles:")
+//	  is Triangle.TriangleIsoceles -> println ("\nTriangle Isisoceles:")
 
 	  is Triangle.TriangleIsoceles.TriangleIsocelesAcute -> t.print()
 	  is Triangle.TriangleIsoceles.TriangleIsocelesEquilateral -> t.print()
    	  is Triangle.TriangleIsoceles.TriangleIsocelesRight -> t.print()
 	  is Triangle.TriangleIsoceles.TriangleIsocelesObtuse -> t.print()
 
-	  is Triangle.TriangleScalene -> println ("\nTriangle Scalene:")
+//	  is Triangle.TriangleScalene -> println ("\nTriangle Scalene:")
 
 	  is Triangle.TriangleScalene.TriangleScaleneAcute -> t.print()
 	  is Triangle.TriangleScalene.TriangleScaleneObtuse -> t.print()
