@@ -1,4 +1,6 @@
-/* https://kotlinlang.org/docs/reference/basic-syntax.html */
+import java.io.File
+import java.util.Stack
+import java.lang.Character.MIN_VALUE as nullChar
 
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
@@ -25,7 +27,6 @@ fun exiting(here:String):Unit {
     level = level - 1	
 }
 
-
 fun read_input(caller:String):String {
     val here = functionName()
     entering(here, caller)
@@ -35,29 +36,56 @@ fun read_input(caller:String):String {
     return str
 }
 
+fun stringListOfFileName (nof: String) : MutableList<String> {
+
+    val result = mutableListOf<String>()
+ 
+    File(nof).useLines {
+    	lines -> lines.forEach { result.add(it)}
+	}
+
+     return result
+}
+
 fun main(args: Array<String>) {
     val here = functionName()
     entering(here,"resolve")
+
+    val stack = Stack<Char>()
+
+//    println("Enter file name. Ex. 'current-block-test.yml'")
+//    val fileName = read_input(here)
+    val fileName = "current-block-test.yml"
+    println("Entered file name : $fileName")
+
+    println("Read the whole file as a List of String :")
+    val stringList = stringListOfFileName (fileName)
+
+    stringList.forEach {
     
-    val addr = read_input(here)
+    	var maxCount = it.length
 
-    println("You have entered : $addr")
-    val str = "^(?:self@)?(?:mfs:|/files)(/.*)"
+    	println("input line: '" + it + "'")
+    	println("maxCount:" + maxCount)
 
-    val emailPattern = Regex("""\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6}""")
 
-    val email:String? = emailParttern.find("this is my email emile.achadde@free.fr")?.value
-    println(email)
-    
-    val regex = str.toRegex()  
+        it.forEach { c -> stack.push(c) }
+	
+	countChar = 0 
+	stack.addAll(it)
+    	while (stack.count > 1) {
 
-    if (regex.matches(input = str)) {
-       println("Ok")  	    
-    }      
-    else {
-    	 println("Not Ok")		
-    }  
+       	      var currentChar = stack.pop()
+       	      var nextChar = stack.pop()
+       
+	      countChar = countChar + 1
+       	      println("currentChar # " + countChar + " " + currentChar)
 
+//       	      when (currentChar) {
+//       	      '#' -> readSharpLine (it)
+//      	      }
+    }
+    }
     exiting(here)
 }
 
