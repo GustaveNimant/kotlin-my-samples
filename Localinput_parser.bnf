@@ -1,0 +1,300 @@
+# [http://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form Wikipedia]
+#
+#  a Block ends with an end.
+#  a Cell does not ends with
+#
+#  a variable_name is always substituable by the variable_kind_block it defines.
+#  an entity belongs to any external domain (figure, chemical, elementary ...).
+#  a property belongs to the property domain (operator, target)
+#
+# les mots clés et symboles terminaux ainsi.
+#
+# Dans les règles lexicales les trois points ..., situés entre deux caractères a et b,
+#                 indiquent l'ensemble des caractères entre a et b dans l'ordre du code ASCII.
+#
+# http://www.enseignement.polytechnique.fr/informatique/ARCHIVES/IF/poly/main004.html
+#
+# Principles of Compiler Design by Aho and Ullman
+# /keep/documents/TEXT/COMPILATION/Compilers_Principles_Techniques_and_Tools_by_Aho_Lam_Sethi_Ullman.djvu
+# http://caml.inria.fr/pub/docs/manual-ocaml/lex.html
+# http://www.enseignement.polytechnique.fr/informatique/ARCHIVES/IF/poly/main004.html
+#
+# Les Tokens sont des abstractions lexicales obtenues
+#     par application d'Expressions Regulières sur les Lexèmes
+#
+#  les keywords terminaux sont représentés tel-quels (Token == Lexeme).
+#  > < encadrent les pre-terminaux (Tokens)
+#  < > encadrent les non-terminaux. <non-terminal> ::= production
+#
+#  " " encadrent les symboles terminaux d’un seul caractère.
+#  ( ) servent au groupement.
+#  |   signifie l'alternative.
+#  [ ] indiquent une partie optionnelle.
+#  { } indiquent une partie qui peut être répétée un nombre quelconque de fois.
+#      tandis qu'un symbole + en exposant des accolades indique une partie répétée au moins une fois.
+#
+# ------------------------------------------------------------------------------
+
+ <inputbox>                   ::= { <command> }
+
+ <command>                    ::= | <command_creation>
+                                  | <command_tounit>
+                                  | <command_stop>
+
+ <command_creation>           ::= | <handle_command_define> 
+                                  | <handle_command_read>
+                                  | <handle_command_set>
+                                  | <handle_command_title>
+
+ <command_tounit>               ::= | <handle_command_print> 
+                                  | <handle_command_write>
+
+ <command_stop>               ::= stop
+
+ <handle_command_define>      ::= define <block_define>
+ <handle_command_read>        ::= read <block_read>
+ <handle_command_set>         ::= set <block_set>
+ <handle_command_title>       ::= title ( string | { string } )
+
+ <handle_command_print>       ::= print <block_print>
+ <handle_command_write>       ::= write <block_write>
+
+# define
+
+ <block_define>               ::= >variable_name< <handle_variable_kind>
+                                   end
+
+ <handle_variable_kind>       ::= >variable_kind< <block_variable_kind>
+
+ <handle_variable_kind>       ::= | <handle_variable_context>
+                                  | <handle_variable_external>
+                                  | <handle_variable_operator>
+                                  | <handle_variable_target>
+
+ <handle_variable_context>    ::= variable_kind_context <block_variable_context>
+ <handle_variable_external>   ::= variable_kind_external <block_variable_external>
+ <handle_variable_operator>   ::= variable_kind_operator <block_variable_operator>
+ <handle_variable_target>     ::= variable_kind_target <block_variable_target>
+
+# block_variable
+ <block_variable_kind>       ::= | <block_variable_context>
+                                 | <block_variable_external>
+                                 | <block_variable_operator>
+                                 | <block_variable_target>
+
+# define context
+
+ <block_variable_context>     ::= [ <cell_sector> ]
+                                    <cell_domain>
+                                    <cell_database>
+                                    <cell_databox> 
+                                    end
+
+# define external
+
+ <block_variable_external>    ::= <box_type>
+                                  <cell_entity_external_name>
+                                  <cell_external_context>
+                                [ <cell_category> ]
+                                  end
+# define operator
+
+ <block_variable_operator>    ::= <box_type>
+                                  <cell_operation> 
+                                  <cell_ondomain>
+                                [ <handle_cofactor> ]
+                                  end
+
+ <handle_cofactor>            ::= cofactor <block_operator_cofactor>
+
+ <block_operator_cofactor>    ::= <cell_cofactor_entity>
+                                [ <cell_cofactor_basic> ]
+                                  end
+# define target
+
+
+ <block_variable_target>      ::= <box_type>
+                                  <cell_target_operator>
+                                  <cell_target_operand>
+                                  end
+
+# print
+
+ <block_print>                ::=  | ( >variable_name< <box_units> )
+                                   | statistics
+                                     end
+# read
+
+ <block_read>                 ::= >variable_name<
+                                  <cell_file>
+                                  <box_units>
+                                  end
+# set
+
+ <block_set>                  ::= <set_alternative>
+                                  <cell_module>
+                                  <cell_function>
+                                  end -- set
+
+ <set_alternative>            ::= cpu | debug | trace
+
+# title
+
+ <block_title>                ::=  { string }
+                                    end
+# write
+
+ <block_write>                ::= >variable_name<
+                                  <cell_file>
+                                  <box_units>
+                                  end
+
+# Cells
+# cell ::= keyword >name<
+
+ <cell_category>              ::= category >category_name<
+ <cell_cofactor_basic>        ::= cofactor_basic >basic_numerical<
+ <cell_cofactor_entity>       ::= cofactor_entity >variable_name_entity<
+ <cell_database>              ::= database >database_name<
+ <cell_databox>               ::= databox >databox_name<
+ <cell_domain>                ::= domain >domain_name<
+ <cell_entity_external_name>  ::= external_name >external_entity_name<
+ <cell_external_context>      ::= external_context >variable_name_context<
+ <cell_file>                  ::= file >file_name<
+ <cell_function>              ::= function >function_name<
+ <cell_module>                ::= module >module_name<
+ <cell_ondomain>              ::= ondomain >domain_name<
+ <cell_operation>             ::= operation >operation_name<
+ <cell_sector>                ::= sector >sector_name<
+ <cell_target_operand>        ::= target_operand >variable_name_entity<
+ <cell_target_operator>       ::= target_operator >variable_name_operator<
+
+# Boxs
+# Box ::= keyword (word list)
+ <box_type>                  ::= type >variable_type_list<
+ <box_units>                 ::= units >variable_name_external_list<
+
+
+# Tokens defined by regular expressions Definitions
+
+ >basic_numerical<             ::= word_float | word_integer
+
+ >category_name<               ::= """ word_lowercase """
+
+ >database_file<               ::= """ word_lowercase """
+
+ >database_name<               ::= """ word_lowercase """
+
+ >domain_name<                 ::= """ word_lowercase """
+
+ >external_entity_name<        ::= """ string """
+
+ >file_name<                   ::= """ word_anycase """
+
+ >function_name<               ::= """ word_lowercase """
+
+ >module_name<                 ::= """ word_capitalized """
+
+ >operation_name<              ::= """ word_capitalized """
+
+ >variable_name<               ::= | >variable_name_context<
+                                   | >variable_name_operator<
+                                   | >variable_name_entity<
+
+ >variable_name_entity<        ::= | >variable_name_entity_external<
+                                   | >variable_name_entity_target<
+                                   | >variable_name_entity_implicit<
+
+ >variable_name_entity_target<   ::= word_capitalized
+
+ >variable_name_entity_external< ::= word_capitalized
+
+ >variable_name_entity_implicit< ::= word_capitalized
+
+ >variable_name_context<         ::= word_capitalized
+
+ >variable_name_operator<        ::= word_capitalized
+
+ >variable_name_external_list<   ::= "[" { >variable_name_external< white_space } "]"
+
+ >variable_type_list<            ::= "[" { word_lowercase white_space} "]"
+
+ >word<                          ::= word_anycase
+                                   | word_capitalized
+                                   | word_lowercase
+                                   | word_uppercase
+
+# -----------------------------------------------------------------------------------------------------------
+
+ >keyword_command<             ::= define
+                                 | print
+                                 | read
+                                 | set
+                                 | title
+                                 | write
+
+ >variable_kind<               ::= context
+                                 | external
+                                 | operator
+                                 | target
+
+# -----------------------------------------------------------------------------------------------------------
+#
+# grep -v "#" Localinput_parser.bnf | sed -e 's/ /\n/g' | sort -u | grep -v "<" | sort -u
+#
+# Keywords Lexemes below are classified in 3 groups :
+
+# Commands : >keyword_command<
+
+# define
+# print
+# read
+# set
+# title
+# write
+
+# Variable_kinds : >keyword_variable_kind<
+
+# context
+# external
+# operator
+# target
+
+# Words : >keyword_word<
+
+# category
+# cofactor
+# cofactor_basic
+# cofactor_entity
+# cpu
+# sector
+# database
+# databox
+# debug
+# domain
+# end
+# external_context
+# file
+# function
+# module
+# external_name
+# statistics
+# stop
+# target_operand
+# target_operator
+# trace
+# type
+# units
+
+# Parser structure 
+
+# block   ::= ...  end
+# list    ::= [ {word } ]
+# box     ::= keyword >list<
+# cell    ::= keyword >name<
+# handle  ::= keyword <block>
+
+# is_keyword_ended 
+#   command_define
+#   variable_kind
+#   keyword_defvarnamed_cofactor

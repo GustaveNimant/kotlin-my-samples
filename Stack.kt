@@ -11,8 +11,6 @@ fun main(args: Array<String>) {
     		   println("c "+c )
     		   stack.push(c) }
 
-
-
     var currentChar = stack.pop()
     var nextChar = stack.pop()
     stack.push(nextChar)

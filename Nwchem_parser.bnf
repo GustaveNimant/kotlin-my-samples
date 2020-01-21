@@ -1,0 +1,116 @@
+ <basis_set_file>            ::=  <version> <el_block> <aoset_block> [ <el_block> <ecpset_block> ] <el_block> end_of_file
+ <version>                   ::=  <vee> integer <dot> integer <dot> integer <eol>
+
+ <ao_basis_block>            ::=  <ao_comment_block> <el_block> <aoset_block>
+
+ <ao_comment_block>          ::=  <ao_comment_emsl> <comment_block>
+
+ <comment_block>             ::=  <comment_header> <spaced_eol> <comment_dashed_line> <spaced_eol> <comment_reference_block> <spaced_eol> <hash_alone> 
+
+ <ao_comment_emsl>           ::=  <hash> <space> <space> basis_set_name <emsl_string> <date> <eol>
+
+ <comment_header>            ::=  <comment_header_string> <eol>
+ <comment_dashed_line>       ::=  <comment_dashed> <eol>
+
+ <comment_reference_block>   ::=  {<comment_reference>} 
+ <comment_reference>         ::=  <hash> <space> <comment_element_line> <colon> <space> <comment_author_name_list> <space> <comment_journal_reference> <dot> <eol>
+
+ <comment_element_line>      ::=  <comment_element> | <comment_element_many>  
+ <comment_element>           ::=  <hash> <space> <center_name> <space> <space> <space> <space> <space>  
+ <comment_element_many>      ::=  <hash> <space> <center_name> <space> <hyphen> <space> <center_name> 
+ <comment_author_name_list>  ::=  <comment_author_name> | <comment_author_name_two> | <comment_author_name_many> 
+ <comment_author_name>       ::=  string 
+ <comment_author_name_many>  ::=  <comment_author_name> {<comma> <space> <comment_author_name>} <comma> <space>
+ <comment_author_name_two>   ::=  <comment_author_name> and <comment_author_name> 
+ <comment_journal_reference> ::=  string
+ <date>                      ::=  <month> <slash> <day> <slash> <year> <space> <hour> <colon> <minute> <space> <day_period>
+ <hash_alone>                ::= <hash> [{<space>}] <eol>
+
+ 
+ <aoset_block>                          ::=  <aoset_definition> <aoset_for_any_center_block> END 
+
+ <aoset_definition>                     ::=  BASIS <space> basis_set_local_name <space> PRINT<eol>
+ 
+ <aoset_set_for_any_center>             ::= { <aoset_for_a_center_block> }
+
+ <aoset_for_a_center_block>             ::= <aoset_center_contraction_scheme> <aoset_for_any_shell_block>
+
+ <aoset_for_any_shell_block>            ::= { <aoset_for_a_shell_block> } 
+
+ <aoset_center_contraction_scheme>      ::=  <hash_basis_set> <space> <aoset_center_shell_expansion> <space> <right_arrow> <space> <aoset_center_shell_contraction> <eol>
+
+ <aoset_center_shell_expansion>         ::=  <left_parenthesis> <aoset_center_contraction_image> <right_parenthesis>
+
+ <aoset_center_shell_contraction>       ::=  <left_bracket> <aoset_center_contraction_image> <right_bracket>
+
+ <hash_basis_set>                        ::=  hash_basis <space> SET <colon> 
+
+ <aoset_center_contraction_image>       ::=  <positive_integer_n_shell_name> {<comma> <positive_integer_n_shell_name>} 
+
+ <positive_integer_n_shell_name>         ::=  <positive_integer> <shell_name>
+ 
+ <aoset_for_a_shell_block>              ::=  <center_and_shell_name> <aoset_numerical_values_block>
+
+ <aoset_numerical_values_block> ::=  { <aoset_numerical_values> }
+
+ <aoset_numerical_values>       ::=  <space> positive_float <space> float <space> [ float ] [ <space> ] <eol>
+
+ <center_and_shell_name>                 ::=  <center_name> { <space> } <shell_name_extended_sp> <eol> 
+
+ <shell_name_extended_sp>                ::=  <shell_name> | SP 
+
+
+ <ecp_basis_block>                       ::=  <comment_block> <el_block> <ecpset_block>
+
+ <ecpset_block>                         ::=  <ecpset_definition> <ecpset_for_any_center_block> END
+
+ <ecpset_definition>                    ::=  ECP [ <space> ecpset_local_name <space> PRINT] <eol>
+
+ <ecpset_for_any_center_block >         ::=  { <ecpset_for_a_center_block> }
+
+ <ecpset_for_a_center_block>            ::=  <ecpset_electron_number> <ecpset_for_any_shell_block> 
+
+ <ecpset_electron_number>               ::=  <center_name> <space> nelec <space> non_negative_integer <eol> 
+
+ <ecpset_for_any_shell_block>           ::=  { <ecpset_for_a_shell_block> } 
+
+ <ecpset_for_a_shell_block>             ::=  <ecp_center_and_shell> <ecpset_numerical_value_block>
+
+ <ecp_center_and_shell>                  ::=  <center_name> { <space> } <shell_name_extended_ul> <eol>
+
+ <ecpset_numerical_values_block>        ::= { <ecpset_numerical_values> }
+
+ <ecpset_numerical_values>              ::=  non_negative_integer { <space> } positive_float { <space> } float <eol>
+
+
+
+
+
+
+
+ <shell_name_extended_ul>    ::=  <shell_name> | ul 
+
+ <center_name>               ::=  "H " | "He" | "Li" | "Be" | "B " | ... 
+ <shell_name>                ::=  S | D | F | G | H
+
+ <el_block>                  ::= { <empty_line> }
+ <day_period>                ::=  "AM" | "PM"
+ <comment_dashed>            ::=  "# --------                             ----------"
+ <comment_header_string>     ::=  "# Elements                             References" 
+ <emsl_string>               ::=  "  EMSL  basis Set Exchange Library  "
+ <day>                       ::=  integer integer
+ <hour>                      ::=  integer integer 
+ <minute>                    ::=  integer integer 
+ <month>                     ::=  integer integer
+ <year>                      ::=  integer integer integer integer
+ <vee>                       ::=  'v'
+ <colon>                     ::=  ':'
+ <dot>                       ::=  '.'
+ <comma>                     ::=  ';'
+ <eol>                       ::=  '\n'
+ <empty_line>                ::=  '\n'
+ <hyphen>                    ::=  '-'
+ <hash>                      ::=  '#'
+ <slash>                     ::=  '/'
+ <space>                     ::=  ' '
+ <semicolon>                 ::=  ';'
