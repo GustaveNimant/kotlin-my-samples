@@ -1,0 +1,17 @@
+Source /my/perl/script/kwextract.pl,v
+Date now
+mutable /.brings/system/bin/kwextract.pl
+previous QmU1RDLsAGNPVuwDjKD3RQx7R6aEuQfcmSiubviDZ2XRVC
+skipped 
+Author michel
+next unknown
+Text  
+parents QmRU26t5KP5QLiNbjWMxSbyfaARvzshfdzozj6M4K73auH
+qm z2kXGab6zthT87F8zfEci4Ah7ngKD9VNjagPTHxVnSGzugX
+tic 1579373044
+Spot 1550698403
+Signature n/a
+Text 
+Text line 1
+Text line 2
+Text 

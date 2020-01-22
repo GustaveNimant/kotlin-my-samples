@@ -30,6 +30,43 @@ sealed class Lexeme ()
 
 data class pairString (val first: String, val second: String)
 
+fun stringOfLexeme (lexeme: Lexeme): String {
+    val string = when (lexeme) {
+        is AuthorKW -> "Author " + lexeme.value
+    	is DateKW -> "Date " + lexeme.value
+    	is SourceKW -> "Source " + lexeme.value
+    	is SignatureKW -> "Signature " + lexeme.value
+    	is MutableKW -> "mutable " + lexeme.value
+    	is ParentsKW -> "parents " + lexeme.value
+    	is PreviousKW -> "previous " + lexeme.value
+    	is NextKW -> "next " + lexeme.value
+    	is TicKW -> "tic " + lexeme.value
+
+	is TextKW -> "Text " + lexeme.value
+    	is QmKW -> "qm " + lexeme.value
+    	is SpotKW -> "Spot " + lexeme.value
+	is Comment -> "Comment " + lexeme.value
+	UnknownKW -> "unknown "
+	SkippedKW -> "skipped "
+    }
+    return string
+}
+
+fun stringOfStringList (str_l: List<String>) : String {
+ val str = str_l.fold("", {acc, s -> acc + s })
+ return str 
+}
+
+fun stringOfGlueOfStringList (glue: String, str_l: List<String>) : String {
+ val str = str_l.fold("", {acc, s -> acc + s + glue })
+ return str 
+}
+
+fun stringListOfLexemeList (lex_l: List<Lexeme>) : List<String> {
+ val str_l = lex_l.map({l -> stringOfLexeme (l) })
+ return str_l 
+}
+
 fun functionName():String {
     val sta = Thread.currentThread().stackTrace[2]
     val str = sta.getMethodName()
@@ -60,6 +97,15 @@ fun read_input(caller:String):String {
     
     exiting(here)
     return str
+}
+
+fun write_output(fileName:String, content: String, caller:String) {
+    val here = functionName()
+    entering(here, caller)
+	
+    File(fileName).bufferedWriter().use { out -> out.write(content)}
+    
+    exiting(here)
 }
 
 fun lineListOfFileName (nof: String) : MutableList<String> {
@@ -126,28 +172,6 @@ fun lexemeOfKeywordOfValue (keyword:String, value: String, caller: String) : Lex
   exiting(here + " with lexeme '$lexeme'")
   return lexeme
  }
-
-fun stringOfLexeme (lexeme: Lexeme): String {
-    val string = when (lexeme) {
-        is AuthorKW -> "Author " + lexeme.value
-    	is DateKW -> "Date " + lexeme.value
-    	is SourceKW -> "Source " + lexeme.value
-    	is SignatureKW -> "Signature " + lexeme.value
-    	is MutableKW -> "mutable " + lexeme.value
-    	is ParentsKW -> "parents " + lexeme.value
-    	is PreviousKW -> "previous " + lexeme.value
-    	is NextKW -> "next " + lexeme.value
-    	is TicKW -> "tic " + lexeme.value
-
-	is TextKW -> "Text " + lexeme.value
-    	is QmKW -> "qm " + lexeme.value
-    	is SpotKW -> "Spot " + lexeme.value
-	is Comment -> "Comment " + lexeme.value
-	UnknownKW -> "unknown "
-	SkippedKW -> "skipped "
-    }
-    return string
-}
 
 fun keywordAndStringOfSharpedLine (lin: String, caller: String) : pairString {
 // # $Source: /my/perl/script/kwextract.pl,v$
@@ -287,6 +311,10 @@ fun main(args: Array<String>) {
     println("lexemeList:")
     lexemeList.forEach{ l -> println(stringOfLexeme(l))}
 
+    val str_l = stringListOfLexemeList (lexemeList)
+    val content = stringOfGlueOfStringList ("\n", str_l)
+    write_output ("some.txt", content, here)
+    
     println("\nnormal termination")
     exiting(here)
 }
