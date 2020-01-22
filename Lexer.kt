@@ -6,25 +6,29 @@ var level = 0
 var dots = "........|........|........|........|........|........|........|"
 
 sealed class Lexeme ()
-       sealed class Keyword () : Lexeme () 
-          data class SourceKW (val s: String) : Lexeme () 
+       sealed class Keyword () : Lexeme ()
+
+       	  data class AuthorKW (val s: String) : Lexeme ()
+	  data class DateKW (val s: String) : Lexeme ()
 	  data class MutableKW (val s: String) : Lexeme () 
-	  data class PreviousKW (val s: String) : Lexeme () 
 	  data class ParentsKW (val s: String) : Lexeme () 
-	  data class DateKW (val s: String) : Lexeme () 
-	  data class TicKW (val s: String) : Lexeme () 
+	  data class PreviousKW (val s: String) : Lexeme () 
+	  data class SourceKW (val s: String) : Lexeme () 
+	  data class TicKW (val s: String) : Lexeme ()
+	  data class TextKW (val s: String) : Lexeme ()
+
+
 	  object UnknownKW : Lexeme ()
 	  object Skipped : Lexeme ()	  
 
        data class Comment (val s: String) : Lexeme () 
-
-       data class Text (val s: String) : Lexeme ()
        
 
 data class pairString (val first: String, val second: String)
 
 fun makeLexemeOfThreeCharacters (thr: String, nex: String) =
 	    when (thr) {
+	      "\$Au" -> AuthorKW (nex)
 	      "\$Da" -> DateKW (nex)
 	      "\$So" -> SourceKW (nex)
 	      "\$mu" -> MutableKW (nex)
@@ -65,6 +69,7 @@ fun read_input(caller:String):String {
     entering(here, caller)
 	
     val str = readLine().toString()
+    
     exiting(here)
     return str
 }
@@ -81,13 +86,12 @@ fun lineListOfFileName (nof: String) : MutableList<String> {
 }
 
 fun wordListOfString (str: String): List<String> {
-    val trimedString = str.trim(' ')    
 
+    val trimedString = str.trim(' ')    
     val regex = Regex("\\s+")
 
-    val result = trimedString.split(
-	regex
-    )
+    val result = trimedString.split(regex)
+
     return result
 }
 
@@ -104,15 +108,31 @@ fun wordStackOfLine (lin: String) : Stack<String> {
     return stack
 }
 
-fun lexemeOfKeywordOfString (keyWord:String, nextWord: String) : Lexeme {
+fun lexemeOfKeywordOfValue (keyword:String, value: String, caller: String) : Lexeme {
 
-   println("keyWord: '" + keyWord + "'")
-   println("nextWord: '" + nextWord + "'")
+    val here = functionName()
+    entering(here, caller)
 
-   val threeFirstChar = keyWord.substring(0, 3)
-   println("threeFirstChar: '" + threeFirstChar + "'")
+    println("$here: input keyword: '$keyword'")
+    println("$here: input value: '$value'")
 
-   return makeLexemeOfThreeCharacters (threeFirstChar, nextWord)
+   var lexeme = when (keyword) {
+       "Author" -> AuthorKW (keyword)
+       "Date" -> DateKW (keyword)
+       "Source" -> SourceKW (keyword)
+       "mutable" -> MutableKW (keyword)
+       "parents" -> ParentsKW (keyword)
+       "previous" -> PreviousKW (keyword)
+       "tic" -> TicKW (keyword)
+
+       else -> {
+       	    val message = "Error unknown Keyword '$keyword'"
+	    throw Exception(message)
+	}
+  }
+
+  exiting(here + " with lexeme '$lexeme'")
+  return lexeme
  }
 
 fun keywordAndStringOfSharpedLine (lin: String, caller: String) : pairString {
@@ -120,7 +140,7 @@ fun keywordAndStringOfSharpedLine (lin: String, caller: String) : pairString {
     val here = functionName()
     entering(here, caller)
 
-   println("$here: lin $lin")
+   println("$here: input lin '$lin'")
    var wordStack = wordStackOfLine (lin)
 
    var currentWord = ""
@@ -140,41 +160,92 @@ fun keywordAndStringOfSharpedLine (lin: String, caller: String) : pairString {
   return pairString (currentWord, nextWord)
 }
 
+fun isKeywordOfString(str:String, caller: String): Boolean {
+    val here = functionName()
+    entering(here, caller)
+
+   println("$here: input str '$str'")
+    val result = str.startsWith('$') && str.endsWith(':')
+
+    exiting(here + " with result '$result'")
+    return result
+}
+
+fun isKeywordValueOfString(str:String, caller: String): Boolean {
+    val here = functionName()
+    entering(here, caller)
+
+   println("$here: input str '$str'")
+    val result = str.endsWith('$')
+
+    exiting(here + " with result '$result'")
+    return result
+}
+
+fun keywordOfString(str:String, caller: String): String {
+    val here = functionName()
+    entering(here, caller)
+
+   println("$here: input str '$str'")
+
+    assert (isKeywordOfString(str, here))
+    val result = (str.substring(1)).trimEnd({c -> c.equals(':')})
+
+    exiting(here + " with result '$result'")
+    return result
+}
+
+fun keywordValueOfString (str:String, caller: String): String {
+    val here = functionName()
+    entering(here, caller)
+
+   println("$here: str '$str'")
+
+    assert (isKeywordValueOfString(str, here))
+    var result = str.trimEnd({ c -> c.equals('$')})
+
+    exiting(here + " with result "+result)
+    return result
+}
+
 fun lexemeOfSharpedLine (lin: String, caller:String) : Lexeme {
 // # $Source: /my/perl/script/kwextract.pl,v$
     val here = functionName()
     entering(here, caller)
 
-   var currentAndNext = keywordAndStringOfSharpedLine (lin, here)
+    val lineTrimed = lin.trim() 
+    if (lineTrimed.isNullOrBlank()) {
+      var lexeme = Skipped
 
-   val currentWord  = currentAndNext.first
-   val nextWord  = currentAndNext.second
+      exiting(here)
+      return lexeme	
+   }
+   else if (lineTrimed.startsWith('$')) {
+   	var currentAndNext = keywordAndStringOfSharpedLine (lineTrimed, here)
+	val currentWord  = currentAndNext.first
+   	val nextWord  = currentAndNext.second
 
-   println("$here: currentWord: '" + currentWord + "'")
-   println("$here: nextWord: '" + nextWord + "'")
+	println("$here: currentWord: '" + currentWord + "'")
+   	println("$here: nextWord: '" + nextWord + "'")
 
-   var firstChar = currentWord.get(0) 
-   println("$here: firstChar: '" + firstChar + "'")
+	assert (isKeywordOfString(currentWord, here))
+	val keyword = keywordOfString (currentWord, here)
+	val keywordValue = keywordValueOfString (nextWord, here)
+	var lexeme = lexemeOfKeywordOfValue (keyword, keywordValue, here)
 
-   var lexeme = when (firstChar) {
-	      '#' -> { Skipped }
-	      '$' -> {
-	      	  lexemeOfKeywordOfString (currentWord, nextWord)
-		}
-	      else -> {
-	      	      val message = "$here: Error unknown firstChar: '" + firstChar + "' in line $lin"
-    		      throw Exception(message)
-		      }
-	    	}
-    exiting(here)
-    return lexeme
+	exiting(here + " with lexeme '$lexeme'")
+	return lexeme
+    }
+    else {
+        val message = "$here: Error unknown first Character in line '$lineTrimed'"
+    	throw Exception(message)
+   }
 }
 
 fun main(args: Array<String>) {
     val here = functionName()
     entering(here,"resolve")
 
-    var Done = false
     var lexemeList = mutableListOf<Lexeme>()
     
 //    println("$here: Enter file name. Ex. 'current-block-test.yml'")
@@ -184,32 +255,24 @@ fun main(args: Array<String>) {
 
     println("Read the whole file as a List of String :")
     val lineList = lineListOfFileName (fileName)
-    var lineStack = lineStackOfLineList (lineList)
 
-    while ( ! Done ) {
-	try {
-	    var currentLine = lineStack.pop()
-	    println("$here: currentLine: '" + currentLine + "'")
+    for (line in lineList) {
+	    println("$here: line: '" + line + "'")
 
-            var firstChar = currentLine.get(0) 
-	    println("$here: firstChar: '" + firstChar + "'")
-	    var lexeme = when (firstChar) {
-	      '#' -> lexemeOfSharpedLine (currentLine, here)
-//	      ' ' -> {
-//	        lineStack.push (currentLine)
-//	      	lexemeListOfTextStack (lineStack)
-//		}
-	      else -> {
-	      	      val message = "$here: Error unknown firstChar: '" + firstChar + "'"
-    		      throw Exception(message)
-		      }
-	      }
-	      lexemeList.add (lexeme)
-	}
-       	catch (e: java.util.EmptyStackException) {
-       	     Done = true			
-        }
+	    if (line.startsWith('#'))  {
+	        var subline = line.substring(1)
+	      	val lexeme = lexemeOfSharpedLine (subline, here)
+		lexemeList.add (lexeme)
+		}		
+	    else {
+	    	val lexeme = TextKW(line)
+		lexemeList.add (lexeme)
+	    }
     }
+    println("lexemeList:")
+    lexemeList.forEach{println(it)}
+
+    println("\nnormal termination")
     exiting(here)
 }
 
