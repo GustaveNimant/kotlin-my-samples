@@ -23,7 +23,7 @@ sealed class Lexeme ()
 
 
 	  object UnknownKW : Lexeme ()
-	  object Skipped : Lexeme ()	  
+	  object SkippedKW : Lexeme ()	  
 
        data class Comment (val value: String) : Lexeme () 
        
@@ -108,7 +108,7 @@ fun lexemeOfKeywordOfValue (keyword:String, value: String, caller: String) : Lex
        "Author" -> AuthorKW (value)
        "Date" -> DateKW (value)
        "Source" -> SourceKW (value)
-       "Signature" -> SignatureKW (value)       
+       "Signature" -> SignatureKW (value)      
        "mutable" -> MutableKW (value)
        "parents" -> ParentsKW (value)
        "previous" -> PreviousKW (value)
@@ -126,6 +126,28 @@ fun lexemeOfKeywordOfValue (keyword:String, value: String, caller: String) : Lex
   exiting(here + " with lexeme '$lexeme'")
   return lexeme
  }
+
+fun stringOfLexeme (lexeme: Lexeme): String {
+    val string = when (lexeme) {
+        is AuthorKW -> "Author " + lexeme.value
+    	is DateKW -> "Date " + lexeme.value
+    	is SourceKW -> "Source " + lexeme.value
+    	is SignatureKW -> "Signature " + lexeme.value
+    	is MutableKW -> "mutable " + lexeme.value
+    	is ParentsKW -> "parents " + lexeme.value
+    	is PreviousKW -> "previous " + lexeme.value
+    	is NextKW -> "next " + lexeme.value
+    	is TicKW -> "tic " + lexeme.value
+
+	is TextKW -> "Text " + lexeme.value
+    	is QmKW -> "qm " + lexeme.value
+    	is SpotKW -> "Spot " + lexeme.value
+	is Comment -> "Comment " + lexeme.value
+	UnknownKW -> "unknown "
+	SkippedKW -> "skipped "
+    }
+    return string
+}
 
 fun keywordAndStringOfSharpedLine (lin: String, caller: String) : pairString {
 // # $Source: /my/perl/script/kwextract.pl,v$
@@ -207,7 +229,7 @@ fun lexemeOfSharpedLine (lin: String, caller:String) : Lexeme {
 
     val lineTrimed = lin.trim() 
     if (lineTrimed.isNullOrBlank()) {
-      var lexeme = Skipped
+      var lexeme = SkippedKW
 
       exiting(here)
       return lexeme	
@@ -261,8 +283,9 @@ fun main(args: Array<String>) {
 		lexemeList.add (lexeme)
 	    }
     }
+    
     println("lexemeList:")
-    lexemeList.forEach{ l -> println(l)}
+    lexemeList.forEach{ l -> println(stringOfLexeme(l))}
 
     println("\nnormal termination")
     exiting(here)
