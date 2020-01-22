@@ -8,40 +8,28 @@ var dots = "........|........|........|........|........|........|........|"
 sealed class Lexeme ()
        sealed class Keyword () : Lexeme ()
 
-       	  data class AuthorKW (val s: String) : Lexeme ()
-	  data class DateKW (val s: String) : Lexeme ()
-	  data class MutableKW (val s: String) : Lexeme () 
-	  data class ParentsKW (val s: String) : Lexeme () 
-	  data class PreviousKW (val s: String) : Lexeme () 
-	  data class SourceKW (val s: String) : Lexeme () 
-	  data class TicKW (val s: String) : Lexeme ()
-	  data class TextKW (val s: String) : Lexeme ()
+       	  data class AuthorKW (val value: String) : Lexeme ()
+	  data class DateKW (val value: String) : Lexeme ()
+	  data class MutableKW (val value: String) : Lexeme () 
+	  data class NextKW (val value: String) : Lexeme ()
+	  data class ParentsKW (val value: String) : Lexeme () 
+	  data class PreviousKW (val value: String) : Lexeme () 
+	  data class QmKW (val value: String) : Lexeme ()	
+	  data class SignatureKW (val value: String) : Lexeme () 	  
+	  data class SourceKW (val value: String) : Lexeme ()
+	  data class SpotKW (val value: String) : Lexeme ()	  
+	  data class TextKW (val value: String) : Lexeme ()
+	  data class TicKW (val value: String) : Lexeme ()
 
 
 	  object UnknownKW : Lexeme ()
 	  object Skipped : Lexeme ()	  
 
-       data class Comment (val s: String) : Lexeme () 
+       data class Comment (val value: String) : Lexeme () 
        
 
 data class pairString (val first: String, val second: String)
 
-fun makeLexemeOfThreeCharacters (thr: String, nex: String) =
-	    when (thr) {
-	      "\$Au" -> AuthorKW (nex)
-	      "\$Da" -> DateKW (nex)
-	      "\$So" -> SourceKW (nex)
-	      "\$mu" -> MutableKW (nex)
-	      "\$pa" -> ParentsKW (nex)
-	      "\$pr" -> PreviousKW (nex)
-	      "\$ti" -> TicKW (nex)
-	      else -> {
-	      	      val message = "Error unknown threeFirstChar: '" + thr + "'"
-    		      throw Exception(message)
-		      }
-	      }
-
-	      
 fun functionName():String {
     val sta = Thread.currentThread().stackTrace[2]
     val str = sta.getMethodName()
@@ -117,13 +105,17 @@ fun lexemeOfKeywordOfValue (keyword:String, value: String, caller: String) : Lex
     println("$here: input value: '$value'")
 
    var lexeme = when (keyword) {
-       "Author" -> AuthorKW (keyword)
-       "Date" -> DateKW (keyword)
-       "Source" -> SourceKW (keyword)
-       "mutable" -> MutableKW (keyword)
-       "parents" -> ParentsKW (keyword)
-       "previous" -> PreviousKW (keyword)
-       "tic" -> TicKW (keyword)
+       "Author" -> AuthorKW (value)
+       "Date" -> DateKW (value)
+       "Source" -> SourceKW (value)
+       "Signature" -> SignatureKW (value)       
+       "mutable" -> MutableKW (value)
+       "parents" -> ParentsKW (value)
+       "previous" -> PreviousKW (value)
+       "next" -> NextKW (value)
+       "tic" -> TicKW (value)       
+       "qm" -> QmKW (value)
+       "spot" -> SpotKW (value)       
 
        else -> {
        	    val message = "Error unknown Keyword '$keyword'"
@@ -270,7 +262,7 @@ fun main(args: Array<String>) {
 	    }
     }
     println("lexemeList:")
-    lexemeList.forEach{println(it)}
+    lexemeList.forEach{ l -> println(l)}
 
     println("\nnormal termination")
     exiting(here)
