@@ -1,71 +1,43 @@
 import java.io.File
 import java.util.Stack
 import java.lang.Character.MIN_VALUE as nullChar
- 
+
+val debug = false
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
 
-sealed class Lexeme ()
-       sealed class Keyword () : Lexeme ()
+sealed class Lexeme ()  // Sharped Line 
+       	  data class KeywordWithPersonName (val name: String) : Lexeme ()
+	  data class KeywordWithDate (val name: String) : Lexeme ()
+	  data class KeywordWithHash (val name: String) : Lexeme () 
+	  data class KeywordWithString (val name: String) : Lexeme ()
+	  data class KeywordWithFile (val name: String) : Lexeme ()
+	  data class KeywordWithInteger (val name: String) : Lexeme ()
 
-       	  data class AuthorKW (val value: String) : Lexeme ()
-	  data class DateKW (val value: String) : Lexeme ()
-	  data class MutableKW (val value: String) : Lexeme () 
-	  data class NextKW (val value: String) : Lexeme ()
-	  data class ParentsKW (val value: String) : Lexeme () 
-	  data class PreviousKW (val value: String) : Lexeme () 
-	  data class QmKW (val value: String) : Lexeme ()	
-	  data class SignatureKW (val value: String) : Lexeme () 	  
-	  data class SourceKW (val value: String) : Lexeme ()
-	  data class SpotKW (val value: String) : Lexeme ()	  
-	  data class TextKW (val value: String) : Lexeme ()
-	  data class TicKW (val value: String) : Lexeme ()
-
-
+	  data class FilePath (val name: String) : Lexeme ()
+	  data class TextRecordSubstituable (val record: String) : Lexeme ()
+	  data class TextRecordConstant (val record: String) : Lexeme ()
+	  data class Comment (val name: String) : Lexeme ()
+	  
 	  object UnknownKW : Lexeme ()
-	  object SkippedKW : Lexeme ()	  
+	  object SkippedKW : Lexeme ()
+	  
+	  object TokenSharp : Lexeme ()
 
-       data class Comment (val value: String) : Lexeme () 
-       
+ data class TokenAlphabetical (val character: Char): Lexeme ()
+ data class TokenAlphanumerical (val character: Char): Lexeme ()
+ data class TokenNumerical (val character: Char) : Lexeme ()
+ object TokenDollar : Lexeme ()
+ object TokenSpace : Lexeme ()
+ object TokenEndOfLine : Lexeme ()
+ object TokenSlash : Lexeme ()
+ object TokenComma : Lexeme ()
+ object TokenColon : Lexeme ()
+ object TokenSemicolon : Lexeme ()
+ object TokenDot : Lexeme ()
+ object TokenHyphen : Lexeme ()
 
 data class pairString (val first: String, val second: String)
-
-fun stringOfLexeme (lexeme: Lexeme): String {
-    val string = when (lexeme) {
-        is AuthorKW -> "Author " + lexeme.value
-    	is DateKW -> "Date " + lexeme.value
-    	is SourceKW -> "Source " + lexeme.value
-    	is SignatureKW -> "Signature " + lexeme.value
-    	is MutableKW -> "mutable " + lexeme.value
-    	is ParentsKW -> "parents " + lexeme.value
-    	is PreviousKW -> "previous " + lexeme.value
-    	is NextKW -> "next " + lexeme.value
-    	is TicKW -> "tic " + lexeme.value
-
-	is TextKW -> "Text " + lexeme.value
-    	is QmKW -> "qm " + lexeme.value
-    	is SpotKW -> "Spot " + lexeme.value
-	is Comment -> "Comment " + lexeme.value
-	UnknownKW -> "unknown "
-	SkippedKW -> "skipped "
-    }
-    return string
-}
-
-fun stringOfStringList (str_l: List<String>) : String {
- val str = str_l.fold("", {acc, s -> acc + s })
- return str 
-}
-
-fun stringOfGlueOfStringList (glue: String, str_l: List<String>) : String {
- val str = str_l.fold("", {acc, s -> acc + s + glue })
- return str 
-}
-
-fun stringListOfLexemeList (lex_l: List<Lexeme>) : List<String> {
- val str_l = lex_l.map({l -> stringOfLexeme (l) })
- return str_l 
-}
 
 fun functionName():String {
     val sta = Thread.currentThread().stackTrace[2]
@@ -119,6 +91,66 @@ fun lineListOfFileName (nof: String) : MutableList<String> {
      return result
 }
 
+fun lexemeOfKeyword (keyword:String, caller: String) : Lexeme {
+
+    val here = functionName()
+    entering(here, caller)
+
+    println("$here: input keyword: '$keyword'")
+
+   var lexeme = when (keyword) {
+       "Author" -> KeywordWithPersonName (keyword)
+       "Date" -> KeywordWithDate (keyword)
+       "Source" -> KeywordWithFile (keyword)
+       "Signature" -> KeywordWithString (keyword)      
+       "mutable" -> KeywordWithHash (keyword)
+       "parents" -> KeywordWithHash (keyword)
+       "previous" -> KeywordWithHash (keyword)
+       "next" -> KeywordWithString (keyword)
+       "tic" -> KeywordWithInteger (keyword)       
+       "qm" -> KeywordWithHash (keyword)
+       "spot" -> KeywordWithInteger (keyword)       
+
+       else -> {
+       	    val message = "$here: Error unknown Keyword '$keyword'"
+	    throw Exception(message)
+	}
+  }
+  
+  println ("$here: output lexeme '$lexeme'")	
+  exiting(here)
+  return lexeme
+ }
+
+fun nextWordOfString(pos:Int, lin: String, caller: String): String {
+    val here = functionName()
+    entering(here, caller)
+
+    println("$here: input pos '$pos'")
+    println("$here: input lin '$lin'")
+    
+    val str = lin.substring(pos)
+    var word = ""    
+    for (c in str){
+	  println("$here: c '$c'")
+	  if (isTokenOfChar(c, here)) {break}
+	  word = word.plus(c.toString())
+    }
+
+    assert (word.isNotEmpty())
+    
+    println("$here: output word '$word'")
+    exiting(here)
+    return word
+}
+
+fun lineStackOfLineList (str_l: List<String>) : Stack<String> {
+    var stack = Stack<String>()
+    str_l.reversed().forEach { l -> stack.push(l) }
+    return stack
+}
+
+
 fun wordListOfString (str: String): List<String> {
 
     val trimedString = str.trim(' ')    
@@ -129,12 +161,6 @@ fun wordListOfString (str: String): List<String> {
     return result
 }
 
-fun lineStackOfLineList (str_l: List<String>) : Stack<String> {
-    var stack = Stack<String>()
-    str_l.reversed().forEach { l -> stack.push(l) }
-    return stack
-}
-
 fun wordStackOfLine (lin: String) : Stack<String> {
     var stack = Stack<String>()
     var wor_l = wordListOfString (lin)
@@ -142,35 +168,29 @@ fun wordStackOfLine (lin: String) : Stack<String> {
     return stack
 }
 
-fun lexemeOfKeywordOfValue (keyword:String, value: String, caller: String) : Lexeme {
-
+fun isTokenOfChar(cha: Char, caller:String) : Boolean {
     val here = functionName()
     entering(here, caller)
 
-    println("$here: input keyword: '$keyword'")
-    println("$here: input value: '$value'")
-
-   var lexeme = when (keyword) {
-       "Author" -> AuthorKW (value)
-       "Date" -> DateKW (value)
-       "Source" -> SourceKW (value)
-       "Signature" -> SignatureKW (value)      
-       "mutable" -> MutableKW (value)
-       "parents" -> ParentsKW (value)
-       "previous" -> PreviousKW (value)
-       "next" -> NextKW (value)
-       "tic" -> TicKW (value)       
-       "qm" -> QmKW (value)
-       "spot" -> SpotKW (value)       
-
-       else -> {
-       	    val message = "Error unknown Keyword '$keyword'"
-	    throw Exception(message)
-	}
-  }
-
-  exiting(here + " with lexeme '$lexeme'")
-  return lexeme
+    if(debug) println("$here: input cha '$cha'")
+    val result = when (cha) {
+		'#' -> true
+		'$' -> true
+		' ' -> true 
+		'\n' -> true
+		'/' -> true
+		',' -> true
+		':' -> true
+		';' -> true
+		'.' -> true
+		'-' -> true
+		'a','z' -> true
+		else -> false
+    }
+    
+  if(debug) println ("$here: output result '$result'")	
+  exiting(here)
+  return result
  }
 
 fun keywordAndStringOfSharpedLine (lin: String, caller: String) : pairString {
@@ -198,6 +218,42 @@ fun keywordAndStringOfSharpedLine (lin: String, caller: String) : pairString {
   return pairString (currentWord, nextWord)
 }
 
+fun isAlphabeticalOfChar(cha:Char, caller: String): Boolean {
+    val here = functionName()
+    entering(here, caller)
+    
+    val pattern = Regex("[a-zA-Z_]")
+    println("$here: input cha '$cha'")
+    val result = pattern.matches(cha.toString())
+
+    exiting(here + " with result '$result'")
+    return result
+}
+
+fun isNumericalOfChar(cha:Char, caller: String): Boolean {
+    val here = functionName()
+    entering(here, caller)
+    
+    val pattern = Regex("[0-9]")
+    println("$here: input cha '$cha'")
+    val result = pattern.matches(cha.toString())
+
+    exiting(here + " with result '$result'")
+    return result
+}
+
+fun isAlphanumericalOfChar(cha:Char, caller: String): Boolean {
+    val here = functionName()
+    entering(here, caller)
+    
+    val pattern = Regex("[a-zA-Z_0-9]")
+    println("$here: input cha '$cha'")
+    val result = pattern.matches(cha.toString())
+
+    exiting(here + " with result '$result'")
+    return result
+}
+
 fun isKeywordOfString(str:String, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
@@ -209,7 +265,7 @@ fun isKeywordOfString(str:String, caller: String): Boolean {
     return result
 }
 
-fun isKeywordValueOfString(str:String, caller: String): Boolean {
+fun isKeywordNameOfString(str:String, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
 
@@ -233,51 +289,196 @@ fun keywordOfString(str:String, caller: String): String {
     return result
 }
 
-fun keywordValueOfString (str:String, caller: String): String {
+fun keywordNameOfString (str:String, caller: String): String {
     val here = functionName()
     entering(here, caller)
 
    println("$here: str '$str'")
 
-    assert (isKeywordValueOfString(str, here))
+    assert (isKeywordNameOfString(str, here))
     var result = str.trimEnd({ c -> c.equals('$')})
 
     exiting(here + " with result "+result)
     return result
 }
 
-fun lexemeOfSharpedLine (lin: String, caller:String) : Lexeme {
+fun lexemeListOfSharpedLine (lin: String, caller:String) : MutableList<Lexeme> {
 // # $Source: /my/perl/script/kwextract.pl,v$
     val here = functionName()
     entering(here, caller)
 
-    val lineTrimed = lin.trim() 
-    if (lineTrimed.isNullOrBlank()) {
-      var lexeme = SkippedKW
+    println("$here: input lin'$lin'")
+    
+    val lexemeList = mutableListOf<Lexeme>()
 
-      exiting(here)
-      return lexeme	
+    var Done = false
+    var position = 0
+    var previousChar:Char? = nullChar
+    
+    while (!Done) {
+    	  var currentChar = lin.get(position)
+	  try {
+	      var lexeme = tokenOfChar(currentChar, position, lin, here)
+	      lexemeList.add(lexeme)
+	      position = position + 1
+	      previousChar = currentChar
+	  }
+	  catch (e: Exception) { // "tokenOfChar: Error unknown Character 'S'"
+
+		var unknownCharacter : Char? = unknownCharacterOfMessage(e.message, here)
+		val lexeme = when (unknownCharacter) {
+		    'S','P' -> {
+		    	val word = nextWordOfString(position, lin, here)
+			position = position + word.length
+    			lexemeOfKeyword (word, here)
+			}
+		    else -> {
+		    	 val message = "$here: Error unknown Character '$unknownCharacter'"
+	    throw Exception(message)
+				}
+		    	}
+    
+
+   		    }
    }
-   else if (lineTrimed.startsWith('$')) {
-   	var currentAndNext = keywordAndStringOfSharpedLine (lineTrimed, here)
-	val currentWord  = currentAndNext.first
-   	val nextWord  = currentAndNext.second
 
-	println("$here: currentWord: '" + currentWord + "'")
-   	println("$here: nextWord: '" + nextWord + "'")
+   println("$here: output lexemeList "+lexemeList)
+   exiting(here)
+   return lexemeList
+}
 
-	assert (isKeywordOfString(currentWord, here))
-	val keyword = keywordOfString (currentWord, here)
-	val keywordValue = keywordValueOfString (nextWord, here)
-	var lexeme = lexemeOfKeywordOfValue (keyword, keywordValue, here)
+fun countOfCharOfString (cha: Char, str:String, caller:String) : Int {
+    val here = functionName()
+    entering(here, caller)
 
-	exiting(here + " with lexeme '$lexeme'")
-	return lexeme
+    var count = 0
+
+    for (c in str) {
+        if (c == cha){count = count + 1}
+    }	
+		
+    exiting(here + " with count " + count.toString())
+    return count
+}
+
+fun lexemeListOfTextRecord (lin: String, caller:String) : MutableList<Lexeme> {
+    val here = functionName()
+    entering(here, caller)
+
+    val count = countOfCharOfString ('$', lin, here) 
+    var lexemeList = mutableListOf<Lexeme>()
+    
+    if (count == 0)  {
+	var lexeme = TextRecordConstant (lin)
+        lexemeList.add (lexeme)
+	exiting(here + " with added lexeme '$lexeme'")
+	return lexemeList
+    }
+    else if (count.rem (2) == 0)  {
+	var lexeme = TextRecordSubstituable (lin)
+        lexemeList.add (lexeme)
+	exiting(here + " with added lexeme '$lexeme'")
+	return lexemeList
     }
     else {
-        val message = "$here: Error unknown first Character in line '$lineTrimed'"
+        val message = "$here: Error found $count \$ characters in line '$lin'"
     	throw Exception(message)
    }
+}
+
+fun tokenOfChar(cha: Char, pos: Int, lin: String, caller: String) : Lexeme {
+    val here = functionName()
+    entering(here, caller)
+
+    println("$here: input cha '$cha'")
+
+    val token = when (cha) {
+		'#' -> TokenSharp
+		'$' -> TokenDollar
+		' ' -> TokenSpace
+		'\n' -> TokenEndOfLine
+		'/' -> TokenSlash
+		',' -> TokenComma
+		':' -> TokenColon
+		';' -> TokenSemicolon
+		'.' -> TokenDot	
+		'-' -> TokenHyphen
+	else -> {
+             val message = "$here: Error unknown Character '$cha'"
+    	     throw Exception(message)
+	     	}
+	}
+
+	println("$here: output token '$token'")
+	exiting(here)
+	return token
+}
+
+fun stringOfLexeme (lexeme: Lexeme): String {
+    val string = when (lexeme) {
+        is KeywordWithPersonName -> lexeme.name
+    	is KeywordWithDate -> lexeme.name
+    	is KeywordWithFile -> lexeme.name
+    	is KeywordWithHash -> lexeme.name
+    	is KeywordWithString -> lexeme.name
+    	is KeywordWithInteger -> lexeme.name
+	is FilePath -> lexeme.name
+	is TextRecordConstant -> lexeme.record
+	is TextRecordSubstituable -> lexeme.record	
+	is Comment -> lexeme.name
+	UnknownKW -> "unknown "
+	SkippedKW -> "skipped "
+TokenSharp	-> "TokenSharp"
+TokenDollar	-> "TokenDollar"
+TokenSpace	-> "TokenSpace"
+TokenEndOfLine	-> "TokenEndOfLine"
+TokenSlash	-> "TokenSlash"
+TokenComma	-> "TokenComma"
+TokenColon	-> "TokenColon"
+TokenSemicolon	-> "TokenSemicolon"
+TokenDot	-> "TokenDot"
+TokenHyphen	-> "TokenHyphen"
+is TokenAlphabetical -> lexeme.character.toString()
+is TokenAlphanumerical -> lexeme.character.toString()
+is TokenNumerical -> lexeme.character.toString()
+}
+    return string
+}
+
+fun stringOfStringList (str_l: List<String>) : String {
+ val str = str_l.fold("", {acc, s -> acc + s })
+ return str 
+}
+
+fun stringOfGlueOfStringList (glue: String, str_l: List<String>) : String {
+ val str = str_l.fold("", {acc, s -> acc + s + glue })
+ return str 
+}
+
+fun stringListOfLexemeList (lex_l: List<Lexeme>) : List<String> {
+ val str_l = lex_l.map({l -> stringOfLexeme (l) })
+ return str_l 
+}
+
+fun unknownCharacterOfMessage (mes: String?, caller: String): Char? {
+    val here = functionName()
+    entering(here, caller)
+
+    val messageType : String?
+    
+    println("$here: input mes '$mes'")
+    
+    var unknownCharacter = try {
+    	messageType = mes?.substring (0, 36)
+	println("$here: messageType '$messageType'")
+	mes?.get (38)
+	}
+    catch (e: Exception) {nullChar}
+
+    println("$here: output character '$unknownCharacter'")
+    exiting(here)
+
+    return unknownCharacter
 }
 
 fun main(args: Array<String>) {
@@ -298,13 +499,12 @@ fun main(args: Array<String>) {
 	    println("$here: line: '" + line + "'")
 
 	    if (line.startsWith('#'))  {
-	        var subline = line.substring(1)
-	      	val lexeme = lexemeOfSharpedLine (subline, here)
-		lexemeList.add (lexeme)
+	      	lexemeList = lexemeListOfSharpedLine (line, here)
+		lexemeList.union (lexemeList)
 		}		
 	    else {
-	    	val lexeme = TextKW(line)
-		lexemeList.add (lexeme)
+	    	lexemeList = lexemeListOfTextRecord (line, here)
+		lexemeList.union (lexemeList)
 	    }
     }
     
