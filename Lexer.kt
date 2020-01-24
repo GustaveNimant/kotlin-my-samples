@@ -16,9 +16,13 @@ sealed class Lexeme ()  // Sharped Line
 
 	  data class Comment (val name: String) : Lexeme ()
 	  data class DateValue (val value: String) : Lexeme ()
+	  data class AuthorName (val name: String) : Lexeme ()
+  	  data class NextName (val name: String) : Lexeme ()
 	  data class FilePath (val name: String) : Lexeme ()
 	  data class QmHash (val name: String) : Lexeme ()
 	  data class Signature (val value: String) : Lexeme ()
+	  data class Spot (val value: String) : Lexeme ()
+	  data class Tic (val value: String) : Lexeme ()	  
 	  data class TextRecordConstant (val record: String) : Lexeme ()
 	  data class TextRecordSubstituable (val record: String) : Lexeme ()
 	  
@@ -497,7 +501,7 @@ fun lexemeListOfAuthorLine (lin: String, caller:String) : MutableList<Lexeme> {
 		  val word = nextWordOfEndCharOfString('$', str, here)
 		  if (isAuthorNameOfString(word, here)) {
 		     position = position + word.length 
-    		     FilePath (word)
+    		     AuthorName (word)
 		  }
 		  else {
 		       val message = "$here: Error word '$word' is not a valid Author Name"
@@ -697,7 +701,7 @@ fun lexemeListOfNextLine (lin: String, caller:String) : MutableList<Lexeme> {
 		  val word = nextWordOfEndCharOfString('$', str, here)
 		  if (isNextNameOfString(word, here)) {
 		     position = position + word.length 
-    		     FilePath (word)
+    		     NextName (word)
 		  }
 		  else {
 		       val message = "$here: Error word '$word' is not a valid Next Name"
@@ -951,11 +955,12 @@ fun lexemeListOfSharpedLine (lin: String, caller:String) : MutableList<Lexeme> {
     while (!Done) {
       try {
     	var currentCharacter = lin.get(position)	
- 	val lexemeList = when (currentCharacter) {
+ 	when (currentCharacter) {
 // Header 
 	'#' -> {
 	    if (lin.length > 1) {
-	       listOf(tokenOfChar(currentCharacter, position, lin, here))
+	       val lexeme = tokenOfChar(currentCharacter, position, lin, here)
+	       lexemeList.add(lexeme)
 	       position = position + 1
 	    }
 	    else {
@@ -964,43 +969,45 @@ fun lexemeListOfSharpedLine (lin: String, caller:String) : MutableList<Lexeme> {
 	    }
 	}
 	' ' -> {
-	    listOf(tokenOfChar(currentCharacter, position, lin, here))
+	    val lexeme = tokenOfChar(currentCharacter, position, lin, here)
+	    lexemeList.add(lexeme)
 	    position = position + 1	 
 	}
 	'$' -> {
-	    listOf(tokenOfChar(currentCharacter, position, lin, here))
+	    val lexeme = tokenOfChar(currentCharacter, position, lin, here)
+	    lexemeList.add(lexeme)
 	    position = position + 1
 	}
 // Remainder	
 	'A' -> {
 	    val str = lin.substring(position)
-	    lexemeList.union (lexemeListOfAuthorLine (str, here))
+	    lexemeList.addAll (lexemeListOfAuthorLine (str, here))
 	    Done = true
 	    }
 	'D' -> {
 	    val str = lin.substring(position)
-	    lexemeList.union (lexemeListOfDateLine (str, here))
+	    lexemeList.addAll (lexemeListOfDateLine (str, here))
 	    Done = true
 	    }
         'm' -> {
 	    val str = lin.substring(position)
-	    lexemeList.union (lexemeListOfMutableLine (str, here)) 
+	    lexemeList.addAll (lexemeListOfMutableLine (str, here)) 
 	    Done = true
 	    }
         'n' -> {
 	    val str = lin.substring(position)
-	    lexemeList.union (lexemeListOfNextLine (str, here)) 
+	    lexemeList.addAll (lexemeListOfNextLine (str, here)) 
 	    Done = true
 	    }
 	'p' -> {
 	    val nextCharacter = lin.get(position + 1)
 	    if (nextCharacter.equals ('a')){
 	       val str = lin.substring(position)
-	       lexemeList.union (lexemeListOfParentsLine (str, here)) 
+	       lexemeList.addAll (lexemeListOfParentsLine (str, here)) 
 	    }
 	    else if (nextCharacter.equals ('r')){
 	       val str = lin.substring(position)
-	       lexemeList.union (lexemeListOfPreviousLine (str, here)) 
+	       lexemeList.addAll (lexemeListOfPreviousLine (str, here)) 
 	    }
 	    else {
 	    	 val message = "$here: Error next character '$nextCharacter' should be 'a' or 'r'"
@@ -1010,23 +1017,23 @@ fun lexemeListOfSharpedLine (lin: String, caller:String) : MutableList<Lexeme> {
 	    }
         'q' -> {
 	    val str = lin.substring(position)
-	    lexemeList.union (lexemeListOfQmHashLine (str, here)) 
+	    lexemeList.addAll (lexemeListOfQmHashLine (str, here)) 
 	    Done = true
 	    }
         's' -> {
 	    val str = lin.substring(position)
-	    lexemeList.union (lexemeListOfSpotLine (str, here)) 
+	    lexemeList.addAll (lexemeListOfSpotLine (str, here)) 
 	    Done = true
 	    }
         'S' -> {
 	    val nextCharacter = lin.get(position + 1)
 	    if (nextCharacter.equals ('i')){
 	       val str = lin.substring(position)
-	       lexemeList.union (lexemeListOfSignatureLine (str, here)) 
+	       lexemeList.addAll (lexemeListOfSignatureLine (str, here)) 
 	    }
 	    else if (nextCharacter.equals ('o')){
 	       val str = lin.substring(position)
-	       lexemeList.union (lexemeListOfSourceLine (str, here)) 
+	       lexemeList.addAll (lexemeListOfSourceLine (str, here)) 
 	    }
 	    else {
 	    	 val message = "$here: Error next character '$nextCharacter' should be 'i' or 'o'"
@@ -1036,7 +1043,7 @@ fun lexemeListOfSharpedLine (lin: String, caller:String) : MutableList<Lexeme> {
 	    }
         't' -> {
 	    val str = lin.substring(position)
-	    lexemeList.union (lexemeListOfTicLine (str, here)) 
+	    lexemeList.addAll (lexemeListOfTicLine (str, here)) 
 	    Done = true
 	    }
 	    else -> {
@@ -1059,7 +1066,7 @@ fun lexemeListOfSharpedLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  }
    }
 
-   println("$here: output lexemeList:\n"+ stringListOfLexemeList(lexemeList))
+   println("$here: output lexemeList: "+ stringListOfLexemeList(lexemeList))
    exiting(here)
    return lexemeList
 }
@@ -1235,7 +1242,7 @@ fun lexemeListOfSpotLine (lin: String, caller:String) : MutableList<Lexeme> {
 		  val word = nextWordOfEndCharOfString('$', str, here)
 		  if (isSpotOfString(word, here)) {
 		     position = position + word.length 
-    		     FilePath (word)
+    		     Spot (word)
 		  }
 		  else {
 		       val message = "$here: Error word '$word' is not a valid Spot field"
@@ -1327,7 +1334,7 @@ fun lexemeListOfTicLine (lin: String, caller:String) : MutableList<Lexeme> {
 		  val word = nextWordOfEndCharOfString('$', str, here)
 		  if (isTicOfString(word, here)) {
 		     position = position + word.length 
-    		     FilePath (word)
+    		     Tic (word)
 		  }
 		  else {
 		       val message = "$here: Error word '$word' is not a valid Tic field"
@@ -1369,8 +1376,12 @@ fun stringOfLexeme (lexeme: Lexeme): String {
     	is KeywordWithHash -> lexeme.name
     	is KeywordWithString -> lexeme.name
     	is KeywordWithInteger -> lexeme.name
+	is AuthorName -> lexeme.name
+	is NextName -> lexeme.name	
 	is FilePath -> lexeme.name
 	is QmHash -> lexeme.name
+	is Spot -> lexeme.value
+	is Tic -> lexeme.value	
 	is Signature -> lexeme.value	
 	is DateValue -> lexeme.value
 	is TextRecordConstant -> lexeme.record
@@ -1474,22 +1485,23 @@ fun main(args: Array<String>) {
     println("Read the whole file as a List of String :")
     val lineList = lineListOfFileName (fileName, here)
 
+    var count = 0
     for (line in lineList) {
-	    println("$here: line: '" + line + "'")
-
-	    if (line.startsWith('#'))  {
-	      	lexemeList = lexemeListOfSharpedLine (line, here)
-		lexemeList.union (lexemeList)
-		}		
-	    else {
-	    	lexemeList = lexemeListOfTextRecord (line, here)
-		lexemeList.union (lexemeList)
-	    }
+      count = count + 1
+      println("$here: for line # $count '$line'")
+      if (line.startsWith('#'))  {
+      	 val lexeme_l = lexemeListOfSharpedLine (line, here)
+	 lexemeList.addAll (lexeme_l)
+	 }		
+      else {
+	 val lexeme_l = lexemeListOfTextRecord (line, here)
+	 lexemeList.addAll (lexeme_l)
+	 }
     }
     
-    println("lexemeList:")
-    lexemeList.forEach{ l -> println(stringOfLexeme(l))}
-
+    val siz = lexemeList.size
+    println("$here: total of $siz lexemes in List")
+    
     val str_l = stringListOfLexemeList (lexemeList)
     val content = stringOfGlueOfStringList ("\n", str_l)
     write_output ("some.txt", content, here)
