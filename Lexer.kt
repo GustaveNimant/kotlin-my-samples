@@ -71,12 +71,7 @@ fun exiting(here:String):Unit {
 }
 
 fun notYetImplemented(fun_nam: String){
-    val here = functionName()
-	
     throw Exception("Error: function '$fun_nam' is not yet implemented")
-
-    exiting(here)
-    return 
 }
 
 fun read_input(caller:String):String {
@@ -255,7 +250,7 @@ fun isAuthorNameOfString(str: String, caller: String): Boolean {
 
     println("$here: input str '$str'")
 
-    val pattern = Regex("[a-zA-Z][a-zA-Z_]*")
+    val pattern = Regex("[a-zA-Z][a-zA-Z_ ]*")
     val result = pattern.matches(str)
 
     exiting(here + " with result '$result'")
@@ -479,7 +474,6 @@ fun lexemeListOfAuthorLine (lin: String, caller:String) : MutableList<Lexeme> {
 
     var Done = false
     var position = 0
-    var previousChar:Char? = nullChar
     
     while (!Done) {
     	  try {
@@ -520,6 +514,7 @@ fun lexemeListOfAuthorLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	val previousCharacter = lin.get(position-1)
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
+		   lexemeList.add (lexeme)	
 	     	   println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
@@ -585,6 +580,7 @@ fun lexemeListOfDateLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	previousCharacter = lin.get(position-1)
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
+		   lexemeList.add (lexeme)
 	     	   println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
@@ -653,6 +649,7 @@ fun lexemeListOfMutableLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	val previousCharacter = lin.get(position-1)
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
+		   lexemeList.add (lexeme)
 	     	   println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
@@ -720,6 +717,7 @@ fun lexemeListOfNextLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	val previousCharacter = lin.get(position-1)
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
+		   lexemeList.add (lexeme)		
 	     	   println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
@@ -788,6 +786,7 @@ fun lexemeListOfParentsLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	val previousCharacter = lin.get(position-1)
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
+		   lexemeList.add (lexeme)
 	     	   println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
@@ -856,6 +855,7 @@ fun lexemeListOfPreviousLine (lin: String, caller:String) : MutableList<Lexeme> 
 	  	val previousCharacter = lin.get(position-1)
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
+		   lexemeList.add (lexeme)
 	     	   println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
@@ -924,6 +924,7 @@ fun lexemeListOfQmHashLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	val previousCharacter = lin.get(position-1)
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
+             	   lexemeList.add (lexeme)
 	     	   println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
@@ -1056,6 +1057,7 @@ fun lexemeListOfSharpedLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	previousCharacter = lin.get(position-1)
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
+             	   lexemeList.add (lexeme)
 	     	   println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
@@ -1127,6 +1129,7 @@ fun lexemeListOfSourceLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	val previousCharacter = lin.get(position-1)
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
+             	   lexemeList.add (lexeme)
 	     	   println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
@@ -1194,6 +1197,7 @@ fun lexemeListOfSignatureLine (lin: String, caller:String) : MutableList<Lexeme>
 	  	val previousCharacter = lin.get(position-1)
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
+             	   lexemeList.add (lexeme)
 	     	   println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
@@ -1220,7 +1224,6 @@ fun lexemeListOfSpotLine (lin: String, caller:String) : MutableList<Lexeme> {
 
     var Done = false
     var position = 0
-    var previousChar:Char? = nullChar
     
     while (!Done) {
     	  try {
@@ -1261,6 +1264,7 @@ fun lexemeListOfSpotLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	val previousCharacter = lin.get(position-1)
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
+             	   lexemeList.add (lexeme)
 	     	   println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
@@ -1312,7 +1316,6 @@ fun lexemeListOfTicLine (lin: String, caller:String) : MutableList<Lexeme> {
 
     var Done = false
     var position = 0
-    var previousChar:Char? = nullChar
     
     while (!Done) {
     	  try {
@@ -1353,6 +1356,7 @@ fun lexemeListOfTicLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	val previousCharacter = lin.get(position-1)
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
+             	   lexemeList.add (lexeme)
 	     	   println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
@@ -1370,23 +1374,23 @@ fun lexemeListOfTicLine (lin: String, caller:String) : MutableList<Lexeme> {
 
 fun stringOfLexeme (lexeme: Lexeme): String {
     val string = when (lexeme) {
-        is KeywordWithPersonName -> lexeme.name
-    	is KeywordWithDate -> lexeme.name
-    	is KeywordWithFile -> lexeme.name
-    	is KeywordWithHash -> lexeme.name
-    	is KeywordWithString -> lexeme.name
-    	is KeywordWithInteger -> lexeme.name
-	is AuthorName -> lexeme.name
-	is NextName -> lexeme.name	
-	is FilePath -> lexeme.name
-	is QmHash -> lexeme.name
-	is Spot -> lexeme.value
-	is Tic -> lexeme.value	
-	is Signature -> lexeme.value	
-	is DateValue -> lexeme.value
-	is TextRecordConstant -> lexeme.record
-	is TextRecordSubstituable -> lexeme.record	
-	is Comment -> lexeme.name
+        is KeywordWithPersonName -> "KeywordWithPersonName("+lexeme.name+")"
+    	is KeywordWithDate -> "KeywordWithDate("+lexeme.name+")"
+    	is KeywordWithFile -> "KeywordWithFile("+lexeme.name+")"
+    	is KeywordWithHash -> "KeywordWithHash("+lexeme.name+")"
+    	is KeywordWithString -> "KeywordWithString("+lexeme.name+")"
+    	is KeywordWithInteger -> "KeywordWithInteger("+lexeme.name+")"
+	is AuthorName -> "AuthorName("+lexeme.name+")"
+	is NextName -> "NextName("+lexeme.name+")"
+	is FilePath -> "FilePath("+lexeme.name+")"
+	is QmHash -> "QmHash("+lexeme.name+")"
+	is Spot -> "Spot("+lexeme.value+")"
+	is Tic -> "Tic("+lexeme.value+")"	
+	is Signature -> "Signature("+lexeme.value+")"	
+	is DateValue -> "DateValue("+lexeme.value+")"
+	is TextRecordConstant -> "TextRecordConstant("+lexeme.record+")"
+	is TextRecordSubstituable -> "TextRecordSubstituable("+lexeme.record+")"	
+	is Comment -> "Comment("+lexeme.name+")"
 	UnknownKW -> "unknown "
 	EmptySharpedLine -> "EmptySharpedLine"
 	SkippedKW -> "skipped "
@@ -1400,9 +1404,11 @@ TokenColon	-> "TokenColon"
 TokenSemicolon	-> "TokenSemicolon"
 TokenDot	-> "TokenDot"
 TokenHyphen	-> "TokenHyphen"
-is TokenAlphabetical -> lexeme.character.toString()
-is TokenAlphanumerical -> lexeme.character.toString()
-is TokenNumerical -> lexeme.character.toString()
+
+is TokenAlphabetical -> "TokenAlphabetical("+lexeme.character.toString()+")"
+is TokenAlphanumerical -> "TokenAlphanumerical("+lexeme.character.toString()+")"
+is TokenNumerical -> "TokenNumerical("+lexeme.character.toString()+")"
+
 }
     return string
 }
@@ -1440,7 +1446,7 @@ fun tokenOfChar(cha: Char, pos: Int, lin: String, caller: String) : Lexeme {
 		'.' -> TokenDot	
 		'-' -> TokenHyphen
 	else -> {
-             val message = "$here: Error unknown Character '$cha'"
+             val message = "$here: Error unknown Character '$cha' at position $pos of line '$lin'"
     	     throw Exception(message)
 	     	}
 	}

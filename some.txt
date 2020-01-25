@@ -1,68 +1,9 @@
 TokenSharp
 TokenSpace
 TokenDollar
-Source
-TokenSpace
-/my/perl/script/kwextract.pl
-TokenVee
-TokenDollar
-TokenSharp
-TokenSpace
-TokenDollar
-Date
-TokenSpace
-now
-TokenSharp
-TokenSpace
-TokenDollar
-mutable
-TokenSpace
-/.brings/system/bin/kwextract.pl
-TokenSharp
-TokenSpace
-TokenDollar
-previous
-TokenSpace
-QmU1RDLsAGNPVuwDjKD3RQx7R6aEuQfcmSiubviDZ2XRVC
-TokenSharp
-TokenSpace
-TokenDollar
-Author
-michel
-TokenSharp
-TokenSpace
-TokenDollar
-next
-unknown
- 
-TokenSharp
-TokenSpace
-TokenDollar
-parents
-TokenSpace
-QmRU26t5KP5QLiNbjWMxSbyfaARvzshfdzozj6M4K73auH
-TokenSharp
-TokenSpace
-TokenDollar
-qm
-TokenSpace
-z2kXGab6zthT87F8zfEci4Ah7ngKD9VNjagPTHxVnSGzugX
-TokenSharp
-TokenSpace
-TokenDollar
-tic
-1579373044
-TokenSharp
-TokenSpace
-TokenDollar
-spot
-1550698403
-TokenSharp
-TokenSpace
-TokenDollar
-Signature
-n/a
-
-line 1
-line 2
-
+KeywordWithPersonName(Author)
+AuthorName(michel Combes)
+TokenEndOfLine
+TextRecordConstant(line 1)
+TextRecordSubstituable(line with variable $a_variable$ here)
+TextRecordConstant(line 3)
