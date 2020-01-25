@@ -34,6 +34,7 @@ sealed class Lexeme ()  // Sharped Line
 
 	  object EmptySharpedLine : Lexeme ()
 	  object TokenSharp : Lexeme ()
+	  object EmptyLine : Lexeme ()
 
  data class TokenAlphabetical (val character: Char): Lexeme ()
  data class TokenAlphanumerical (val character: Char): Lexeme ()
@@ -1304,62 +1305,50 @@ fun lexemeListOfTextRecord (lin: String, caller:String) : MutableList<Lexeme> {
     var lexemeList = mutableListOf<Lexeme>()
 
     val wor_l = wordListOfString (lin)
-    var Done = false
-    var position = 0
-    
-    while (!Done) {
-    	  try {
-    	      var currentCharacter = lin.get(position)
-	      when (currentCharacter){
-	      '$' -> {
-	      	  var lexeme = tokenOfChar(currentCharacter, position, lin, here)
-		  lexemeList.add (lexeme)
+
+    for (currentWord in wor_l) { 
+      println("$here: for currentWord '$currentWord'")
+
+      try {
+      	  var currentCharacter = currentWord.get(0)
+	  
+      when (currentCharacter){
+	'$' -> {
+	    lexemeList.add (TokenDollar)
+	    
 // $variable$ to be susbsituted 
-		  position = position + 1
-	      	  val str = lin.substring(position)
-    	      	  val word = nextWordOfEndCharOfString('$', str, here)
+	      	  val str = currentWord.substring(1)
+		  if (! str.last().equals('$')) {
+		       val message = "$here: Error currentWord '$currentWord' must end with a '$'"
+		       throw Exception(message)
+		  }
+
+		  val word = nextWordOfEndCharOfString('$', str, here)
 
 		  if (isTextVariableOfString(word, here)) {
-		     position = position + word.length 
-		     lexeme = TextVariableSubstituable(word)
+		     val lexeme = TextVariableSubstituable(word)
 		     lexemeList.add (lexeme)
+		     lexemeList.add (TokenDollar)	
 		  }
 		  else {
 		       val message = "$here: Error word '$word' is not a valid variable name"
 		       throw Exception(message)
 		  }
 		  }
-	      ' ' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
-		  position = position + 1
-	      	  val str = lin.substring(position)
-		  val word = nextWordOfEndCharOfString(' ', str, here)
-		  if (isTextWordOfString(word, here)) {
-		     position = position + word.length 
-		     val lexeme = TextWordConstant(word)
-		     lexemeList.add (lexeme)
-		  }
-		  else {
-		       val message = "$here: Error word '$word' is not a valid word of Text"
-		       throw Exception(message)
-		  }
-	          }
-	       else -> {
-	      	  val str = lin.substring(position)
-		  val word = nextWordOfEndCharOfString(' ', str, here)
-		  position = position + word.length 
-		  val lexeme = TextStringConstant(word)
+	  else -> {
+		  val lexeme = TextWordConstant(currentWord)
 		  lexemeList.add (lexeme)
 	          }
-		}
-   		}
-	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	     	   val lexeme = TokenEndOfLine
-             	   lexemeList.add (lexeme)
-	     	   println("$here: setting End Of Line")
-	     	   Done = true			
-	  }
+        }
+   } 
+      catch (e: java.lang.StringIndexOutOfBoundsException) {
+      	    lexemeList.add (EmptyLine)
+	    }
+
    }
+
+
+   lexemeList.add (TokenEndOfLine)
    println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
@@ -1450,12 +1439,13 @@ fun stringOfLexeme (lexeme: Lexeme): String {
 	is Signature -> "Signature("+lexeme.value+")"	
 	is DateValue -> "DateValue("+lexeme.value+")"
 	is TextRecordConstant -> "TextRecordConstant("+lexeme.record+")"
-	is TextWordConstant -> "TextRecordConstant("+lexeme.word+")"
-	is TextStringConstant -> "TextRecordConstant("+lexeme.string+")"
+	is TextWordConstant -> "TextWordConstant("+lexeme.word+")"
+	is TextStringConstant -> "TextStringConstant("+lexeme.string+")"
 	is TextVariableSubstituable -> "TextVariableSubstituable("+lexeme.variable+")"	
 	is Comment -> "Comment("+lexeme.name+")"
 	UnknownKW -> "unknown "
 	EmptySharpedLine -> "EmptySharpedLine"
+	EmptyLine -> "EmptyLine"
 	SkippedKW -> "skipped "
 TokenSharp	-> "TokenSharp"
 TokenDollar	-> "TokenDollar"
