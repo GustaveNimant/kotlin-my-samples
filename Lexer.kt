@@ -9,7 +9,8 @@ var dots = "........|........|........|........|........|........|........|"
 sealed class Lexeme ()  // Sharped Line 
        	  data class KeywordWithPersonName (val name: String) : Lexeme ()
 	  data class KeywordWithDate (val name: String) : Lexeme ()
-	  data class KeywordWithHash (val name: String) : Lexeme () 
+	  data class KeywordWithQmHash (val name: String) : Lexeme ()
+	  data class KeywordWithZ2Hash (val name: String) : Lexeme () 
 	  data class KeywordWithString (val name: String) : Lexeme ()
 	  data class KeywordWithFile (val name: String) : Lexeme ()
 	  data class KeywordWithInteger (val name: String) : Lexeme ()
@@ -19,7 +20,8 @@ sealed class Lexeme ()  // Sharped Line
 	  data class AuthorName (val name: String) : Lexeme ()
   	  data class NextName (val name: String) : Lexeme ()
 	  data class FilePath (val name: String) : Lexeme ()
-	  data class QmHash (val name: String) : Lexeme ()
+	  data class QmHash (val hash: String) : Lexeme ()
+	  data class Z2Hash (val hash: String) : Lexeme ()
 	  data class Signature (val value: String) : Lexeme ()
 	  data class Spot (val value: String) : Lexeme ()
 	  data class Tic (val value: String) : Lexeme ()	  
@@ -139,12 +141,12 @@ fun lexemeOfKeyword (keyword:String, caller: String) : Lexeme {
        "Date" -> KeywordWithDate (keyword)
        "Source" -> KeywordWithFile (keyword)
        "Signature" -> KeywordWithString (keyword)      
-       "mutable" -> KeywordWithHash (keyword)
-       "parents" -> KeywordWithHash (keyword)
-       "previous" -> KeywordWithHash (keyword)
+       "mutable" -> KeywordWithFile (keyword)
+       "parents" -> KeywordWithQmHash (keyword)
+       "previous" -> KeywordWithQmHash (keyword)
        "next" -> KeywordWithString (keyword)
        "tic" -> KeywordWithInteger (keyword)       
-       "qm" -> KeywordWithHash (keyword)
+       "qm" -> KeywordWithZ2Hash (keyword)
        "spot" -> KeywordWithInteger (keyword)       
        else -> {
        	    val message = "$here: Error unknown Keyword '$keyword'"
@@ -926,10 +928,10 @@ fun lexemeListOfQmHashLine (lin: String, caller:String) : MutableList<Lexeme> {
 		  val word = nextWordOfEndCharOfString('$', str, here)
 		  if (isZ2HashOfString(word, here)) {
 		     position = position + word.length 
-    		     QmHash (word)
+    		     Z2Hash (word)
 		  }
 		  else {
-		       val message = "$here: Error word '$word' is not a valid Qm Hash"
+		       val message = "$here: Error word '$word' is not a valid z2 Hash"
 		       throw Exception(message)
 		  }
 	          }
@@ -1427,13 +1429,15 @@ fun stringOfLexeme (lexeme: Lexeme): String {
         is KeywordWithPersonName -> "KeywordWithPersonName("+lexeme.name+")"
     	is KeywordWithDate -> "KeywordWithDate("+lexeme.name+")"
     	is KeywordWithFile -> "KeywordWithFile("+lexeme.name+")"
-    	is KeywordWithHash -> "KeywordWithHash("+lexeme.name+")"
+    	is KeywordWithQmHash -> "KeywordWithQmHash("+lexeme.name+")"
+	is KeywordWithZ2Hash -> "KeywordWithZ2Hash("+lexeme.name+")"
     	is KeywordWithString -> "KeywordWithString("+lexeme.name+")"
     	is KeywordWithInteger -> "KeywordWithInteger("+lexeme.name+")"
 	is AuthorName -> "AuthorName("+lexeme.name+")"
 	is NextName -> "NextName("+lexeme.name+")"
 	is FilePath -> "FilePath("+lexeme.name+")"
-	is QmHash -> "QmHash("+lexeme.name+")"
+	is QmHash -> "QmHash("+lexeme.hash+")"
+	is Z2Hash -> "Z2Hash("+lexeme.hash+")"
 	is Spot -> "Spot("+lexeme.value+")"
 	is Tic -> "Tic("+lexeme.value+")"	
 	is Signature -> "Signature("+lexeme.value+")"	
