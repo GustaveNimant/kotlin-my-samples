@@ -23,8 +23,11 @@ sealed class Lexeme ()  // Sharped Line
 	  data class Signature (val value: String) : Lexeme ()
 	  data class Spot (val value: String) : Lexeme ()
 	  data class Tic (val value: String) : Lexeme ()	  
+
 	  data class TextRecordConstant (val record: String) : Lexeme ()
-	  data class TextRecordSubstituable (val record: String) : Lexeme ()
+	  data class TextStringConstant (val string: String) : Lexeme ()
+	  data class TextWordConstant (val word: String) : Lexeme ()
+	  data class TextVariableSubstituable (val variable: String) : Lexeme ()
 	  
 	  object UnknownKW : Lexeme ()
 	  object SkippedKW : Lexeme ()
@@ -202,11 +205,10 @@ fun lineStackOfLineList (str_l: List<String>) : Stack<String> {
     return stack
 }
 
-
 fun wordListOfString (str: String): List<String> {
 
     val trimedString = str.trim(' ')    
-    val regex = Regex("\\s+")
+    val regex = Regex("""\s+""")
 
     val result = trimedString.split(regex)
 
@@ -368,6 +370,30 @@ fun isTicOfString(str: String, caller: String): Boolean {
     entering(here, caller)
     
     val pattern = Regex("""\d+""")
+    println("$here: input str '$str'")
+    val result = pattern.matches(str)
+
+    exiting(here + " with result '$result'")
+    return result
+}
+
+fun isTextVariableOfString(str: String, caller: String): Boolean {
+    val here = functionName()
+    entering(here, caller)
+    
+    val pattern = Regex("""\w+""")
+    println("$here: input str '$str'")
+    val result = pattern.matches(str)
+
+    exiting(here + " with result '$result'")
+    return result
+}
+
+fun isTextWordOfString(str: String, caller: String): Boolean {
+    val here = functionName()
+    entering(here, caller)
+    
+    val pattern = Regex("""\w+""")
     println("$here: input str '$str'")
     val result = pattern.matches(str)
 
@@ -541,7 +567,6 @@ fun lexemeListOfDateLine (lin: String, caller:String) : MutableList<Lexeme> {
 
     var Done = false
     var position = 0
-    var previousCharacter: Char? = nullChar
     
     while (!Done) {
     	  try {
@@ -577,7 +602,7 @@ fun lexemeListOfDateLine (lin: String, caller:String) : MutableList<Lexeme> {
 		lexemeList.add (lexeme)
    		}
 	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	previousCharacter = lin.get(position-1)
+	  	val previousCharacter = lin.get(position-1)
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
 		   lexemeList.add (lexeme)
@@ -607,7 +632,6 @@ fun lexemeListOfMutableLine (lin: String, caller:String) : MutableList<Lexeme> {
 
     var Done = false
     var position = 0
-    var previousChar: Char? = nullChar
     
     while (!Done) {
     	  try {
@@ -676,7 +700,6 @@ fun lexemeListOfNextLine (lin: String, caller:String) : MutableList<Lexeme> {
 
     var Done = false
     var position = 0
-    var previousChar:Char? = nullChar
     
     while (!Done) {
     	  try {
@@ -744,7 +767,6 @@ fun lexemeListOfParentsLine (lin: String, caller:String) : MutableList<Lexeme> {
 
     var Done = false
     var position = 0
-    var previousChar: Char? = nullChar
     
     while (!Done) {
     	  try {
@@ -813,7 +835,6 @@ fun lexemeListOfPreviousLine (lin: String, caller:String) : MutableList<Lexeme> 
 
     var Done = false
     var position = 0
-    var previousChar: Char? = nullChar
     
     while (!Done) {
     	  try {
@@ -882,7 +903,6 @@ fun lexemeListOfQmHashLine (lin: String, caller:String) : MutableList<Lexeme> {
 
     var Done = false
     var position = 0
-    var previousChar: Char? = nullChar
     
     while (!Done) {
     	  try {
@@ -951,7 +971,6 @@ fun lexemeListOfSharpedLine (lin: String, caller:String) : MutableList<Lexeme> {
 
     var Done = false
     var position = 0
-    var previousCharacter: Char? = nullChar
     
     while (!Done) {
       try {
@@ -1054,7 +1073,7 @@ fun lexemeListOfSharpedLine (lin: String, caller:String) : MutableList<Lexeme> {
 	    }
       }
       catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	previousCharacter = lin.get(position-1)
+	  	val previousCharacter = lin.get(position-1)
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
              	   lexemeList.add (lexeme)
@@ -1084,7 +1103,6 @@ fun lexemeListOfSourceLine (lin: String, caller:String) : MutableList<Lexeme> {
 
     var Done = false
     var position = 0
-    var previousChar: Char? = nullChar
     
     while (!Done) {
     	  try {
@@ -1156,7 +1174,6 @@ fun lexemeListOfSignatureLine (lin: String, caller:String) : MutableList<Lexeme>
 
     var Done = false
     var position = 0
-    var previousChar:Char? = nullChar
     
     while (!Done) {
     	  try {
@@ -1269,7 +1286,7 @@ fun lexemeListOfSpotLine (lin: String, caller:String) : MutableList<Lexeme> {
 	     	   Done = true			
 	     	}
 		else {
-		     val message = "$here: Error previous character '$previousCharacter' should be '$'"
+		     val message = "$here: Error at end of line previous character '$previousCharacter' should be '$'"
 	    	     throw Exception(message)
 		}
 	  }
@@ -1284,26 +1301,70 @@ fun lexemeListOfTextRecord (lin: String, caller:String) : MutableList<Lexeme> {
     val here = functionName()
     entering(here, caller)
 
-    val count = countOfCharOfString ('$', lin, here) 
     var lexemeList = mutableListOf<Lexeme>()
+
+    val wor_l = wordListOfString (lin)
+    var Done = false
+    var position = 0
     
-    if (count == 0)  {
-	var lexeme = TextRecordConstant (lin)
-        lexemeList.add (lexeme)
-	exiting(here + " with added lexeme '$lexeme'")
-	return lexemeList
-    }
-    else if (count.rem (2) == 0)  {
-	var lexeme = TextRecordSubstituable (lin)
-        lexemeList.add (lexeme)
-	exiting(here + " with added lexeme '$lexeme'")
-	return lexemeList
-    }
-    else {
-        val message = "$here: Error found $count \$ characters in line '$lin'"
-    	throw Exception(message)
+    while (!Done) {
+    	  try {
+    	      var currentCharacter = lin.get(position)
+	      when (currentCharacter){
+	      '$' -> {
+	      	  var lexeme = tokenOfChar(currentCharacter, position, lin, here)
+		  lexemeList.add (lexeme)
+// $variable$ to be susbsituted 
+		  position = position + 1
+	      	  val str = lin.substring(position)
+    	      	  val word = nextWordOfEndCharOfString('$', str, here)
+
+		  if (isTextVariableOfString(word, here)) {
+		     position = position + word.length 
+		     lexeme = TextVariableSubstituable(word)
+		     lexemeList.add (lexeme)
+		  }
+		  else {
+		       val message = "$here: Error word '$word' is not a valid variable name"
+		       throw Exception(message)
+		  }
+		  }
+	      ' ' -> {
+	      	  tokenOfChar(currentCharacter, position, lin, here)
+		  position = position + 1
+	      	  val str = lin.substring(position)
+		  val word = nextWordOfEndCharOfString(' ', str, here)
+		  if (isTextWordOfString(word, here)) {
+		     position = position + word.length 
+		     val lexeme = TextWordConstant(word)
+		     lexemeList.add (lexeme)
+		  }
+		  else {
+		       val message = "$here: Error word '$word' is not a valid word of Text"
+		       throw Exception(message)
+		  }
+	          }
+	       else -> {
+	      	  val str = lin.substring(position)
+		  val word = nextWordOfEndCharOfString(' ', str, here)
+		  position = position + word.length 
+		  val lexeme = TextStringConstant(word)
+		  lexemeList.add (lexeme)
+	          }
+		}
+   		}
+	  catch (e: java.lang.StringIndexOutOfBoundsException) {
+	     	   val lexeme = TokenEndOfLine
+             	   lexemeList.add (lexeme)
+	     	   println("$here: setting End Of Line")
+	     	   Done = true			
+	  }
    }
+   println("$here: output lexemeList "+lexemeList)
+   exiting(here)
+   return lexemeList
 }
+
 
 fun lexemeListOfTicLine (lin: String, caller:String) : MutableList<Lexeme> {
 // # $tic: 1579373044$'
@@ -1389,7 +1450,9 @@ fun stringOfLexeme (lexeme: Lexeme): String {
 	is Signature -> "Signature("+lexeme.value+")"	
 	is DateValue -> "DateValue("+lexeme.value+")"
 	is TextRecordConstant -> "TextRecordConstant("+lexeme.record+")"
-	is TextRecordSubstituable -> "TextRecordSubstituable("+lexeme.record+")"	
+	is TextWordConstant -> "TextRecordConstant("+lexeme.word+")"
+	is TextStringConstant -> "TextRecordConstant("+lexeme.string+")"
+	is TextVariableSubstituable -> "TextVariableSubstituable("+lexeme.variable+")"	
 	is Comment -> "Comment("+lexeme.name+")"
 	UnknownKW -> "unknown "
 	EmptySharpedLine -> "EmptySharpedLine"
