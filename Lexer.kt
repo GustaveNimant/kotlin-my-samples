@@ -33,31 +33,20 @@ sealed class Lexeme ()  // Sharped Line
 	  
 	  object UnknownKW : Lexeme ()
 	  object SkippedKW : Lexeme ()
+// beginning of Library
 
-	  object EmptySharpedLine : Lexeme ()
-	  object TokenSharp : Lexeme ()
-	  object EmptyLine : Lexeme ()
+fun countOfCharOfString (cha: Char, str:String, caller:String) : Int {
+    val here = functionName()
+    entering(here, caller)
 
- data class TokenAlphabetical (val character: Char): Lexeme ()
- data class TokenAlphanumerical (val character: Char): Lexeme ()
- data class TokenNumerical (val character: Char) : Lexeme ()
+    var count = 0
 
- object TokenDollar : Lexeme ()
- object TokenSpace : Lexeme ()
- object TokenEndOfLine : Lexeme ()
- object TokenVee : Lexeme ()
- object TokenComma : Lexeme ()
- object TokenColon : Lexeme ()
- object TokenSemicolon : Lexeme ()
- object TokenDot : Lexeme ()
- object TokenHyphen : Lexeme ()
-
-data class pairString (val first: String, val second: String)
-
-fun functionName():String {
-    val sta = Thread.currentThread().stackTrace[2]
-    val str = sta.getMethodName()
-    return str	
+    for (c in str) {
+        if (c == cha){count = count + 1}
+    }	
+		
+    exiting(here + " with count " + count.toString())
+    return count
 }
 
 fun entering(here:String, caller:String):Unit {
@@ -76,11 +65,13 @@ fun exiting(here:String):Unit {
     level = level - 1	
 }
 
-fun notYetImplemented(fun_nam: String){
-    throw Exception("Error: function '$fun_nam' is not yet implemented")
+fun functionName():String {
+    val sta = Thread.currentThread().stackTrace[2]
+    val str = sta.getMethodName()
+    return str	
 }
 
-fun read_input(caller:String):String {
+fun inputRead(caller:String):String {
     val here = functionName()
     entering(here, caller)
 	
@@ -88,29 +79,6 @@ fun read_input(caller:String):String {
     
     exiting(here)
     return str
-}
-
-fun write_output(fileName:String, content: String, caller:String) {
-    val here = functionName()
-    entering(here, caller)
-	
-    File(fileName).bufferedWriter().use { out -> out.write(content)}
-    
-    exiting(here)
-}
-
-fun countOfCharOfString (cha: Char, str:String, caller:String) : Int {
-    val here = functionName()
-    entering(here, caller)
-
-    var count = 0
-
-    for (c in str) {
-        if (c == cha){count = count + 1}
-    }	
-		
-    exiting(here + " with count " + count.toString())
-    return count
 }
 
 fun lineListOfFileName (nof: String, caller: String) : MutableList<String> {
@@ -129,6 +97,65 @@ fun lineListOfFileName (nof: String, caller: String) : MutableList<String> {
   exiting(here)
   return result
 }
+
+fun lineStackOfLineList (str_l: List<String>) : Stack<String> {
+    var stack = Stack<String>()
+    str_l.reversed().forEach { l -> stack.push(l) }
+    return stack
+}
+
+fun nextWordOfEndCharOfString(del: Char, str: String, caller: String): String {
+    val here = functionName()
+    entering(here, caller)
+
+    println("$here: input del '$del'")
+    println("$here: input str '$str'")
+    
+    var word = ""    
+    for (c in str){
+	  println("$here: c '$c'")
+	  if (c.equals(del)) {break}
+	  word = word.plus(c.toString())
+    }
+
+    assert (word.isNotEmpty())
+    
+    println("$here: output word '$word'")
+    exiting(here)
+    return word
+}
+
+fun notYetImplemented(fun_nam: String){
+    throw Exception("Error: function '$fun_nam' is not yet implemented")
+}
+
+fun outputWrite(fileName:String, content: String, caller:String) {
+    val here = functionName()
+    entering(here, caller)
+	
+    File(fileName).bufferedWriter().use { out -> out.write(content)}
+    
+    exiting(here)
+}
+
+fun wordListOfString (str: String): List<String> {
+    val trimedString = str.trim(' ')    
+    val regex = Regex("""\s+""")
+
+    val result = trimedString.split(regex)
+
+    return result
+}
+
+fun wordStackOfLine (lin: String) : Stack<String> {
+    var stack = Stack<String>()
+    var wor_l = wordListOfString (lin)
+    wor_l.reversed().forEach { w -> stack.push(w)}
+    return stack
+}
+
+
+// end of Library
 
 fun lexemeOfKeyword (keyword:String, caller: String) : Lexeme {
     val here = functionName()
@@ -179,50 +206,6 @@ fun nextWordOfString(pos:Int, lin: String, caller: String): String {
     println("$here: output word '$word'")
     exiting(here)
     return word
-}
-
-fun nextWordOfEndCharOfString(del: Char, str: String, caller: String): String {
-    val here = functionName()
-    entering(here, caller)
-
-    println("$here: input del '$del'")
-    println("$here: input str '$str'")
-    
-    var word = ""    
-    for (c in str){
-	  println("$here: c '$c'")
-	  if (c.equals(del)) {break}
-	  word = word.plus(c.toString())
-    }
-
-    assert (word.isNotEmpty())
-    
-    println("$here: output word '$word'")
-    exiting(here)
-    return word
-}
-
-fun lineStackOfLineList (str_l: List<String>) : Stack<String> {
-    var stack = Stack<String>()
-    str_l.reversed().forEach { l -> stack.push(l) }
-    return stack
-}
-
-fun wordListOfString (str: String): List<String> {
-
-    val trimedString = str.trim(' ')    
-    val regex = Regex("""\s+""")
-
-    val result = trimedString.split(regex)
-
-    return result
-}
-
-fun wordStackOfLine (lin: String) : Stack<String> {
-    var stack = Stack<String>()
-    var wor_l = wordListOfString (lin)
-    wor_l.reversed().forEach { w -> stack.push(w)}
-    return stack
 }
 
 fun isAlphabeticalOfChar(cha: Char, caller: String): Boolean {
@@ -1356,7 +1339,6 @@ fun lexemeListOfTextRecord (lin: String, caller:String) : MutableList<Lexeme> {
    return lexemeList
 }
 
-
 fun lexemeListOfTicLine (lin: String, caller:String) : MutableList<Lexeme> {
 // # $tic: 1579373044$'
     val here = functionName()
@@ -1540,9 +1522,8 @@ fun main(args: Array<String>) {
 
     var lexemeList = mutableListOf<Lexeme>()
     
-//    println("$here: Enter file name. Ex. 'current-block-test.yml'")
-//    val fileName = read_input(here)
-    val fileName = "t.yml"
+    val fileName = inputRead(here)
+//    val fileName = "t.yml"
     println("$here: Entered file name : $fileName")
 
     println("Read the whole file as a List of String :")
@@ -1567,7 +1548,7 @@ fun main(args: Array<String>) {
     
     val str_l = stringListOfLexemeList (lexemeList)
     val content = stringOfGlueOfStringList ("\n", str_l)
-    write_output ("some.txt", content, here)
+    outputWrite ("some.txt", content, here)
     
     println("\nnormal termination")
     exiting(here)

@@ -1,15 +1,11 @@
 package MyLibrary
- 
+
 import java.io.File
 import java.util.Base64
 
-class MyLibrary {
+class MyLibrary
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
-
-fun notYetImplemented(fun_nam:String){
-    throw Exception("function $fun_nam is not yet implemented")
-}
 
 fun functionName():String {
     val sta = Thread.currentThread().stackTrace[2]
@@ -20,7 +16,7 @@ fun functionName():String {
 fun entering(here:String, caller:String):Unit {
     level = level + 1
     if (level > 70) {
-       println ("Error maximum number of nesting levels reached")
+       println ("Errot maximum number of nesting levels reached")
     } else {
         var points = dots.substring(0, level)
         println("$points Entering  in $here called by $caller")
@@ -33,17 +29,11 @@ fun exiting(here:String):Unit {
     level = level - 1	
 }
 
-fun read_input(caller:String):String {
-    val here = functionName()
-    entering(here, caller)
-	
-    val str = readLine().toString()
-
-    exiting(here+" with str = $str")
-    return str
+fun notYetImplemented(fun_nam: String){
+    throw Exception("Error: function '$fun_nam' is not yet implemented")
 }
 
-fun readInput(caller:String):String {
+fun inputRead(caller:String):String {
     val here = functionName()
     entering(here, caller)
 	
@@ -53,7 +43,12 @@ fun readInput(caller:String):String {
     return str
 }
 
-
+fun outputWrite(fileName:String, content: String, caller:String) {
+    val here = functionName()
+    entering(here, caller)
+	
+    File(fileName).bufferedWriter().use { out -> out.write(content)}
+    
+    exiting(here)
 }
 
-// ---------- end of header ----------
