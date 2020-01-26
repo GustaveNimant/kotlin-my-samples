@@ -1,6 +1,7 @@
 CC=kotlinc
 
 run = $(basename $(arg))
+
 all: $(run)
 
 MyLibrary.jar: MyLibrary.kt

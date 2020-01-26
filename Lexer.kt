@@ -8,51 +8,51 @@ import MyLibrary.*
 // kotlinc -classpath MyLibrary.jar Lexer.kt -include-runtime -d Lexer.jar
 // java -esa --class-path MyLibrary.jar:Lexer.jar LexerKt
 
-sealed class Lexeme ()  // Sharped Line 
-       	  data class KeywordWithPersonName (val name: String) : Lexeme ()
-	  data class KeywordWithDate (val name: String) : Lexeme ()
-	  data class KeywordWithQmHash (val name: String) : Lexeme ()
-	  data class KeywordWithZ2Hash (val name: String) : Lexeme () 
-	  data class KeywordWithString (val name: String) : Lexeme ()
-	  data class KeywordWithFile (val name: String) : Lexeme ()
-	  data class KeywordWithInteger (val name: String) : Lexeme ()
+sealed class Lexeme ()
+  data class KeywordWithPersonName (val name: String) : Lexeme ()
+  data class KeywordWithDate (val name: String) : Lexeme ()
+  data class KeywordWithQmHash (val name: String) : Lexeme ()
+  data class KeywordWithZ2Hash (val name: String) : Lexeme () 
+  data class KeywordWithString (val name: String) : Lexeme ()
+  data class KeywordWithFile (val name: String) : Lexeme ()
+  data class KeywordWithInteger (val name: String) : Lexeme ()
 
-	  data class Comment (val name: String) : Lexeme ()
-	  data class DateValue (val value: String) : Lexeme ()
-	  data class AuthorName (val name: String) : Lexeme ()
-  	  data class NextName (val name: String) : Lexeme ()
-	  data class FilePath (val name: String) : Lexeme ()
-	  data class QmHash (val hash: String) : Lexeme ()
-	  data class Z2Hash (val hash: String) : Lexeme ()
-	  data class Signature (val value: String) : Lexeme ()
-	  data class Spot (val value: String) : Lexeme ()
-	  data class Tic (val value: String) : Lexeme ()	  
+  data class Comment (val name: String) : Lexeme ()
+  data class DateValue (val value: String) : Lexeme ()
+  data class AuthorName (val name: String) : Lexeme ()
+  data class NextName (val name: String) : Lexeme ()
+  data class FilePath (val name: String) : Lexeme ()
+  data class QmHash (val hash: String) : Lexeme ()
+  data class Z2Hash (val hash: String) : Lexeme ()
+  data class Signature (val value: String) : Lexeme ()
+  data class Spot (val value: String) : Lexeme ()
+  data class Tic (val value: String) : Lexeme ()	  
 
-	  data class TextRecordConstant (val record: String) : Lexeme ()
-	  data class TextStringConstant (val string: String) : Lexeme ()
-	  data class TextWordConstant (val word: String) : Lexeme ()
-	  data class TextVariableSubstituable (val variable: String) : Lexeme ()
+  data class TextRecordConstant (val record: String) : Lexeme ()
+  data class TextStringConstant (val string: String) : Lexeme ()
+  data class TextWordConstant (val word: String) : Lexeme ()
+  data class TextVariableSubstituable (val variable: String) : Lexeme ()
 	  
-	  object UnknownKW : Lexeme ()
-	  object SkippedKW : Lexeme ()
+  data class TokenAlphabetical (val character: Char): Lexeme ()
+  data class TokenAlphanumerical (val character: Char): Lexeme ()
+  data class TokenNumerical (val character: Char) : Lexeme ()
 
-	  object EmptySharpedLine : Lexeme ()
-	  object TokenSharp : Lexeme ()
-	  object EmptyLine : Lexeme ()
+  object TokenUnknown : Lexeme ()
+  object TokenSkipped : Lexeme ()
 
- data class TokenAlphabetical (val character: Char): Lexeme ()
- data class TokenAlphanumerical (val character: Char): Lexeme ()
- data class TokenNumerical (val character: Char) : Lexeme ()
+  object TokenEmptySharpedLine : Lexeme ()
+  object TokenEmptyLine : Lexeme ()
 
- object TokenDollar : Lexeme ()
- object TokenSpace : Lexeme ()
- object TokenEndOfLine : Lexeme ()
- object TokenVee : Lexeme ()
- object TokenComma : Lexeme ()
- object TokenColon : Lexeme ()
- object TokenSemicolon : Lexeme ()
- object TokenDot : Lexeme ()
- object TokenHyphen : Lexeme ()
+  object TokenDollar : Lexeme ()
+  object TokenSpace : Lexeme ()
+  object TokenEndOfLine : Lexeme ()
+  object TokenVee : Lexeme ()
+  object TokenComma : Lexeme ()
+  object TokenColon : Lexeme ()
+  object TokenSemicolon : Lexeme ()
+  object TokenSharp : Lexeme ()
+  object TokenDot : Lexeme ()
+  object TokenHyphen : Lexeme ()
 
 data class pairString (val first: String, val second: String)
 
@@ -105,7 +105,7 @@ fun isNextNameOfString(str: String, caller: String): Boolean {
     return result
 }
 
-fun lexemeOfKeyword (keyword:String, caller: String) : Lexeme {
+fun lexemeOfKeyword (keyword: String, caller: String) : Lexeme {
     val here = functionName()
     entering(here, caller)
 
@@ -134,7 +134,7 @@ fun lexemeOfKeyword (keyword:String, caller: String) : Lexeme {
   return lexeme
  }
 
-fun isKeywordOfString(str:String, caller: String): Boolean {
+fun isKeywordOfString(str: String, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
 
@@ -145,7 +145,7 @@ fun isKeywordOfString(str:String, caller: String): Boolean {
     return result
 }
 
-fun isKeywordNameOfString(str:String, caller: String): Boolean {
+fun isKeywordNameOfString(str: String, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
 
@@ -184,8 +184,9 @@ fun isSpotOfString(str: String, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
     
-    val pattern = Regex("""\d+""")
     println("$here: input str '$str'")
+
+    val pattern = Regex("""\d+""")
     val result = pattern.matches(str)
 
     exiting(here + " with result '$result'")
@@ -196,8 +197,9 @@ fun isTicOfString(str: String, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
     
-    val pattern = Regex("""\d+""")
     println("$here: input str '$str'")
+
+    val pattern = Regex("""\d+""")
     val result = pattern.matches(str)
 
     exiting(here + " with result '$result'")
@@ -228,7 +230,7 @@ fun isTextWordOfString(str: String, caller: String): Boolean {
     return result
 }
 
-fun isTokenOfChar(cha: Char, caller:String) : Boolean {
+fun isTokenOfChar(cha: Char, caller: String) : Boolean {
     val here = functionName()
     entering(here, caller)
 
@@ -290,7 +292,7 @@ fun keywordAndStringOfSharpedLine (lin: String, caller: String) : pairString {
   return pairString (currentWord, nextWord)
 }
 
-fun keywordOfString(str:String, caller: String): String {
+fun keywordOfString(str: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
 
@@ -303,7 +305,7 @@ fun keywordOfString(str:String, caller: String): String {
     return result
 }
 
-fun keywordNameOfString (str:String, caller: String): String {
+fun keywordNameOfString (str: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
 
@@ -316,7 +318,7 @@ fun keywordNameOfString (str:String, caller: String): String {
     return result
 }
 
-fun lexemeListOfAuthorLine (lin: String, caller:String) : MutableList<Lexeme> {
+fun lexemeListOfAuthorLine (lin: String, caller: String) : MutableList<Lexeme> {
 // # $Author: michel$'
     val here = functionName()
     entering(here, caller)
@@ -383,7 +385,7 @@ fun lexemeListOfAuthorLine (lin: String, caller:String) : MutableList<Lexeme> {
    return lexemeList
 }
 
-fun lexemeListOfDateLine (lin: String, caller:String) : MutableList<Lexeme> {
+fun lexemeListOfDateLine (lin: String, caller: String) : MutableList<Lexeme> {
 // # $Date: now$
     val here = functionName()
     entering(here, caller)
@@ -448,7 +450,7 @@ fun lexemeListOfDateLine (lin: String, caller:String) : MutableList<Lexeme> {
    return lexemeList
 }
 
-fun lexemeListOfMutableLine (lin: String, caller:String) : MutableList<Lexeme> {
+fun lexemeListOfMutableLine (lin: String, caller: String) : MutableList<Lexeme> {
 // mutable: /.brings/system/bin/kwextract.pl$
     val here = functionName()
     entering(here, caller)
@@ -516,7 +518,7 @@ fun lexemeListOfMutableLine (lin: String, caller:String) : MutableList<Lexeme> {
    return lexemeList
 }
 
-fun lexemeListOfNextLine (lin: String, caller:String) : MutableList<Lexeme> {
+fun lexemeListOfNextLine (lin: String, caller: String) : MutableList<Lexeme> {
 // # $next: unknown$'
     val here = functionName()
     entering(here, caller)
@@ -583,7 +585,7 @@ fun lexemeListOfNextLine (lin: String, caller:String) : MutableList<Lexeme> {
    return lexemeList
 }
 
-fun lexemeListOfParentsLine (lin: String, caller:String) : MutableList<Lexeme> {
+fun lexemeListOfParentsLine (lin: String, caller: String) : MutableList<Lexeme> {
 // parents: QmU1RDLsAGNPVuwDjKD3RQx7R6aEuQfcmSiubviDZ2XRVC$
     val here = functionName()
     entering(here, caller)
@@ -651,7 +653,7 @@ fun lexemeListOfParentsLine (lin: String, caller:String) : MutableList<Lexeme> {
    return lexemeList
 }
 
-fun lexemeListOfPreviousLine (lin: String, caller:String) : MutableList<Lexeme> {
+fun lexemeListOfPreviousLine (lin: String, caller: String) : MutableList<Lexeme> {
 // previous: QmU1RDLsAGNPVuwDjKD3RQx7R6aEuQfcmSiubviDZ2XRVC$
     val here = functionName()
     entering(here, caller)
@@ -719,7 +721,7 @@ fun lexemeListOfPreviousLine (lin: String, caller:String) : MutableList<Lexeme> 
    return lexemeList
 }
 
-fun lexemeListOfQmHashLine (lin: String, caller:String) : MutableList<Lexeme> {
+fun lexemeListOfQmHashLine (lin: String, caller: String) : MutableList<Lexeme> {
 // qm: z2U1RDLsAGNPVuwDjKD3RQx7R6aEuQfcmSiubviDZ2XRVC$
     val here = functionName()
     entering(here, caller)
@@ -787,7 +789,7 @@ fun lexemeListOfQmHashLine (lin: String, caller:String) : MutableList<Lexeme> {
    return lexemeList
 }
 
-fun lexemeListOfSharpedLine (lin: String, caller:String) : MutableList<Lexeme> {
+fun lexemeListOfSharpedLine (lin: String, caller: String) : MutableList<Lexeme> {
 // Source: /my/perl/script/kwextract.pl,v$
     val here = functionName()
     entering(here, caller)
@@ -812,7 +814,7 @@ fun lexemeListOfSharpedLine (lin: String, caller:String) : MutableList<Lexeme> {
 	    }
 	    else {
 	       Done = true
-	       EmptySharpedLine
+	       TokenEmptySharpedLine
 	    }
 	}
 	' ' -> {
@@ -919,7 +921,7 @@ fun lexemeListOfSharpedLine (lin: String, caller:String) : MutableList<Lexeme> {
    return lexemeList
 }
 
-fun lexemeListOfSourceLine (lin: String, caller:String) : MutableList<Lexeme> {
+fun lexemeListOfSourceLine (lin: String, caller: String) : MutableList<Lexeme> {
 // Source: /my/perl/script/kwextract.pl,v$
     val here = functionName()
     entering(here, caller)
@@ -990,7 +992,7 @@ fun lexemeListOfSourceLine (lin: String, caller:String) : MutableList<Lexeme> {
    return lexemeList
 }
 
-fun lexemeListOfSignatureLine (lin: String, caller:String) : MutableList<Lexeme> {
+fun lexemeListOfSignatureLine (lin: String, caller: String) : MutableList<Lexeme> {
 // # $spot: 1579373044$'
     val here = functionName()
     entering(here, caller)
@@ -1057,7 +1059,7 @@ fun lexemeListOfSignatureLine (lin: String, caller:String) : MutableList<Lexeme>
    return lexemeList
 }
 
-fun lexemeListOfSpotLine (lin: String, caller:String) : MutableList<Lexeme> {
+fun lexemeListOfSpotLine (lin: String, caller: String) : MutableList<Lexeme> {
 // # $spot: 1579373044$'
     val here = functionName()
     entering(here, caller)
@@ -1090,12 +1092,12 @@ fun lexemeListOfSpotLine (lin: String, caller:String) : MutableList<Lexeme> {
 		  if (isSpotOfString(word, here)) {
 		     position = position + word.length 
     		     Spot (word)
-		  }
+		     }
 		  else {
 		       val message = "$here: Error word '$word' is not a valid Spot field"
 		       throw Exception(message)
-		  }
-	          }
+		       }
+	           }    
 	       else -> {
 		     val message = "$here: Error unknown current Character '$currentCharacter' at position $position"
 		     throw Exception(message)
@@ -1124,7 +1126,7 @@ fun lexemeListOfSpotLine (lin: String, caller:String) : MutableList<Lexeme> {
    return lexemeList
 }
 
-fun lexemeListOfTextRecord (lin: String, caller:String) : MutableList<Lexeme> {
+fun lexemeListOfTextRecord (lin: String, caller: String) : MutableList<Lexeme> {
     val here = functionName()
     entering(here, caller)
 
@@ -1146,9 +1148,9 @@ fun lexemeListOfTextRecord (lin: String, caller:String) : MutableList<Lexeme> {
 	      	  val str = currentWord.substring(1)
 		  if (! str.last().equals('$')) {
 		     fatalErrorPrint ("currentWord ends with a '$'",
-		                      currentWord,
+  		                       currentWord,
 				      "Check current line '$lin' is actual Text",
-				      here)
+				       here)
 		  }
 
 		  val word = nextWordOfEndCharOfString('$', str, here)
@@ -1171,9 +1173,8 @@ fun lexemeListOfTextRecord (lin: String, caller:String) : MutableList<Lexeme> {
         }
    } 
       catch (e: java.lang.StringIndexOutOfBoundsException) {
-      	    lexemeList.add (EmptyLine)
+      	    lexemeList.add (TokenEmptyLine)
 	    }
-
    }
 
 
@@ -1183,7 +1184,7 @@ fun lexemeListOfTextRecord (lin: String, caller:String) : MutableList<Lexeme> {
    return lexemeList
 }
 
-fun lexemeListOfTicLine (lin: String, caller:String) : MutableList<Lexeme> {
+fun lexemeListOfTicLine (lin: String, caller: String) : MutableList<Lexeme> {
 // # $tic: 1579373044$'
     val here = functionName()
     entering(here, caller)
@@ -1274,46 +1275,47 @@ fun nextWordOfString(pos:Int, lin: String, caller: String): String {
 
 fun stringOfLexeme (lexeme: Lexeme): String {
     val string = when (lexeme) {
-        is KeywordWithPersonName -> "KeywordWithPersonName("+lexeme.name+")"
-    	is KeywordWithDate -> "KeywordWithDate("+lexeme.name+")"
-    	is KeywordWithFile -> "KeywordWithFile("+lexeme.name+")"
-    	is KeywordWithQmHash -> "KeywordWithQmHash("+lexeme.name+")"
-	is KeywordWithZ2Hash -> "KeywordWithZ2Hash("+lexeme.name+")"
-    	is KeywordWithString -> "KeywordWithString("+lexeme.name+")"
-    	is KeywordWithInteger -> "KeywordWithInteger("+lexeme.name+")"
+
 	is AuthorName -> "AuthorName("+lexeme.name+")"
-	is NextName -> "NextName("+lexeme.name+")"
-	is FilePath -> "FilePath("+lexeme.name+")"
-	is QmHash -> "QmHash("+lexeme.hash+")"
-	is Z2Hash -> "Z2Hash("+lexeme.hash+")"
-	is Spot -> "Spot("+lexeme.value+")"
-	is Tic -> "Tic("+lexeme.value+")"	
-	is Signature -> "Signature("+lexeme.value+")"	
+	is Comment -> "Comment("+lexeme.name+")"
 	is DateValue -> "DateValue("+lexeme.value+")"
+	is FilePath -> "FilePath("+lexeme.name+")"
+	is KeywordWithZ2Hash -> "KeywordWithZ2Hash("+lexeme.name+")"
+	is NextName -> "NextName("+lexeme.name+")"
+	is QmHash -> "QmHash("+lexeme.hash+")"
+	is Signature -> "Signature("+lexeme.value+")"	
+	is Spot -> "Spot("+lexeme.value+")"
 	is TextRecordConstant -> "TextRecordConstant("+lexeme.record+")"
-	is TextWordConstant -> "TextWordConstant("+lexeme.word+")"
 	is TextStringConstant -> "TextStringConstant("+lexeme.string+")"
 	is TextVariableSubstituable -> "TextVariableSubstituable("+lexeme.variable+")"	
-	is Comment -> "Comment("+lexeme.name+")"
-	UnknownKW -> "unknown "
-	EmptySharpedLine -> "EmptySharpedLine"
-	EmptyLine -> "EmptyLine"
-	SkippedKW -> "skipped "
-TokenSharp	-> "TokenSharp"
-TokenDollar	-> "TokenDollar"
-TokenSpace	-> "TokenSpace"
-TokenEndOfLine	-> "TokenEndOfLine"
-TokenVee	-> "TokenVee"
-TokenComma	-> "TokenComma"
-TokenColon	-> "TokenColon"
-TokenSemicolon	-> "TokenSemicolon"
-TokenDot	-> "TokenDot"
-TokenHyphen	-> "TokenHyphen"
+	is TextWordConstant -> "TextWordConstant("+lexeme.word+")"
+	is Tic -> "Tic("+lexeme.value+")"	
+	is TokenAlphabetical -> "TokenAlphabetical("+lexeme.character.toString()+")"
+	is TokenAlphanumerical -> "TokenAlphanumerical("+lexeme.character.toString()+")"
+	is TokenNumerical -> "TokenNumerical("+lexeme.character.toString()+")"
+	is Z2Hash -> "Z2Hash("+lexeme.hash+")"
 
-is TokenAlphabetical -> "TokenAlphabetical("+lexeme.character.toString()+")"
-is TokenAlphanumerical -> "TokenAlphanumerical("+lexeme.character.toString()+")"
-is TokenNumerical -> "TokenNumerical("+lexeme.character.toString()+")"
+	is KeywordWithDate -> "KeywordWithDate("+lexeme.name+")"
+    	is KeywordWithFile -> "KeywordWithFile("+lexeme.name+")"
+    	is KeywordWithInteger -> "KeywordWithInteger("+lexeme.name+")"
+    	is KeywordWithQmHash -> "KeywordWithQmHash("+lexeme.name+")"
+    	is KeywordWithString -> "KeywordWithString("+lexeme.name+")"
+        is KeywordWithPersonName -> "KeywordWithPersonName("+lexeme.name+")"
 
+	TokenColon	-> "TokenColon"
+	TokenComma	-> "TokenComma"
+	TokenDollar	-> "TokenDollar"
+	TokenDot	-> "TokenDot"
+	TokenEmptyLine -> "TokenEmptyLine"
+	TokenEmptySharpedLine -> "TokenEmptySharpedLine"
+	TokenEndOfLine	-> "TokenEndOfLine"
+	TokenHyphen	-> "TokenHyphen"
+	TokenSemicolon	-> "TokenSemicolon"
+	TokenSharp	-> "TokenSharp"
+	TokenSkipped -> "skipped "
+	TokenSpace	-> "TokenSpace"
+	TokenUnknown -> "unknown "
+	TokenVee	-> "TokenVee"
 }
     return string
 }

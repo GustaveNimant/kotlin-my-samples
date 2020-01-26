@@ -1,7 +1,7 @@
 // https://stackoverflow.com/questions/48181751/get-name-of-current-function-in-kotlin
 // https://docs.oracle.com/javase/8/docs/api/java/lang/StackTraceElement.html
 
-fun functionName():String {
+fun functionName(): String {
     val sta_a = Thread.currentThread().stackTrace
     val sta_2 = sta_a[2]
     val str = sta_2.getMethodName()
@@ -17,12 +17,12 @@ fun functionName():String {
     return str	
 }
 
-fun functionNameOfStack(stack:StackTraceElement):String {
+fun functionNameOfStack(stack:StackTraceElement): String {
     val str = stack.getMethodName()
     return str	
 }
 
-fun functionNameOfThread(thread:Thread):String {
+fun functionNameOfThread(thread:Thread): String {
     println("Entering in functionNameOfThread with thread: $thread")	
     val sta = thread.stackTrace
     println("in functionNameOfThread sta: $sta")	

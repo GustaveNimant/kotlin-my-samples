@@ -1,8 +1,8 @@
 sealed class Color () 
     data class Red (val hue: String) : Color()
-    data class Blue (val hue:String) : Color()
+    data class Blue (val hue: String) : Color()
 
-fun make(name: String, hue:String) = when (name) {
+fun make(name: String, hue: String) = when (name) {
             "Red" -> Red (hue)
             "Blue" -> Blue (hue)
 	    else -> throw Exception ("Error hue '$hue' for color '$name'") 

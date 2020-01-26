@@ -3,13 +3,13 @@
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
 
-fun functionName():String {
+fun functionName(): String {
     val sta = Thread.currentThread().stackTrace[2]
     val str = sta.getMethodName()
     return str	
 }
 
-fun entering(here:String, caller:String):Unit {
+fun entering(here: String, caller: String):Unit {
     level = level + 1
     if (level > 70) {
        println ("Error maximum number of nesting levels reached")
@@ -19,14 +19,14 @@ fun entering(here:String, caller:String):Unit {
     }
 }
 
-fun exiting(here:String):Unit {
+fun exiting(here: String):Unit {
     var points = dots.substring(0, level)
     println("$points Exiting from $here")
     level = level - 1	
 }
 
 
-fun read_input(caller:String):String {
+fun read_input(caller: String): String {
     val here = functionName()
     entering(here, caller)
 	
@@ -46,7 +46,7 @@ fun main(args: Array<String>) {
 
     val emailPattern = Regex("""\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6}""")
 
-    val email:String? = emailParttern.find("this is my email emile.achadde@free.fr")?.value
+    val email: String? = emailParttern.find("this is my email emile.achadde@free.fr")?.value
     println(email)
     
     val regex = str.toRegex()  

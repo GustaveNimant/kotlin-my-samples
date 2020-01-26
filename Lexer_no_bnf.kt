@@ -67,13 +67,13 @@ fun stringListOfLexemeList (lex_l: List<Lexeme>) : List<String> {
  return str_l 
 }
 
-fun functionName():String {
+fun functionName(): String {
     val sta = Thread.currentThread().stackTrace[2]
     val str = sta.getMethodName()
     return str	
 }
 
-fun entering(here:String, caller:String):Unit {
+fun entering(here: String, caller: String):Unit {
     level = level + 1
     if (level > 70) {
        println ("Error maximum number of nesting levels reached")
@@ -83,13 +83,13 @@ fun entering(here:String, caller:String):Unit {
     }
 }
 
-fun exiting(here:String):Unit {
+fun exiting(here: String):Unit {
     var points = dots.substring(0, level)
     println("$points Exiting from $here")
     level = level - 1	
 }
 
-fun read_input(caller:String):String {
+fun read_input(caller: String): String {
     val here = functionName()
     entering(here, caller)
 	
@@ -99,7 +99,7 @@ fun read_input(caller:String):String {
     return str
 }
 
-fun write_output(fileName:String, content: String, caller:String) {
+fun write_output(fileName: String, content: String, caller: String) {
     val here = functionName()
     entering(here, caller)
 	
@@ -142,7 +142,7 @@ fun wordStackOfLine (lin: String) : Stack<String> {
     return stack
 }
 
-fun lexemeOfKeywordOfValue (keyword:String, value: String, caller: String) : Lexeme {
+fun lexemeOfKeywordOfValue (keyword: String, value: String, caller: String) : Lexeme {
 
     val here = functionName()
     entering(here, caller)
@@ -198,7 +198,7 @@ fun keywordAndStringOfSharpedLine (lin: String, caller: String) : pairString {
   return pairString (currentWord, nextWord)
 }
 
-fun isKeywordOfString(str:String, caller: String): Boolean {
+fun isKeywordOfString(str: String, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
 
@@ -209,7 +209,7 @@ fun isKeywordOfString(str:String, caller: String): Boolean {
     return result
 }
 
-fun isKeywordValueOfString(str:String, caller: String): Boolean {
+fun isKeywordValueOfString(str: String, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
 
@@ -220,7 +220,7 @@ fun isKeywordValueOfString(str:String, caller: String): Boolean {
     return result
 }
 
-fun keywordOfString(str:String, caller: String): String {
+fun keywordOfString(str: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
 
@@ -233,7 +233,7 @@ fun keywordOfString(str:String, caller: String): String {
     return result
 }
 
-fun keywordValueOfString (str:String, caller: String): String {
+fun keywordValueOfString (str: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
 
@@ -246,7 +246,7 @@ fun keywordValueOfString (str:String, caller: String): String {
     return result
 }
 
-fun lexemeOfSharpedLine (lin: String, caller:String) : Lexeme {
+fun lexemeOfSharpedLine (lin: String, caller: String) : Lexeme {
 // # $Source: /my/perl/script/kwextract.pl,v$
     val here = functionName()
     entering(here, caller)

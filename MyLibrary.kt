@@ -13,7 +13,7 @@ val debug = false
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
 
-fun countOfCharOfString (cha: Char, str:String, caller:String) : Int {
+fun countOfCharOfString (cha: Char, str: String, caller: String) : Int {
     val here = functionName()
     entering(here, caller)
 
@@ -27,13 +27,13 @@ fun countOfCharOfString (cha: Char, str:String, caller:String) : Int {
     return count
 }
 
-fun fatalErrorPrint (expecting: String, found: String, cure: String, where:String):Unit {
+fun fatalErrorPrint (expecting: String, found: String, cure: String, where: String):Unit {
   val message: String = "\n$where: Expecting $expecting\n" + "$where: Found '$found'\n" + "$where: Cure: $cure\n"
 
   throw Exception(message)
 }
 
-fun entering(here:String, caller:String):Unit {
+fun entering(here: String, caller: String):Unit {
     level = level + 1
     if (level > 70) {
        println ("Error maximum number of nesting levels reached")
@@ -43,13 +43,13 @@ fun entering(here:String, caller:String):Unit {
     }
 }
 
-fun exiting(here:String):Unit {
+fun exiting(here: String):Unit {
     var points = dots.substring(0, level)
     println("$points Exiting from $here")
     level = level - 1	
 }
 
-fun functionName():String {
+fun functionName(): String {
     val sta = Thread.currentThread().stackTrace[2]
     val str = sta.getMethodName()
     return str	
@@ -139,7 +139,7 @@ fun notYetImplemented(fun_nam: String){
     throw Exception("Error: function '$fun_nam' is not yet implemented")
 }
 
-fun read_input(caller:String):String {
+fun read_input(caller: String): String {
     val here = functionName()
     entering(here, caller)
 	
@@ -175,7 +175,7 @@ fun wordStackOfLine (lin: String) : Stack<String> {
     return stack
 }
 
-fun write_output(fileName:String, content: String, caller:String) {
+fun write_output(fileName: String, content: String, caller: String) {
     val here = functionName()
     entering(here, caller)
 	

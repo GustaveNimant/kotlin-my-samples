@@ -40,7 +40,7 @@ TokenDollar
 KeywordWithString(next)
 NextName(unknown)
 TokenEndOfLine
-EmptyLine
+TokenEmptyLine
 TokenEndOfLine
 TokenSharp
 TokenSpace
@@ -74,7 +74,7 @@ TokenDollar
 KeywordWithString(Signature)
 Signature(n/a)
 TokenEndOfLine
-EmptyLine
+TokenEmptyLine
 TokenEndOfLine
 TextWordConstant(line)
 TextWordConstant(1)
@@ -82,5 +82,5 @@ TokenEndOfLine
 TextWordConstant(line)
 TextWordConstant(2)
 TokenEndOfLine
-EmptyLine
+TokenEmptyLine
 TokenEndOfLine

@@ -8,17 +8,17 @@ import java.util.Base64
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
 
-fun notYetImplemented(fun_nam:String){
+fun notYetImplemented(fun_nam: String){
     throw Exception("function $fun_nam is not yet implemented")
 }
 
-fun functionName():String {
+fun functionName(): String {
     val sta = Thread.currentThread().stackTrace[2]
     val str = sta.getMethodName()
     return str	
 }
 
-fun entering(here:String, caller:String):Unit {
+fun entering(here: String, caller: String):Unit {
     level = level + 1
     if (level > 70) {
        println ("Error maximum number of nesting levels reached")
@@ -28,14 +28,14 @@ fun entering(here:String, caller:String):Unit {
     }
 }
 
-fun exiting(here:String):Unit {
+fun exiting(here: String):Unit {
     var points = dots.substring(0, level)
     println("$points Exiting from $here")
     level = level - 1	
 }
 
 // ---------- end of header ----------
-fun read_input(caller:String):String {
+fun read_input(caller: String): String {
     val here = functionName()
     entering(here, caller)
 	
@@ -45,7 +45,7 @@ fun read_input(caller:String):String {
     return str
 }
 
-fun readInput(caller:String):String {
+fun readInput(caller: String): String {
     val here = functionName()
     entering(here, caller)
 	
@@ -55,7 +55,7 @@ fun readInput(caller:String):String {
     return str
 }
 
-fun ipms_api (files_stat:String, mfs_path:String, hash_equal:String, caller:String):String {
+fun ipms_api (files_stat: String, mfs_path: String, hash_equal: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
 
@@ -70,7 +70,7 @@ fun ipms_api (files_stat:String, mfs_path:String, hash_equal:String, caller:Stri
     return result
 }
 
-fun ipms_local_mutable_resolve (mfs_path:String, caller:String):String {
+fun ipms_local_mutable_resolve (mfs_path: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
     println ("$here: input mfs_path is '$mfs_path'");
@@ -88,7 +88,7 @@ fun ipms_local_mutable_resolve (mfs_path:String, caller:String):String {
     return result
 }
 
-fun hashOfPath (str:String, caller:String):String {
+fun hashOfPath (str: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
     println ("$here: input str is '$str'");

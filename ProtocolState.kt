@@ -4,17 +4,17 @@
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
 
-fun notYetImplemented(fun_nam:String){
+fun notYetImplemented(fun_nam: String){
     throw Exception("function $fun_nam is not yet implemented")
 }
 
-fun functionName():String {
+fun functionName(): String {
     val sta = Thread.currentThread().stackTrace[2]
     val str = sta.getMethodName()
     return str	
 }
 
-fun entering(here:String, caller:String):Unit {
+fun entering(here: String, caller: String):Unit {
     level = level + 1
     if (level > 70) {
        println ("Error maximum number of nesting levels reached")
@@ -24,13 +24,13 @@ fun entering(here:String, caller:String):Unit {
     }
 }
 
-fun exiting(here:String):Unit {
+fun exiting(here: String):Unit {
     var points = dots.substring(0, level)
     println("$points Exiting from $here")
     level = level - 1	
 }
 
-fun read_input(caller:String):String {
+fun read_input(caller: String): String {
     val here = functionName()
     entering(here, caller)
 	
@@ -40,7 +40,7 @@ fun read_input(caller:String):String {
     return str
 }
 
-fun readInput(caller:String):String {
+fun readInput(caller: String): String {
     val here = functionName()
     entering(here, caller)
 	

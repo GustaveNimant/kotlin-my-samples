@@ -4,13 +4,13 @@ class Utilities {
       var level = 0
       var dots = "........|........|........|........|........|........|........|"
 
-      fun functionName():String {
+      fun functionName(): String {
       	  val sta = Thread.currentThread().stackTrace[2]
     	  val str = sta.getMethodName()
     	  return str	
 	  }
 
-	  fun entering(here:String, caller:String):Unit {
+	  fun entering(here: String, caller: String):Unit {
     	  level = level + 1
 	  if (level > 70) {
 	     println ("Error maximum number of nesting levels reached")
@@ -20,7 +20,7 @@ class Utilities {
     	  }
 }
 
-fun exiting(here:String):Unit {
+fun exiting(here: String):Unit {
     var points = dots.substring(0, level)
     println("$points Exiting from $here")
     level = level - 1	
