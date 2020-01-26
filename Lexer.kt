@@ -1379,7 +1379,7 @@ fun main(args: Array<String>) {
 
     var lexemeList = mutableListOf<Lexeme>()
 
-    println("$here: enter file name example : current-block-test.yml")
+    println("$here: enter file name. For example : current-block-test.yml")
     val fileName = inputRead(here)
     println("$here: File name entered is '$fileName'")
 
