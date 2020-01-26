@@ -56,7 +56,6 @@ sealed class Lexeme ()  // Sharped Line
 
 data class pairString (val first: String, val second: String)
 
-
 fun isAuthorNameOfString(str: String, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
@@ -369,7 +368,7 @@ fun lexemeListOfAuthorLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
 		   lexemeList.add (lexeme)	
-	     	   println("$here: setting End Of Line")
+	     	   if (debug) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -434,7 +433,7 @@ fun lexemeListOfDateLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
 		   lexemeList.add (lexeme)
-	     	   println("$here: setting End Of Line")
+	     	   if (debug) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -502,7 +501,7 @@ fun lexemeListOfMutableLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
 		   lexemeList.add (lexeme)
-	     	   println("$here: setting End Of Line")
+	     	   if (debug) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -569,7 +568,7 @@ fun lexemeListOfNextLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
 		   lexemeList.add (lexeme)		
-	     	   println("$here: setting End Of Line")
+	     	   if (debug) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -637,7 +636,7 @@ fun lexemeListOfParentsLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
 		   lexemeList.add (lexeme)
-	     	   println("$here: setting End Of Line")
+	     	   if (debug) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -705,7 +704,7 @@ fun lexemeListOfPreviousLine (lin: String, caller:String) : MutableList<Lexeme> 
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
 		   lexemeList.add (lexeme)
-	     	   println("$here: setting End Of Line")
+	     	   if (debug) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -773,7 +772,7 @@ fun lexemeListOfQmHashLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
              	   lexemeList.add (lexeme)
-	     	   println("$here: setting End Of Line")
+	     	   if (debug) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -905,7 +904,7 @@ fun lexemeListOfSharpedLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
              	   lexemeList.add (lexeme)
-	     	   println("$here: setting End Of Line")
+	     	   if (debug) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -976,7 +975,7 @@ fun lexemeListOfSourceLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
              	   lexemeList.add (lexeme)
-	     	   println("$here: setting End Of Line")
+	     	   if (debug) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -1043,7 +1042,7 @@ fun lexemeListOfSignatureLine (lin: String, caller:String) : MutableList<Lexeme>
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
              	   lexemeList.add (lexeme)
-	     	   println("$here: setting End Of Line")
+	     	   if (debug) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -1110,7 +1109,7 @@ fun lexemeListOfSpotLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
              	   lexemeList.add (lexeme)
-	     	   println("$here: setting End Of Line")
+	     	   if (debug) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -1134,7 +1133,7 @@ fun lexemeListOfTextRecord (lin: String, caller:String) : MutableList<Lexeme> {
     val wor_l = wordListOfString (lin)
 
     for (currentWord in wor_l) { 
-      println("$here: for currentWord '$currentWord'")
+      if (debug) println("$here: for currentWord '$currentWord'")
 
       try {
       	  var currentCharacter = currentWord.get(0)
@@ -1234,7 +1233,7 @@ fun lexemeListOfTicLine (lin: String, caller:String) : MutableList<Lexeme> {
 	  	if (previousCharacter.equals('$')) {
 	     	   var lexeme = TokenEndOfLine
              	   lexemeList.add (lexeme)
-	     	   println("$here: setting End Of Line")
+	     	   if (debug) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -1259,7 +1258,7 @@ fun nextWordOfString(pos:Int, lin: String, caller: String): String {
     val str = lin.substring(pos)
     var word = ""    
     for (c in str){
-	  println("$here: c '$c'")
+	  if (debug) println("$here: c '$c'")
 	  if (isTokenOfChar(c, here)) {break}
 	  word = word.plus(c.toString())
     }
@@ -1376,19 +1375,17 @@ fun main(args: Array<String>) {
     entering(here,"resolve")
 
     var lexemeList = mutableListOf<Lexeme>()
-    
-//    println("$here: Enter file name. Ex. 'current-block-test.yml'")
-//    val fileName = read_input(here)
-    val fileName = "t.yml"
-    println("$here: Entered file name : $fileName")
 
-    println("Read the whole file as a List of String :")
+    println("$here: enter file name example : current-block-test.yml")
+    val fileName = read_input(here)
+    println("$here: File name entered is '$fileName'")
+
     val lineList = lineListOfFileName (fileName, here)
 
     var count = 0
     for (line in lineList) {
       count = count + 1
-      println("$here: for line # $count '$line'")
+      if (debug) println("$here: for line # $count '$line'")
       if (line.startsWith('#'))  {
       	 val lexeme_l = lexemeListOfSharpedLine (line, here)
 	 lexemeList.addAll (lexeme_l)
@@ -1400,7 +1397,7 @@ fun main(args: Array<String>) {
     }
     
     val siz = lexemeList.size
-    println("$here: total of $siz lexemes in List")
+    println("$here: total of $siz lexemes in file '$fileName'")
     
     val str_l = stringListOfLexemeList (lexemeList)
     val content = stringOfGlueOfStringList ("\n", str_l)

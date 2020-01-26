@@ -98,7 +98,7 @@ fun nextWordOfEndCharOfString(del: Char, str: String, caller: String): String {
     
     var word = ""    
     for (c in str){
-	  println("$here: c '$c'")
+	  if (debug) println("$here: c '$c'")
 	  if (c.equals(del)) {break}
 	  word = word.plus(c.toString())
     }
