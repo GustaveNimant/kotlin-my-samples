@@ -13,7 +13,7 @@ class Utilities {
 	  fun entering(here:String, caller:String):Unit {
     	  level = level + 1
 	  if (level > 70) {
-	     println ("Errot maximum number of nesting levels reached")
+	     println ("Error maximum number of nesting levels reached")
 	  } else {
             var points = dots.substring(0, level)
             println("$points Entering  in $here called by $caller")

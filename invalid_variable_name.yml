@@ -1,0 +1,4 @@
+# $Source: /my/perl/script/kwextract.pl,v$
+line this is an $invalid#variable$ name 
+line 2
+

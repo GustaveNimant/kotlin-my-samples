@@ -1142,11 +1142,13 @@ fun lexemeListOfTextRecord (lin: String, caller:String) : MutableList<Lexeme> {
 	'$' -> {
 	    lexemeList.add (TokenDollar)
 	    
-// $variable$ to be susbsituted 
+// $variable$ to be substituted 
 	      	  val str = currentWord.substring(1)
 		  if (! str.last().equals('$')) {
-		       val message = "$here: Error currentWord '$currentWord' must end with a '$'"
-		       throw Exception(message)
+		     fatalErrorPrint ("currentWord ends with a '$'",
+		                      currentWord,
+				      "Check current line '$lin' is actual Text",
+				      here)
 		  }
 
 		  val word = nextWordOfEndCharOfString('$', str, here)
@@ -1157,8 +1159,10 @@ fun lexemeListOfTextRecord (lin: String, caller:String) : MutableList<Lexeme> {
 		     lexemeList.add (TokenDollar)	
 		  }
 		  else {
-		       val message = "$here: Error word '$word' is not a valid variable name"
-		       throw Exception(message)
+		     fatalErrorPrint ("word below followed Regexp \"\"\"\\w+\"\"\"",
+		                      word,
+				      "Check the Regular Expression",
+				      here)
 		  }
 		  }
 	  else -> {
