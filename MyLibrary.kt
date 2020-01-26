@@ -139,7 +139,7 @@ fun notYetImplemented(fun_nam: String){
     throw Exception("Error: function '$fun_nam' is not yet implemented")
 }
 
-fun read_input(caller: String): String {
+fun inputRead(caller: String): String {
     val here = functionName()
     entering(here, caller)
 	
@@ -175,7 +175,7 @@ fun wordStackOfLine (lin: String) : Stack<String> {
     return stack
 }
 
-fun write_output(fileName: String, content: String, caller: String) {
+fun outputWrite(fileName: String, content: String, caller: String) {
     val here = functionName()
     entering(here, caller)
 	

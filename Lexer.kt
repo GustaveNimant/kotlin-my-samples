@@ -794,7 +794,7 @@ fun lexemeListOfSharpedLine (lin: String, caller: String) : MutableList<Lexeme> 
     val here = functionName()
     entering(here, caller)
 
-    println("$here: input lin'$lin'")
+    println("$here: input lin '$lin'")
     
     val lexemeList = mutableListOf<Lexeme>()
 
@@ -1177,7 +1177,6 @@ fun lexemeListOfTextRecord (lin: String, caller: String) : MutableList<Lexeme> {
 	    }
    }
 
-
    lexemeList.add (TokenEndOfLine)
    println("$here: output lexemeList "+lexemeList)
    exiting(here)
@@ -1316,7 +1315,7 @@ fun stringOfLexeme (lexeme: Lexeme): String {
 	TokenSpace	-> "TokenSpace"
 	TokenUnknown -> "unknown "
 	TokenVee	-> "TokenVee"
-}
+	}
     return string
 }
 
@@ -1381,7 +1380,7 @@ fun main(args: Array<String>) {
     var lexemeList = mutableListOf<Lexeme>()
 
     println("$here: enter file name example : current-block-test.yml")
-    val fileName = read_input(here)
+    val fileName = inputRead(here)
     println("$here: File name entered is '$fileName'")
 
     val lineList = lineListOfFileName (fileName, here)
@@ -1405,7 +1404,7 @@ fun main(args: Array<String>) {
     
     val str_l = stringListOfLexemeList (lexemeList)
     val content = stringOfGlueOfStringList ("\n", str_l)
-    write_output ("some.txt", content, here)
+    outputWrite ("some.txt", content, here)
     
     println("\nnormal termination")
     exiting(here)

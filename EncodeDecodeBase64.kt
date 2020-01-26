@@ -34,7 +34,7 @@ fun exiting(here: String):Unit {
     level = level - 1	
 }
 
-fun read_input(caller: String): String {
+fun inputRead(caller: String): String {
     val here = functionName()
     entering(here, caller)
 	

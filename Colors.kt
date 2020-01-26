@@ -11,7 +11,7 @@ sealed class Color () {
 
 fun eval(c: Color) =
         when (c) {
-	    is Color.Dark -> println("Dark")
+//	    is Color.Dark -> println("Dark")
             is Color.Dark.DarkRed -> println("Dark Red")
             is Color.Dark.DarkBlue -> println("Dark Blue")
 
@@ -21,6 +21,7 @@ fun eval(c: Color) =
 }
 
 fun main(args: Array<String>) {
+//    val d = Color.Dark()
     val dr = Color.Dark.DarkRed()
     eval(dr)
 }

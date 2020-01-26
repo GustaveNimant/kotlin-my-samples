@@ -35,7 +35,7 @@ fun exiting(here: String):Unit {
 }
 
 // ---------- end of header ----------
-fun read_input(caller: String): String {
+fun inputRead(caller: String): String {
     val here = functionName()
     entering(here, caller)
 	

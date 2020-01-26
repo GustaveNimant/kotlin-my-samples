@@ -113,7 +113,7 @@ fun notYetImplemented(fun_nam: String){
     throw Exception("Error: function '$fun_nam' is not yet implemented")
 }
 
-fun read_input(caller: String): String {
+fun inputRead(caller: String): String {
     val here = functionName()
     entering(here, caller)
 	
@@ -123,7 +123,7 @@ fun read_input(caller: String): String {
     return str
 }
 
-fun write_output(fileName: String, content: String, caller: String) {
+fun outputWrite(fileName: String, content: String, caller: String) {
     val here = functionName()
     entering(here, caller)
 	
@@ -1544,7 +1544,7 @@ fun main(args: Array<String>) {
     var lexemeList = mutableListOf<Lexeme>()
     
 //    println("$here: Enter file name. Ex. 'current-block-test.yml'")
-//    val fileName = read_input(here)
+//    val fileName = inputRead(here)
     val fileName = "t.yml"
     println("$here: Entered file name : $fileName")
 
@@ -1570,7 +1570,7 @@ fun main(args: Array<String>) {
     
     val str_l = stringListOfLexemeList (lexemeList)
     val content = stringOfGlueOfStringList ("\n", str_l)
-    write_output ("some.txt", content, here)
+    outputWrite ("some.txt", content, here)
     
     println("\nnormal termination")
     exiting(here)
