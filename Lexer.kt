@@ -4,6 +4,10 @@ import java.lang.Character.MIN_VALUE as nullChar
 
 import MyLibrary.*
 
+// kotlinc MyLibrary.kt -include-runtime -d MyLibrary.jar 
+// kotlinc -classpath MyLibrary.jar Lexer.kt -include-runtime -d Lexer.jar
+// java -esa --class-path MyLibrary.jar:Lexer.jar LexerKt
+
 sealed class Lexeme ()  // Sharped Line 
        	  data class KeywordWithPersonName (val name: String) : Lexeme ()
 	  data class KeywordWithDate (val name: String) : Lexeme ()

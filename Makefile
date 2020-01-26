@@ -3,11 +3,14 @@ CC=kotlinc
 run = $(basename $(arg))
 all: $(run)
 
-$(run): $(run).jar
-	java -ea -jar $^
+MyLibrary.jar: MyLibrary.kt
+	$(CC) $< -include-runtime -d $@
+
+$(run): MyLibrary.jar $(run).jar
+	java -esa --class-path MyLibrary.jar:$(run).jar $(run)Kt
 
 %.jar: %.kt
-	$(CC) $< -include-runtime -d $@ 
+	$(CC) -classpath MyLibrary.jar $< -include-runtime -d $@ 
 
 clean:
 	rm -rf *.jar
