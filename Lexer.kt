@@ -1152,7 +1152,6 @@ fun lexemeListOfTextRecord (lin: String, caller:String) : MutableList<Lexeme> {
 		  }
 
 		  val word = nextWordOfEndCharOfString('$', str, here)
-
 		  if (isTextVariableOfString(word, here)) {
 		     val lexeme = TextVariableSubstituable(word)
 		     lexemeList.add (lexeme)
@@ -1183,7 +1182,6 @@ fun lexemeListOfTextRecord (lin: String, caller:String) : MutableList<Lexeme> {
    exiting(here)
    return lexemeList
 }
-
 
 fun lexemeListOfTicLine (lin: String, caller:String) : MutableList<Lexeme> {
 // # $tic: 1579373044$'
