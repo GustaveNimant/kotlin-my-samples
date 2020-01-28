@@ -1,3 +1,5 @@
+package Lexer
+
 import java.io.File
 import java.util.Stack
 import java.lang.Character.MIN_VALUE as nullChar
@@ -56,6 +58,8 @@ sealed class Lexeme ()
 
 data class pairString (val first: String, val second: String)
 
+data class lexemeList (val list:List<Lexeme>)
+
 fun isAuthorNameOfString(str: String, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
@@ -104,35 +108,6 @@ fun isNextNameOfString(str: String, caller: String): Boolean {
     exiting(here + " with result '$result'")
     return result
 }
-
-fun lexemeOfKeyword (keyword: String, caller: String) : Lexeme {
-    val here = functionName()
-    entering(here, caller)
-
-    println("$here: input keyword: '$keyword'")
-
-   var lexeme = when (keyword) {
-       "Author" -> KeywordWithPersonName (keyword)
-       "Date" -> KeywordWithDate (keyword)
-       "Source" -> KeywordWithFile (keyword)
-       "Signature" -> KeywordWithString (keyword)      
-       "mutable" -> KeywordWithFile (keyword)
-       "parents" -> KeywordWithQmHash (keyword)
-       "previous" -> KeywordWithQmHash (keyword)
-       "next" -> KeywordWithString (keyword)
-       "tic" -> KeywordWithInteger (keyword)       
-       "qm" -> KeywordWithZ2Hash (keyword)
-       "spot" -> KeywordWithInteger (keyword)       
-       else -> {
-       	    val message = "$here: Error unknown Keyword '$keyword'"
-	    throw Exception(message)
-	}
-  }
-  
-  println ("$here: output lexeme '$lexeme'")	
-  exiting(here)
-  return lexeme
- }
 
 fun isKeywordOfString(str: String, caller: String): Boolean {
     val here = functionName()
@@ -193,19 +168,6 @@ fun isSpotOfString(str: String, caller: String): Boolean {
     return result
 }
 
-fun isTicOfString(str: String, caller: String): Boolean {
-    val here = functionName()
-    entering(here, caller)
-    
-    println("$here: input str '$str'")
-
-    val pattern = Regex("""\d+""")
-    val result = pattern.matches(str)
-
-    exiting(here + " with result '$result'")
-    return result
-}
-
 fun isTextVariableOfString(str: String, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
@@ -224,6 +186,19 @@ fun isTextWordOfString(str: String, caller: String): Boolean {
     
     val pattern = Regex("""\w+""")
     println("$here: input str '$str'")
+    val result = pattern.matches(str)
+
+    exiting(here + " with result '$result'")
+    return result
+}
+
+fun isTicOfString(str: String, caller: String): Boolean {
+    val here = functionName()
+    entering(here, caller)
+    
+    println("$here: input str '$str'")
+
+    val pattern = Regex("""\d+""")
     val result = pattern.matches(str)
 
     exiting(here + " with result '$result'")
@@ -292,19 +267,6 @@ fun keywordAndStringOfSharpedLine (lin: String, caller: String) : pairString {
   return pairString (currentWord, nextWord)
 }
 
-fun keywordOfString(str: String, caller: String): String {
-    val here = functionName()
-    entering(here, caller)
-
-   println("$here: input str '$str'")
-
-    assert (isKeywordOfString(str, here))
-    val result = (str.substring(1)).trimEnd({c -> c.equals(':')})
-
-    exiting(here + " with result '$result'")
-    return result
-}
-
 fun keywordNameOfString (str: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
@@ -315,6 +277,19 @@ fun keywordNameOfString (str: String, caller: String): String {
     var result = str.trimEnd({ c -> c.equals('$')})
 
     exiting(here + " with result "+result)
+    return result
+}
+
+fun keywordOfString(str: String, caller: String): String {
+    val here = functionName()
+    entering(here, caller)
+
+   println("$here: input str '$str'")
+
+    assert (isKeywordOfString(str, here))
+    val result = (str.substring(1)).trimEnd({c -> c.equals(':')})
+
+    exiting(here + " with result '$result'")
     return result
 }
 
@@ -1250,6 +1225,63 @@ fun lexemeListOfTicLine (lin: String, caller: String) : MutableList<Lexeme> {
    return lexemeList
 }
 
+fun lexemeListOfYmlFile (ymlFileName: String, caller: String): List<Lexeme> {
+    val here = functionName()
+    entering(here, caller)
+
+    var lexemeList = mutableListOf<Lexeme>()
+    println("$here: input ymlFileName '$ymlFileName'")
+    val lineList = lineListOfFileName (ymlFileName, here)
+
+    var count = 0
+    for (line in lineList) {
+      count = count + 1
+      if (debug) println("$here: for line # $count '$line'")
+      if (line.startsWith('#'))  {
+      	 val lexeme_l = lexemeListOfSharpedLine (line, here)
+	 lexemeList.addAll (lexeme_l)
+	 }		
+      else {
+	 val lexeme_l = lexemeListOfTextRecord (line, here)
+	 lexemeList.addAll (lexeme_l)
+	 }
+    }
+    
+    if (debug) println("$here: output lexemeList $lexemeList")
+    exiting(here)
+
+    return lexemeList
+}
+
+fun lexemeOfKeyword (keyword: String, caller: String) : Lexeme {
+    val here = functionName()
+    entering(here, caller)
+
+    println("$here: input keyword: '$keyword'")
+
+   var lexeme = when (keyword) {
+       "Author" -> KeywordWithPersonName (keyword)
+       "Date" -> KeywordWithDate (keyword)
+       "Source" -> KeywordWithFile (keyword)
+       "Signature" -> KeywordWithString (keyword)      
+       "mutable" -> KeywordWithFile (keyword)
+       "parents" -> KeywordWithQmHash (keyword)
+       "previous" -> KeywordWithQmHash (keyword)
+       "next" -> KeywordWithString (keyword)
+       "tic" -> KeywordWithInteger (keyword)       
+       "qm" -> KeywordWithZ2Hash (keyword)
+       "spot" -> KeywordWithInteger (keyword)       
+       else -> {
+       	    val message = "$here: Error unknown Keyword '$keyword'"
+	    throw Exception(message)
+	}
+  }
+  
+  println ("$here: output lexeme '$lexeme'")	
+  exiting(here)
+  return lexeme
+ }
+
 fun nextWordOfString(pos:Int, lin: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
@@ -1270,6 +1302,25 @@ fun nextWordOfString(pos:Int, lin: String, caller: String): String {
     println("$here: output word '$word'")
     exiting(here)
     return word
+}
+
+fun printLexemeListOfYmlFile (ymlFileName: String, caller: String) {
+    val here = functionName()
+    entering(here, caller)
+
+    println("$here: input ymlFileName '$ymlFileName'")
+    
+    val lex_l = lexemeListOfYmlFile (ymlFileName, here)
+    val str_l = stringListOfLexemeList (lex_l)
+    val content = stringOfGlueOfStringList ("\n", str_l)
+
+    println ("Lexemes from file '$ymlFileName'")
+    println (content) 
+}
+
+fun stringListOfLexemeList (lex_l: List<Lexeme>) : List<String> {
+ val str_l = lex_l.map({l -> stringOfLexeme (l) })
+ return str_l 
 }
 
 fun stringOfLexeme (lexeme: Lexeme): String {
@@ -1317,11 +1368,6 @@ fun stringOfLexeme (lexeme: Lexeme): String {
 	TokenVee	-> "TokenVee"
 	}
     return string
-}
-
-fun stringListOfLexemeList (lex_l: List<Lexeme>) : List<String> {
- val str_l = lex_l.map({l -> stringOfLexeme (l) })
- return str_l 
 }
 
 fun tokenOfChar(cha: Char, pos: Int, lin: String, caller: String) : Lexeme {
@@ -1373,40 +1419,75 @@ fun unknownCharacterOfMessage (mes: String?, caller: String): Char? {
     return unknownCharacter
 }
 
-fun main(args: Array<String>) {
+fun writeLexemeListOfYmlFileOfOuputFile (ymlFileName: String, lexFileName: String, caller: String) {
     val here = functionName()
-    entering(here,"resolve")
+    entering(here, caller)
 
-    var lexemeList = mutableListOf<Lexeme>()
+    println("$here: input ymlFileName '$ymlFileName'")
+    println("$here: input lexFileName '$lexFileName'")
 
-    println("$here: enter file name. For example : current-block-test.yml")
-    val fileName = inputRead(here)
-    println("$here: File name entered is '$fileName'")
-
-    val lineList = lineListOfFileName (fileName, here)
-
-    var count = 0
-    for (line in lineList) {
-      count = count + 1
-      if (debug) println("$here: for line # $count '$line'")
-      if (line.startsWith('#'))  {
-      	 val lexeme_l = lexemeListOfSharpedLine (line, here)
-	 lexemeList.addAll (lexeme_l)
-	 }		
-      else {
-	 val lexeme_l = lexemeListOfTextRecord (line, here)
-	 lexemeList.addAll (lexeme_l)
-	 }
-    }
-    
-    val siz = lexemeList.size
-    println("$here: total of $siz lexemes in file '$fileName'")
-    
-    val str_l = stringListOfLexemeList (lexemeList)
+    val lex_l = lexemeListOfYmlFile (ymlFileName, here)
+    val str_l = stringListOfLexemeList (lex_l)
     val content = stringOfGlueOfStringList ("\n", str_l)
-    outputWrite ("some.txt", content, here)
-    
-    println("\nnormal termination")
-    exiting(here)
+
+    outputWrite (lexFileName, content, here)
+
+    val siz = lex_l.size
+    println("$here: $siz lexemes written to File '$lexFileName'")
 }
+
+fun provideYmlFileName(caller: String): String {
+    val here = functionName()
+    entering(here, caller)
+
+    var ymlFileName = "current-block-test.yml" 
+    val yml_f = inputRead(here)
+    if (! yml_f.isNullOrBlank()) {
+        ymlFileName = yml_f
+    }
+    println("$here: input Yml File name is '$ymlFileName'")
+
+    exiting(here)
+    return ymlFileName
+}
+
+fun provideLexFileName(caller: String): String {
+    val here = functionName()
+    entering(here, caller)
+
+    var lexFileName = "current-block-test.lex" 
+    val lex_f = inputRead(here)
+    if (! lex_f.isNullOrBlank()) {
+        lexFileName = lex_f
+    }
+    println("$here: input Lex File name is '$lexFileName'")
+
+    exiting(here)
+    return lexFileName
+}
+
+fun buildLexemeList(ymlFileName: String, caller: String) : List<Lexeme> {
+    val here = functionName()
+    entering(here, caller)
+
+    val lex_l = lexemeListOfYmlFile (ymlFileName, here)
+
+    if (debug) println("$here: output lexeme List '$lex_l'")
+    exiting(here)
+    return lex_l
+}
+
+fun provideLexemeList(caller: String) : List<Lexeme> {
+    val here = functionName()
+    entering(here, caller)
+
+    val ymlFileName = provideYmlFileName (here)
+    val lex_l = buildLexemeList(ymlFileName, here)
+
+    if (debug) println("$here: output lexeme List '$lex_l'")
+    exiting(here)
+    return lex_l
+}
+
+
 
