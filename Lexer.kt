@@ -1436,10 +1436,26 @@ fun writeLexemeListOfYmlFileOfOuputFile (ymlFileName: String, lexFileName: Strin
     println("$here: $siz lexemes written to File '$lexFileName'")
 }
 
+fun writeLexemeList (caller: String) {
+    val here = functionName()
+    entering(here, caller)
+
+    val lex_l = provideLexemeList (here)
+    val str_l = stringListOfLexemeList (lex_l)
+    val content = stringOfGlueOfStringList ("\n", str_l)
+
+    val lexFileName = provideLexFileName(here)
+    outputWrite (lexFileName, content, here)
+
+    val siz = lex_l.size
+    println("$here: $siz lexemes written to File '$lexFileName'")
+}
+
 fun provideYmlFileName(caller: String): String {
     val here = functionName()
     entering(here, caller)
 
+    println("$here: enter input Yml file name. Default 'current-block-test.yml'")
     var ymlFileName = "current-block-test.yml" 
     val yml_f = inputRead(here)
     if (! yml_f.isNullOrBlank()) {
@@ -1455,7 +1471,8 @@ fun provideLexFileName(caller: String): String {
     val here = functionName()
     entering(here, caller)
 
-    var lexFileName = "current-block-test.lex" 
+    var lexFileName = "current-block-test.lex"
+    println("$here: enter output file name. Default '$lexFileName'")	
     val lex_f = inputRead(here)
     if (! lex_f.isNullOrBlank()) {
         lexFileName = lex_f
