@@ -1,14 +1,13 @@
-package Lexer
+package my.lexer
 
 import java.io.File
 import java.util.Stack
 import java.lang.Character.MIN_VALUE as nullChar
 
-import MyLibrary.*
+import my.library.*
 
 // kotlinc MyLibrary.kt -include-runtime -d MyLibrary.jar 
 // kotlinc -classpath MyLibrary.jar Lexer.kt -include-runtime -d Lexer.jar
-// java -esa --class-path MyLibrary.jar:Lexer.jar LexerKt
 
 sealed class Lexeme ()
   data class KeywordWithPersonName (val name: String) : Lexeme ()
@@ -58,7 +57,27 @@ sealed class Lexeme ()
 
 data class pairString (val first: String, val second: String)
 
-data class lexemeList (val list:List<Lexeme>)
+object lexemeListRegister {
+     var list = mutableListOf<Lexeme>()
+
+     fun isEmpty () : Boolean {
+     	 return list.isEmpty()
+     }
+     
+     fun store (l:List<Lexeme>) {
+     	 l.forEach {e -> list.add(e)}
+     }
+     
+     fun retrieve (caller: String) : List<Lexeme> {
+         val here = functionName()
+    	 entering(here, caller)
+     	 var l = mutableListOf<Lexeme>()
+     	 list.forEach {e -> l.add(e)}
+
+	 exiting(here)
+	 return l
+     }
+}
 
 fun isAuthorNameOfString(str: String, caller: String): Boolean {
     val here = functionName()
@@ -1315,7 +1334,15 @@ fun printLexemeListOfYmlFile (ymlFileName: String, caller: String) {
     val content = stringOfGlueOfStringList ("\n", str_l)
 
     println ("Lexemes from file '$ymlFileName'")
-    println (content) 
+    println (content)
+
+    exiting(here)
+}
+
+fun printStringList (str_l: List<String>) {
+    val content = stringOfGlueOfStringList ("\n", str_l)
+
+    println (content)
 }
 
 fun stringListOfLexemeList (lex_l: List<Lexeme>) : List<String> {
@@ -1345,26 +1372,26 @@ fun stringOfLexeme (lexeme: Lexeme): String {
 	is TokenNumerical -> "TokenNumerical("+lexeme.character.toString()+")"
 	is Z2Hash -> "Z2Hash("+lexeme.hash+")"
 
-	is KeywordWithDate -> "KeywordWithDate("+lexeme.name+")"
-    	is KeywordWithFile -> "KeywordWithFile("+lexeme.name+")"
+	is KeywordWithDate    -> "KeywordWithDate("+lexeme.name+")"
+    	is KeywordWithFile    -> "KeywordWithFile("+lexeme.name+")"
     	is KeywordWithInteger -> "KeywordWithInteger("+lexeme.name+")"
-    	is KeywordWithQmHash -> "KeywordWithQmHash("+lexeme.name+")"
-    	is KeywordWithString -> "KeywordWithString("+lexeme.name+")"
+    	is KeywordWithQmHash  -> "KeywordWithQmHash("+lexeme.name+")"
+    	is KeywordWithString  -> "KeywordWithString("+lexeme.name+")"
         is KeywordWithPersonName -> "KeywordWithPersonName("+lexeme.name+")"
 
 	TokenColon	-> "TokenColon"
 	TokenComma	-> "TokenComma"
 	TokenDollar	-> "TokenDollar"
 	TokenDot	-> "TokenDot"
-	TokenEmptyLine -> "TokenEmptyLine"
+	TokenEmptyLine  -> "TokenEmptyLine"
 	TokenEmptySharpedLine -> "TokenEmptySharpedLine"
 	TokenEndOfLine	-> "TokenEndOfLine"
 	TokenHyphen	-> "TokenHyphen"
 	TokenSemicolon	-> "TokenSemicolon"
 	TokenSharp	-> "TokenSharp"
-	TokenSkipped -> "skipped "
+	TokenSkipped    -> "skipped "
 	TokenSpace	-> "TokenSpace"
-	TokenUnknown -> "unknown "
+	TokenUnknown    -> "unknown "
 	TokenVee	-> "TokenVee"
 	}
     return string
@@ -1444,44 +1471,14 @@ fun writeLexemeList (caller: String) {
     val str_l = stringListOfLexemeList (lex_l)
     val content = stringOfGlueOfStringList ("\n", str_l)
 
-    val lexFileName = provideLexFileName(here)
+    val lexFileName = provideAnyFileNameOfWhat("Lexeme", here)
     outputWrite (lexFileName, content, here)
 
     val siz = lex_l.size
     println("$here: $siz lexemes written to File '$lexFileName'")
 }
 
-fun provideYmlFileName(caller: String): String {
-    val here = functionName()
-    entering(here, caller)
-
-    println("$here: enter input Yml file name. Default 'current-block-test.yml'")
-    var ymlFileName = "current-block-test.yml" 
-    val yml_f = inputRead(here)
-    if (! yml_f.isNullOrBlank()) {
-        ymlFileName = yml_f
-    }
-    println("$here: input Yml File name is '$ymlFileName'")
-
-    exiting(here)
-    return ymlFileName
-}
-
-fun provideLexFileName(caller: String): String {
-    val here = functionName()
-    entering(here, caller)
-
-    var lexFileName = "current-block-test.lex"
-    println("$here: enter output file name. Default '$lexFileName'")	
-    val lex_f = inputRead(here)
-    if (! lex_f.isNullOrBlank()) {
-        lexFileName = lex_f
-    }
-    println("$here: input Lex File name is '$lexFileName'")
-
-    exiting(here)
-    return lexFileName
-}
+// IRP
 
 fun buildLexemeList(ymlFileName: String, caller: String) : List<Lexeme> {
     val here = functionName()
@@ -1494,12 +1491,27 @@ fun buildLexemeList(ymlFileName: String, caller: String) : List<Lexeme> {
     return lex_l
 }
 
+fun buildAndStoreLexemeList(caller: String) {
+    val here = functionName()
+    entering(here, caller)
+
+    val ymlFileName = provideAnyFileNameOfWhat ("Yml", here)
+    var lex_l = buildLexemeList(ymlFileName, here)
+    lexemeListRegister.store (lex_l)
+
+    if (debug) println("$here: output lexeme List '$lex_l'")
+    exiting(here)
+}
+
 fun provideLexemeList(caller: String) : List<Lexeme> {
     val here = functionName()
     entering(here, caller)
 
-    val ymlFileName = provideYmlFileName (here)
-    val lex_l = buildLexemeList(ymlFileName, here)
+    if (lexemeListRegister.isEmpty()){
+       buildAndStoreLexemeList(here)
+    }
+    
+    val lex_l = lexemeListRegister.retrieve(here)
 
     if (debug) println("$here: output lexeme List '$lex_l'")
     exiting(here)

@@ -1,4 +1,4 @@
-package MyLibrary
+package my.library
 
 import java.io.File
 import java.util.Base64
@@ -53,6 +53,16 @@ fun functionName(): String {
     val sta = Thread.currentThread().stackTrace[2]
     val str = sta.getMethodName()
     return str	
+}
+
+fun inputRead(caller: String): String {
+    val here = functionName()
+    entering(here, caller)
+	
+    val str = readLine().toString()
+    
+    exiting(here)
+    return str
 }
 
 fun isAlphabeticalOfChar(cha: Char, caller: String): Boolean {
@@ -139,14 +149,20 @@ fun notYetImplemented(fun_nam: String){
     throw Exception("Error: function '$fun_nam' is not yet implemented")
 }
 
-fun inputRead(caller: String): String {
+fun provideAnyFileNameOfWhat(what: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
-	
-    val str = readLine().toString()
-    
+
+    var anyFileName = what+".txt" 
+    println("$here: enter file name for '$what'. Default '$anyFileName'")
+    val any_f = inputRead(here)
+    if (! any_f.isNullOrBlank()) {
+        anyFileName = any_f
+    }
+    println("$here: input File name is '$anyFileName'")
+
     exiting(here)
-    return str
+    return anyFileName
 }
 
 fun stringOfGlueOfStringList (glue: String, str_l: List<String>) : String {

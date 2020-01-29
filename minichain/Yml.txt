@@ -3,9 +3,7 @@
 # $mutable: /.brings/system/bin/kwextract.pl$
 # $previous: QmU1RDLsAGNPVuwDjKD3RQx7R6aEuQfcmSiubviDZ2XRVC$
 #
-# $Author: michel$
-# $next: unknown$
- 
+
 # $parents: QmRU26t5KP5QLiNbjWMxSbyfaARvzshfdzozj6M4K73auH$
 # $qm: z2kXGab6zthT87F8zfEci4Ah7ngKD9VNjagPTHxVnSGzugX$
 # $tic: 1579373044$
@@ -13,5 +11,10 @@
 # $Signature: n/a$
 
 line 1
-line 2
+line 2 with a $variable$ embedded
+line 3
 
+# $Author: michel$
+# $next: unknown$
+
+ 
