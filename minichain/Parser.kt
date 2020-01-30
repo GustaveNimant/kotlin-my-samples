@@ -77,6 +77,17 @@ fun blockKindOfMetaLexemeList (met_l: List<Lexeme>, caller: String): String {
     return result
 }
 
+fun hasKeywordPreviousOfMetaLexemeList (met_l: List<Lexeme>, caller: String): Boolean {
+    val here = functionName()
+    entering(here, caller)
+
+    val lex = KeywordWithQmHash("previous")
+    val result = met_l.contains(lex)
+
+    exiting(here)
+    return result
+}
+
 fun main(args: Array<String>) {
     val here = functionName()
     entering(here, "Parser")
@@ -91,10 +102,14 @@ fun main(args: Array<String>) {
     str_l = stringListOfLexemeList (tex_l)
     printStringList (str_l)
 
-    val blockKind = blockKindOfMetaLexemeList (met_l, here)
-    println("$here: blockKind '$blockKind'")
-	   
-//    val informationTree = TreeNode<String> ("blockchain")
+    val informationTree =
+      if (hasKeywordPreviousOfMetaLexemeList (met_l, here)) {
+        TreeNode<String> ("block-current")
+      } else {
+        TreeNode<String> ("block-genesis")
+      }
+      
+    println ("$here: informationTree '$informationTree'")
     println("\nnormal termination")
     exiting(here)
 }
