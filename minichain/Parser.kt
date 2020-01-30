@@ -1,3 +1,5 @@
+// The Parser : List of Lexemes => Tree of Domain Entities
+
 import java.io.File
 import java.util.Stack
 import java.lang.Character.MIN_VALUE as nullChar
@@ -9,6 +11,27 @@ import my.lexer.*
 // kotlinc -classpath MyLibrary.jar Lexer.kt -include-runtime -d Lexer.jar
 // kotlinc -classpath MyLibrary.jar:Lexer.jar Parser.kt -include-runtime -d Parser.jar 
 // java -esa --class-path MyLibrary.jar:Lexer.jar:Parser.jar ParserKt
+
+class TreeNode<T>(value:T){
+    var value:T = value
+
+    var parent:TreeNode<T>? = null
+
+    var children:MutableList<TreeNode<T>> = mutableListOf()
+
+    fun addChild(node:TreeNode<T>){
+        children.add(node)
+        node.parent = this
+    }
+
+    override fun toString(): String {
+        var s = "${value}"
+        if (!children.isEmpty()) {
+            s += " {" + children.map { it.toString() } + " }"
+        }
+        return s
+    }
+}
 
 fun provideMetaList (caller: String) : List<Lexeme> {
     val here = functionName()

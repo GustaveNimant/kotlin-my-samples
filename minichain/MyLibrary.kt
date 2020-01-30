@@ -153,7 +153,12 @@ fun provideAnyFileNameOfWhat(what: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
 
-    var anyFileName = what+".txt" 
+    val whatLc = what.toLowerCase()
+    var anyFileName =
+      when (whatLc) {
+        "lexeme" -> what+".lex"
+        else -> what+".txt"
+      }
     println("$here: enter file name for '$what'. Default '$anyFileName'")
     val any_f = inputRead(here)
     if (! any_f.isNullOrBlank()) {
