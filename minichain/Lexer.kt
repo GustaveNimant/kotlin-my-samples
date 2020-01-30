@@ -34,10 +34,6 @@ sealed class Lexeme ()
   data class TextWordConstant (val word: String) : Lexeme ()
   data class TextVariableSubstituable (val variable: String) : Lexeme ()
 	  
-  data class TokenAlphabetical (val character: Char): Lexeme ()
-  data class TokenAlphanumerical (val character: Char): Lexeme ()
-  data class TokenNumerical (val character: Char) : Lexeme ()
-
   object TokenUnknown : Lexeme ()
   object TokenSkipped : Lexeme ()
 
@@ -116,18 +112,6 @@ fun isFilePathOfString(str: String, caller: String): Boolean {
     return result
 }
 
-fun isNextNameOfString(str: String, caller: String): Boolean {
-    val here = functionName()
-    entering(here, caller)
-    
-    println("$here: input str '$str'")
-    val pattern = Regex("""\w[a-zA-Z_0-9]*""")
-    val result = pattern.matches(str)
-
-    exiting(here + " with result '$result'")
-    return result
-}
-
 fun isKeywordOfString(str: String, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
@@ -145,6 +129,28 @@ fun isKeywordNameOfString(str: String, caller: String): Boolean {
 
     println("$here: input str '$str'")
     val result = str.endsWith('$')
+
+    exiting(here + " with result '$result'")
+    return result
+}
+
+fun isKeywordWithQmHashOfLexeme(lex: Lexeme, caller: String): Boolean {
+    val here = functionName()
+    entering(here, caller)
+
+    println("$here: input lex '$lex'")
+    val result = lex is KeywordWithQmHash
+    exiting(here + " with result '$result'")
+    return result
+}
+
+fun isNextNameOfString(str: String, caller: String): Boolean {
+    val here = functionName()
+    entering(here, caller)
+    
+    println("$here: input str '$str'")
+    val pattern = Regex("""\w[a-zA-Z_0-9]*""")
+    val result = pattern.matches(str)
 
     exiting(here + " with result '$result'")
     return result
@@ -1367,9 +1373,6 @@ fun stringOfLexeme (lexeme: Lexeme): String {
 	is TextVariableSubstituable -> "TextVariableSubstituable("+lexeme.variable+")"	
 	is TextWordConstant -> "TextWordConstant("+lexeme.word+")"
 	is Tic -> "Tic("+lexeme.value+")"	
-	is TokenAlphabetical -> "TokenAlphabetical("+lexeme.character.toString()+")"
-	is TokenAlphanumerical -> "TokenAlphanumerical("+lexeme.character.toString()+")"
-	is TokenNumerical -> "TokenNumerical("+lexeme.character.toString()+")"
 	is Z2Hash -> "Z2Hash("+lexeme.hash+")"
 
 	is KeywordWithDate    -> "KeywordWithDate("+lexeme.name+")"

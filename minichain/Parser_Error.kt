@@ -67,9 +67,15 @@ fun blockKindOfMetaLexemeList (met_l: List<Lexeme>, caller: String): String {
 
     var result = "genesis"
     for (lex in met_l) {
-      	if (lex is KeywordWithQmHash && lex.name == "previous") {	
-       	   result = "current"
-	   break
+      if (isKeywordWithQmHashOfLexeme(lex, here)) {
+      if (lex.name == "previous") {	
+             	println("$here: lex is Keyword '$lex'")
+		}
+		}
+      if (lex is KeywordWithQmHash && lex.name == "previous") {	
+       	println("$here: lex '$lex'")	
+       	result = "current"
+	break
       }
     }	
 

@@ -38,25 +38,25 @@
  
  <block>                     ::= <block_current> | <block_genesis> | <block_head> 
  <block_current>             ::= <meta_data> <text_data>
- <block_genesis>             ::= <meta_data_head> <head_data>  
+ <block_genesis>             ::= <meta_data_genesis> <head_data>  
  <block_head>                ::= <meta_data_head> <head_data>
- <block_history>             ::= <title_history> <meta_data_history> <data_history>
-
+ 
+ 
  <meta_data>                 ::= { <meta_record> }
  <meta_data_head>            ::= { <meta_data_head_record> }
  
- <meta_data_record>          ::= { <sharp> <space> <keyword_token_current> <space> <keyword_value> <dollar> <eol>
+ <meta_record>               ::= { <sharp> <space> <keyword_token> <space> <keyword_value> <dollar> <eol>
 
- <keyword_token_current>     ::= <dollar> <keyword_name_current> <colon>
- <keyword_name_current>      ::= <keyword_with_date> | <keyword_with_file> | <keyword_with_hash> | <keyword_with_integer>| <keyword_with_person_name> | <keyword_with_string>
+ <keyword_token>             ::= <dollar> <keyword_name> <colon>
+ <keyword_name>              ::= <keyword_with_date> | <keyword_with_file> | <keyword_with_hash> | <keyword_with_integer>| <keyword_with_person_name> | <keyword_with_string>
 
  <meta_data_head_record>     ::= ???
 
+ <block_history>             ::= <title_history> <meta_data_history> <data_history>
  <title_history>             ::= <hyphen><hyphen><hyphen><space><sharp><sapce>blocks
  <meta_data_history>         ::= <sharp> <space> <dollar>mutable<hyphen><space>
  <data_history>              ::= <hyphen> <space> <qm_hash> <space> <sharp> string
- 
- 
+  
  <keyword_with_date>         ::= Date
  <keyword_with_file>         ::= Source | mutable
  <keyword_with_hash>         ::= previous | Previous | parents | qm
