@@ -75,6 +75,66 @@ object lexemeListRegister {
      }
 }
 
+fun fullnameListOfLexemeList (lex_l: List<Lexeme>) : List<String> {
+  val str_l = lex_l.map({l -> fullnameOfLexeme (l) })
+  return str_l 
+}
+
+fun fullnameOfLexeme (lexeme: Lexeme): String {
+    val string = when (lexeme) {
+
+	is AuthorName -> "AuthorName("+lexeme.name+")"
+	is Comment -> "Comment("+lexeme.name+")"
+	is DateValue -> "DateValue("+lexeme.value+")"
+	is FilePath -> "FilePath("+lexeme.name+")"
+	is KeywordWithZ2Hash -> "KeywordWithZ2Hash("+lexeme.name+")"
+	is NextName -> "NextName("+lexeme.name+")"
+	is QmHash -> "QmHash("+lexeme.hash+")"
+	is Signature -> "Signature("+lexeme.value+")"	
+	is Spot -> "Spot("+lexeme.value+")"
+	is TextRecordConstant -> "TextRecordConstant("+lexeme.record+")"
+	is TextStringConstant -> "TextStringConstant("+lexeme.string+")"
+	is TextVariableSubstituable -> "TextVariableSubstituable("+lexeme.variable+")"	
+	is TextWordConstant -> "TextWordConstant("+lexeme.word+")"
+	is Tic -> "Tic("+lexeme.value+")"	
+	is Z2Hash -> "Z2Hash("+lexeme.hash+")"
+
+	is KeywordWithDate    -> "KeywordWithDate("+lexeme.name+")"
+    	is KeywordWithFile    -> "KeywordWithFile("+lexeme.name+")"
+    	is KeywordWithInteger -> "KeywordWithInteger("+lexeme.name+")"
+    	is KeywordWithQmHash  -> "KeywordWithQmHash("+lexeme.name+")"
+    	is KeywordWithString  -> "KeywordWithString("+lexeme.name+")"
+        is KeywordWithPersonName -> "KeywordWithPersonName("+lexeme.name+")"
+
+	TokenColon	-> "TokenColon"
+	TokenComma	-> "TokenComma"
+	TokenDollar	-> "TokenDollar"
+	TokenDot	-> "TokenDot"
+	TokenEmptyLine  -> "TokenEmptyLine"
+	TokenEmptySharpedLine -> "TokenEmptySharpedLine"
+	TokenEndOfLine	-> "TokenEndOfLine"
+	TokenHyphen	-> "TokenHyphen"
+	TokenSemicolon	-> "TokenSemicolon"
+	TokenSharp	-> "TokenSharp"
+	TokenSkipped    -> "skipped "
+	TokenSpace	-> "TokenSpace"
+	TokenUnknown    -> "unknown "
+	TokenVee	-> "TokenVee"
+	}
+    return string
+}
+
+fun hasKeywordPreviousOfLexemeList (met_l: List<Lexeme>, caller: String): Boolean {
+    val here = functionName()
+    entering(here, caller)
+
+    val lex = KeywordWithQmHash("previous")
+    val result = met_l.contains(lex)
+
+    exiting(here)
+    return result
+}
+
 fun isAuthorNameOfString(str: String, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
@@ -112,6 +172,106 @@ fun isFilePathOfString(str: String, caller: String): Boolean {
     return result
 }
 
+fun isInMetaOfLexeme(lex: Lexeme, caller: String): Boolean {
+    val here = functionName()
+    entering(here, caller)
+
+    println("$here: input lex '$lex'")
+    val result = when (lex) {
+	is TextRecordConstant  -> false
+	is TextStringConstant  -> false
+	is TextVariableSubstituable  -> false
+	is TextWordConstant  -> false
+
+	TokenColon	 -> true
+	TokenComma	 -> true
+	TokenDollar	 -> true
+	TokenDot	 -> true
+	TokenEndOfLine	 -> true
+	TokenHyphen	 -> true
+	TokenSemicolon	 -> true
+	TokenSharp	 -> true
+	TokenSpace	 -> true
+
+	is AuthorName  -> true
+	is Comment  -> true
+	is DateValue  -> true
+	is FilePath  -> true
+	is KeywordWithZ2Hash  -> true
+	is NextName  -> true
+	is QmHash  -> true
+	is Signature  -> true
+	is Spot  -> true
+	is Tic  -> true
+	is Z2Hash  -> true
+
+	is KeywordWithDate     -> true
+    	is KeywordWithFile     -> true
+    	is KeywordWithInteger  -> true
+    	is KeywordWithQmHash   -> true
+    	is KeywordWithString   -> true
+        is KeywordWithPersonName  -> true
+
+	TokenSkipped     -> true
+	TokenUnknown     -> true
+	TokenVee	 -> true
+	TokenEmptyLine   -> true
+	TokenEmptySharpedLine  -> true
+    }
+    exiting(here + " with result '$result'")
+    return result
+}
+
+fun isInTextOfLexeme(lex: Lexeme, caller: String): Boolean {
+    val here = functionName()
+    entering(here, caller)
+
+    println("$here: input lex '$lex'")
+    val result = when (lex) {
+	is TextRecordConstant  -> true
+	is TextStringConstant  -> true
+	is TextVariableSubstituable  -> true
+	is TextWordConstant  -> true
+
+	TokenColon	 -> true
+	TokenComma	 -> true
+	TokenDollar	 -> true
+	TokenDot	 -> true
+	TokenEndOfLine	 -> true
+	TokenHyphen	 -> true
+	TokenSemicolon	 -> true
+	TokenSharp	 -> true
+	TokenSpace	 -> true
+
+	is AuthorName  -> false
+	is Comment  -> false
+	is DateValue  -> false
+	is FilePath  -> false
+	is KeywordWithZ2Hash  -> false
+	is NextName  -> false
+	is QmHash  -> false
+	is Signature  -> false
+	is Spot  -> false
+	is Tic  -> false
+	is Z2Hash  -> false
+
+	is KeywordWithDate     -> false
+    	is KeywordWithFile     -> false
+    	is KeywordWithInteger  -> false
+    	is KeywordWithQmHash   -> false
+    	is KeywordWithString   -> false
+        is KeywordWithPersonName  -> false
+
+	TokenSkipped     -> false
+	TokenUnknown     -> false
+	TokenVee	 -> false
+	TokenEmptyLine   -> false
+	TokenEmptySharpedLine  -> false
+    }
+    exiting(here + " with result '$result'")
+    return result
+}
+
 fun isKeywordOfString(str: String, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
@@ -140,6 +300,25 @@ fun isKeywordWithQmHashOfLexeme(lex: Lexeme, caller: String): Boolean {
 
     println("$here: input lex '$lex'")
     val result = lex is KeywordWithQmHash
+    exiting(here + " with result '$result'")
+    return result
+}
+
+fun isKeywordWithOfLexeme(lex: Lexeme, caller: String): Boolean {
+    val here = functionName()
+    entering(here, caller)
+
+    println("$here: input lex '$lex'")
+    val result = when (lex) {
+    	is KeywordWithZ2Hash -> true 
+	is KeywordWithDate -> true     
+    	is KeywordWithFile -> true 
+    	is KeywordWithInteger -> true 
+    	is KeywordWithQmHash -> true  
+    	is KeywordWithString -> true   
+        is KeywordWithPersonName -> true
+	else -> false
+    }
     exiting(here + " with result '$result'")
     return result
 }
@@ -916,7 +1095,7 @@ fun lexemeListOfSharpedLine (lin: String, caller: String) : MutableList<Lexeme> 
 	  }
    }
 
-   println("$here: output lexemeList: "+ stringListOfLexemeList(lexemeList))
+   println("$here: output lexemeList: "+ fullnameListOfLexemeList(lexemeList))
    exiting(here)
    return lexemeList
 }
@@ -1126,16 +1305,16 @@ fun lexemeListOfSpotLine (lin: String, caller: String) : MutableList<Lexeme> {
    return lexemeList
 }
 
-fun lexemeListOfTextRecord (lin: String, caller: String) : MutableList<Lexeme> {
+fun lexemeListOfTextRecord (rec: String, caller: String) : MutableList<Lexeme> {
     val here = functionName()
     entering(here, caller)
 
     var lexemeList = mutableListOf<Lexeme>()
 
-    val wor_l = wordListOfString (lin)
+    val wor_l = wordListOfString (rec)
 
     for (currentWord in wor_l) { 
-      if (debug) println("$here: for currentWord '$currentWord'")
+      println("$here: for currentWord '$currentWord'")
 
       try {
       	  var currentCharacter = currentWord.get(0)
@@ -1149,7 +1328,7 @@ fun lexemeListOfTextRecord (lin: String, caller: String) : MutableList<Lexeme> {
 		  if (! str.last().equals('$')) {
 		     fatalErrorPrint ("currentWord ends with a '$'",
   		                       currentWord,
-				      "Check current line '$lin' is actual Text",
+				      "Check current record '$rec' is actual Text",
 				       here)
 		  }
 
@@ -1307,6 +1486,26 @@ fun lexemeOfKeyword (keyword: String, caller: String) : Lexeme {
   return lexeme
  }
 
+fun nameKeywordWithOfLexeme(lex: Lexeme, caller: String): String {
+    val here = functionName()
+    entering(here, caller)
+
+    println("$here: input lex '$lex'")
+    val result = when (lex) {
+    	is KeywordWithZ2Hash -> lex.name 
+	is KeywordWithDate -> lex.name     
+    	is KeywordWithFile -> lex.name 
+    	is KeywordWithInteger -> lex.name 
+    	is KeywordWithQmHash -> lex.name  
+    	is KeywordWithString -> lex.name   
+        is KeywordWithPersonName -> lex.name
+	else -> "none"
+    }
+    
+    exiting(here + " with result '$result'")
+    return result
+}
+
 fun nextWordOfString(pos:Int, lin: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
@@ -1336,7 +1535,7 @@ fun printLexemeListOfYmlFile (ymlFileName: String, caller: String) {
     println("$here: input ymlFileName '$ymlFileName'")
     
     val lex_l = lexemeListOfYmlFile (ymlFileName, here)
-    val str_l = stringListOfLexemeList (lex_l)
+    val str_l = fullnameListOfLexemeList (lex_l)
     val content = stringOfGlueOfStringList ("\n", str_l)
 
     println ("Lexemes from file '$ymlFileName'")
@@ -1351,53 +1550,53 @@ fun printStringList (str_l: List<String>) {
     println (content)
 }
 
-fun stringListOfLexemeList (lex_l: List<Lexeme>) : List<String> {
- val str_l = lex_l.map({l -> stringOfLexeme (l) })
- return str_l 
-}
-
-fun stringOfLexeme (lexeme: Lexeme): String {
+fun stringValueOfLexeme (lexeme: Lexeme): String {
     val string = when (lexeme) {
 
-	is AuthorName -> "AuthorName("+lexeme.name+")"
-	is Comment -> "Comment("+lexeme.name+")"
-	is DateValue -> "DateValue("+lexeme.value+")"
-	is FilePath -> "FilePath("+lexeme.name+")"
-	is KeywordWithZ2Hash -> "KeywordWithZ2Hash("+lexeme.name+")"
-	is NextName -> "NextName("+lexeme.name+")"
-	is QmHash -> "QmHash("+lexeme.hash+")"
-	is Signature -> "Signature("+lexeme.value+")"	
-	is Spot -> "Spot("+lexeme.value+")"
-	is TextRecordConstant -> "TextRecordConstant("+lexeme.record+")"
-	is TextStringConstant -> "TextStringConstant("+lexeme.string+")"
-	is TextVariableSubstituable -> "TextVariableSubstituable("+lexeme.variable+")"	
-	is TextWordConstant -> "TextWordConstant("+lexeme.word+")"
-	is Tic -> "Tic("+lexeme.value+")"	
-	is Z2Hash -> "Z2Hash("+lexeme.hash+")"
+	is AuthorName -> lexeme.name
+	is Comment -> lexeme.name
+	is DateValue -> lexeme.value
+	is FilePath -> lexeme.name
+	is KeywordWithZ2Hash -> lexeme.name
+	is NextName -> lexeme.name
+	is QmHash -> lexeme.hash
+	is Signature -> lexeme.value	
+	is Spot -> lexeme.value
+	is TextRecordConstant -> lexeme.record
+	is TextStringConstant -> lexeme.string
+	is TextVariableSubstituable -> lexeme.variable	
+	is TextWordConstant -> lexeme.word
+	is Tic -> lexeme.value	
+	is Z2Hash -> lexeme.hash
 
-	is KeywordWithDate    -> "KeywordWithDate("+lexeme.name+")"
-    	is KeywordWithFile    -> "KeywordWithFile("+lexeme.name+")"
-    	is KeywordWithInteger -> "KeywordWithInteger("+lexeme.name+")"
-    	is KeywordWithQmHash  -> "KeywordWithQmHash("+lexeme.name+")"
-    	is KeywordWithString  -> "KeywordWithString("+lexeme.name+")"
-        is KeywordWithPersonName -> "KeywordWithPersonName("+lexeme.name+")"
+	is KeywordWithDate    -> lexeme.name
+    	is KeywordWithFile    -> lexeme.name
+    	is KeywordWithInteger -> lexeme.name
+    	is KeywordWithQmHash  -> lexeme.name
+    	is KeywordWithString  -> lexeme.name
+        is KeywordWithPersonName -> lexeme.name
 
-	TokenColon	-> "TokenColon"
-	TokenComma	-> "TokenComma"
-	TokenDollar	-> "TokenDollar"
-	TokenDot	-> "TokenDot"
-	TokenEmptyLine  -> "TokenEmptyLine"
-	TokenEmptySharpedLine -> "TokenEmptySharpedLine"
-	TokenEndOfLine	-> "TokenEndOfLine"
-	TokenHyphen	-> "TokenHyphen"
-	TokenSemicolon	-> "TokenSemicolon"
-	TokenSharp	-> "TokenSharp"
-	TokenSkipped    -> "skipped "
-	TokenSpace	-> "TokenSpace"
-	TokenUnknown    -> "unknown "
-	TokenVee	-> "TokenVee"
+	TokenColon	-> ":"
+	TokenComma	-> ","
+	TokenDollar	-> "\$"
+	TokenDot	-> "."
+	TokenEmptyLine  -> ""
+	TokenEmptySharpedLine -> ""
+	TokenEndOfLine	-> "\n"
+	TokenHyphen	-> "-"
+	TokenSemicolon	-> ";"
+	TokenSharp	-> "#"
+	TokenSpace	-> " "
+	TokenVee	-> "v"
+	TokenUnknown    -> "unknown"
+	TokenSkipped    -> "skipped"
 	}
     return string
+}
+
+fun stringValueListOfLexemeList (lex_l: List<Lexeme>) : List<String> {
+  val str_l = lex_l.map({l -> stringValueOfLexeme (l) })
+  return str_l 
 }
 
 fun tokenOfChar(cha: Char, pos: Int, lin: String, caller: String) : Lexeme {
@@ -1457,7 +1656,7 @@ fun writeLexemeListOfYmlFileOfOuputFile (ymlFileName: String, lexFileName: Strin
     println("$here: input lexFileName '$lexFileName'")
 
     val lex_l = lexemeListOfYmlFile (ymlFileName, here)
-    val str_l = stringListOfLexemeList (lex_l)
+    val str_l = fullnameListOfLexemeList (lex_l)
     val content = stringOfGlueOfStringList ("\n", str_l)
 
     outputWrite (lexFileName, content, here)
@@ -1471,7 +1670,7 @@ fun writeLexemeList (caller: String) {
     entering(here, caller)
 
     val lex_l = provideLexemeList (here)
-    val str_l = stringListOfLexemeList (lex_l)
+    val str_l = fullnameListOfLexemeList (lex_l)
     val content = stringOfGlueOfStringList ("\n", str_l)
 
     val lexFileName = provideAnyFileNameOfWhat("Lexeme", here)
