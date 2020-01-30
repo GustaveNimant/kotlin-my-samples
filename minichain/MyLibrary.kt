@@ -13,6 +13,12 @@ val debug = false
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
 
+fun characterStackOfString (str: String) : Stack<Char> {
+    var stack = Stack<Char>()
+    str.reversed().forEach { c -> stack.push(c)}
+    return stack
+}
+
 fun countOfCharOfString (cha: Char, str: String, caller: String) : Int {
     val here = functionName()
     entering(here, caller)
@@ -122,6 +128,35 @@ fun lineStackOfLineList (str_l: List<String>) : Stack<String> {
     var stack = Stack<String>()
     str_l.reversed().forEach { l -> stack.push(l) }
     return stack
+}
+
+fun nextWordAndStackOfEndCharOfCharacterStack(del: Char, cha_s: Stack<Char>, caller: String): Pair<String, Stack<Char>> {
+    val here = functionName()
+    entering(here, caller)
+
+    println("$here: input del '$del'")
+    println("$here: input cha_s '$cha_s'")
+    var done = false
+    var word = ""
+    var cha = cha_s.pop()
+    
+    while (! done){
+      println("$here: cha '$cha'")
+      word = word.plus(cha.toString())
+      try {
+      	  cha = cha_s.pop()
+          done = cha.equals(del)
+      }
+      catch (e: java.util.EmptyStackException) {
+            done = true			       
+      }
+    }
+
+    assert (word.isNotEmpty())
+    
+    println("$here: output word '$word'")
+    exiting(here)
+    return Pair (word, cha_s)
 }
 
 fun nextWordOfEndCharOfString(del: Char, str: String, caller: String): String {

@@ -1310,29 +1310,38 @@ fun lexemeListOfTextRecord (rec: String, caller: String) : MutableList<Lexeme> {
     entering(here, caller)
 
     var lexemeList = mutableListOf<Lexeme>()
+    
+    println("$here: input rec '$rec'")
+    var stack = characterStackOfString (rec)
+    var cha = nullChar
+    var word = ""
+    
+    while (! stack.isEmpty()) {
+      cha = stack.pop()
+      println("$here: for cha '$cha'")
 
-    val wor_l = wordListOfString (rec)
-
-    for (currentWord in wor_l) { 
-      println("$here: for currentWord '$currentWord'")
-
-      try {
-      	  var currentCharacter = currentWord.get(0)
-	  
-      when (currentCharacter){
+      when (cha){
+      	' ' -> {
+	  var lexeme = TokenSpace
+	  lexemeList.add (lexeme)
+	  println("$here: cha '$cha' lexeme '$lexeme'")
+	  }
 	'$' -> {
 	    lexemeList.add (TokenDollar)
 	    
-// $variable$ to be substituted 
-	      	  val str = currentWord.substring(1)
-		  if (! str.last().equals('$')) {
-		     fatalErrorPrint ("currentWord ends with a '$'",
-  		                       currentWord,
-				      "Check current record '$rec' is actual Text",
+// $variable$ to be substituted
+		  var (w, s) = nextWordAndStackOfEndCharOfCharacterStack('$', stack, here)
+		  stack = s
+		  word = w
+		  cha = stack.pop()
+		  if (! cha.equals('$')) {
+		     fatalErrorPrint ("current character were a '$'",
+  		                       cha.toString(),
+				      "Check that current record '$rec' is actual Text",
 				       here)
 		  }
 
-		  val word = nextWordOfEndCharOfString('$', str, here)
+		  println("$here: for after word '$word'")
 		  if (isTextVariableOfString(word, here)) {
 		     val lexeme = TextVariableSubstituable(word)
 		     lexemeList.add (lexeme)
@@ -1346,15 +1355,20 @@ fun lexemeListOfTextRecord (rec: String, caller: String) : MutableList<Lexeme> {
 		  }
 		  }
 	  else -> {
-		  val lexeme = TextWordConstant(currentWord)
+	       stack.push(cha)
+	       var (w, s) = nextWordAndStackOfEndCharOfCharacterStack(' ', stack, here)
+		  stack = s
+		  word = w
+		  println("$here: for else word '$word'")
+		  
+		  val lexeme = TextWordConstant(word)
+
+		  println("$here: for lexeme '$lexeme'")
 		  lexemeList.add (lexeme)
 	          }
         }
+	println("$here: end for lexemeList '$lexemeList'")
    } 
-      catch (e: java.lang.StringIndexOutOfBoundsException) {
-      	    lexemeList.add (TokenEmptyLine)
-	    }
-   }
 
    lexemeList.add (TokenEndOfLine)
    println("$here: output lexemeList "+lexemeList)
