@@ -134,18 +134,19 @@ fun nextWordAndStackOfEndCharOfCharacterStack(del: Char, cha_s: Stack<Char>, cal
     val here = functionName()
     entering(here, caller)
 
-    println("$here: input del '$del'")
-    println("$here: input cha_s '$cha_s'")
+    if (debug) println("$here: input del '$del'")
+    if (debug) println("$here: input cha_s '$cha_s'")
     var done = false
     var word = ""
     var cha = cha_s.pop()
     
     while (! done){
-      println("$here: cha '$cha'")
+      if (debug) println("$here: cha '$cha'")
       word = word.plus(cha.toString())
       try {
       	  cha = cha_s.pop()
           done = cha.equals(del)
+	  if (done) {cha_s.push(cha)}
       }
       catch (e: java.util.EmptyStackException) {
             done = true			       
@@ -154,7 +155,8 @@ fun nextWordAndStackOfEndCharOfCharacterStack(del: Char, cha_s: Stack<Char>, cal
 
     assert (word.isNotEmpty())
     
-    println("$here: output word '$word'")
+    if (debug) println("$here: output word '$word'")
+    if (debug) println("$here: output cha_s '$cha_s'")
     exiting(here)
     return Pair (word, cha_s)
 }

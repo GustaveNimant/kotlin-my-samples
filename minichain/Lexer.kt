@@ -968,138 +968,6 @@ fun lexemeListOfQmHashLine (lin: String, caller: String) : MutableList<Lexeme> {
    return lexemeList
 }
 
-fun lexemeListOfSharpedLine (lin: String, caller: String) : MutableList<Lexeme> {
-// Source: /my/perl/script/kwextract.pl,v$
-    val here = functionName()
-    entering(here, caller)
-
-    println("$here: input lin '$lin'")
-    
-    val lexemeList = mutableListOf<Lexeme>()
-
-    var Done = false
-    var position = 0
-    
-    while (!Done) {
-      try {
-    	var currentCharacter = lin.get(position)	
- 	when (currentCharacter) {
-// Header 
-	'#' -> {
-	    if (lin.length > 1) {
-	       val lexeme = tokenOfChar(currentCharacter, position, lin, here)
-	       lexemeList.add(lexeme)
-	       position = position + 1
-	    }
-	    else {
-	       Done = true
-	       TokenEmptySharpedLine
-	    }
-	}
-	' ' -> {
-	    val lexeme = tokenOfChar(currentCharacter, position, lin, here)
-	    lexemeList.add(lexeme)
-	    position = position + 1	 
-	}
-	'$' -> {
-	    val lexeme = tokenOfChar(currentCharacter, position, lin, here)
-	    lexemeList.add(lexeme)
-	    position = position + 1
-	}
-// Remainder	
-	'A' -> {
-	    val str = lin.substring(position)
-	    lexemeList.addAll (lexemeListOfAuthorLine (str, here))
-	    Done = true
-	    }
-	'D' -> {
-	    val str = lin.substring(position)
-	    lexemeList.addAll (lexemeListOfDateLine (str, here))
-	    Done = true
-	    }
-        'm' -> {
-	    val str = lin.substring(position)
-	    lexemeList.addAll (lexemeListOfMutableLine (str, here)) 
-	    Done = true
-	    }
-        'n' -> {
-	    val str = lin.substring(position)
-	    lexemeList.addAll (lexemeListOfNextLine (str, here)) 
-	    Done = true
-	    }
-	'p' -> {
-	    val nextCharacter = lin.get(position + 1)
-	    if (nextCharacter.equals ('a')){
-	       val str = lin.substring(position)
-	       lexemeList.addAll (lexemeListOfParentsLine (str, here)) 
-	    }
-	    else if (nextCharacter.equals ('r')){
-	       val str = lin.substring(position)
-	       lexemeList.addAll (lexemeListOfPreviousLine (str, here)) 
-	    }
-	    else {
-	    	 val message = "$here: Error next character '$nextCharacter' should be 'a' or 'r'"
-	    	 throw Exception(message)
-	    }
-	    Done = true  
-	    }
-        'q' -> {
-	    val str = lin.substring(position)
-	    lexemeList.addAll (lexemeListOfQmHashLine (str, here)) 
-	    Done = true
-	    }
-        's' -> {
-	    val str = lin.substring(position)
-	    lexemeList.addAll (lexemeListOfSpotLine (str, here)) 
-	    Done = true
-	    }
-        'S' -> {
-	    val nextCharacter = lin.get(position + 1)
-	    if (nextCharacter.equals ('i')){
-	       val str = lin.substring(position)
-	       lexemeList.addAll (lexemeListOfSignatureLine (str, here)) 
-	    }
-	    else if (nextCharacter.equals ('o')){
-	       val str = lin.substring(position)
-	       lexemeList.addAll (lexemeListOfSourceLine (str, here)) 
-	    }
-	    else {
-	    	 val message = "$here: Error next character '$nextCharacter' should be 'i' or 'o'"
-	    	 throw Exception(message)
-	    }
-	    Done = true  
-	    }
-        't' -> {
-	    val str = lin.substring(position)
-	    lexemeList.addAll (lexemeListOfTicLine (str, here)) 
-	    Done = true
-	    }
-	    else -> {
-	    	 val message = "$here: Error unexpected current character '$currentCharacter' at position $position"
-	    	 throw Exception(message)
-	    }
-	    }
-      }
-      catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	val previousCharacter = lin.get(position-1)
-	  	if (previousCharacter.equals('$')) {
-	     	   var lexeme = TokenEndOfLine
-             	   lexemeList.add (lexeme)
-	     	   if (debug) println("$here: setting End Of Line")
-	     	   Done = true			
-	     	}
-		else {
-		     val message = "$here: Error previous character '$previousCharacter' (position $position) should be '$'"
-	    throw Exception(message)
-		}
-	  }
-   }
-
-   println("$here: output lexemeList: "+ fullnameListOfLexemeList(lexemeList))
-   exiting(here)
-   return lexemeList
-}
-
 fun lexemeListOfSourceLine (lin: String, caller: String) : MutableList<Lexeme> {
 // Source: /my/perl/script/kwextract.pl,v$
     val here = functionName()
@@ -1300,77 +1168,6 @@ fun lexemeListOfSpotLine (lin: String, caller: String) : MutableList<Lexeme> {
 	  }
    }
 
-   println("$here: output lexemeList "+lexemeList)
-   exiting(here)
-   return lexemeList
-}
-
-fun lexemeListOfTextRecord (rec: String, caller: String) : MutableList<Lexeme> {
-    val here = functionName()
-    entering(here, caller)
-
-    var lexemeList = mutableListOf<Lexeme>()
-    
-    println("$here: input rec '$rec'")
-    var stack = characterStackOfString (rec)
-    var cha = nullChar
-    var word = ""
-    
-    while (! stack.isEmpty()) {
-      cha = stack.pop()
-      println("$here: for cha '$cha'")
-
-      when (cha){
-      	' ' -> {
-	  var lexeme = TokenSpace
-	  lexemeList.add (lexeme)
-	  println("$here: cha '$cha' lexeme '$lexeme'")
-	  }
-	'$' -> {
-	    lexemeList.add (TokenDollar)
-	    
-// $variable$ to be substituted
-		  var (w, s) = nextWordAndStackOfEndCharOfCharacterStack('$', stack, here)
-		  stack = s
-		  word = w
-		  cha = stack.pop()
-		  if (! cha.equals('$')) {
-		     fatalErrorPrint ("current character were a '$'",
-  		                       cha.toString(),
-				      "Check that current record '$rec' is actual Text",
-				       here)
-		  }
-
-		  println("$here: for after word '$word'")
-		  if (isTextVariableOfString(word, here)) {
-		     val lexeme = TextVariableSubstituable(word)
-		     lexemeList.add (lexeme)
-		     lexemeList.add (TokenDollar)	
-		  }
-		  else {
-		     fatalErrorPrint ("word below followed Regexp \"\"\"\\w+\"\"\"",
-		                      word,
-				      "Check the Regular Expression",
-				      here)
-		  }
-		  }
-	  else -> {
-	       stack.push(cha)
-	       var (w, s) = nextWordAndStackOfEndCharOfCharacterStack(' ', stack, here)
-		  stack = s
-		  word = w
-		  println("$here: for else word '$word'")
-		  
-		  val lexeme = TextWordConstant(word)
-
-		  println("$here: for lexeme '$lexeme'")
-		  lexemeList.add (lexeme)
-	          }
-        }
-	println("$here: end for lexemeList '$lexemeList'")
-   } 
-
-   lexemeList.add (TokenEndOfLine)
    println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
@@ -1734,5 +1531,208 @@ fun provideLexemeList(caller: String) : List<Lexeme> {
     return lex_l
 }
 
+
+fun lexemeListOfSharpedLine (lin: String, caller: String) : MutableList<Lexeme> {
+// Source: /my/perl/script/kwextract.pl,v$
+    val here = functionName()
+    entering(here, caller)
+
+    println("$here: input lin '$lin'")
+    
+    val lexemeList = mutableListOf<Lexeme>()
+
+    var Done = false
+    var position = 0
+    
+    while (!Done) {
+      try {
+    	var currentCharacter = lin.get(position)	
+ 	when (currentCharacter) {
+// Header 
+	'#' -> {
+	    if (lin.length > 1) {
+	       val lexeme = tokenOfChar(currentCharacter, position, lin, here)
+	       lexemeList.add(lexeme)
+	       position = position + 1
+	    }
+	    else {
+	       Done = true
+	       TokenEmptySharpedLine
+	    }
+	}
+	' ' -> {
+	    val lexeme = tokenOfChar(currentCharacter, position, lin, here)
+	    lexemeList.add(lexeme)
+	    position = position + 1	 
+	}
+	'$' -> {
+	    val lexeme = tokenOfChar(currentCharacter, position, lin, here)
+	    lexemeList.add(lexeme)
+	    position = position + 1
+	}
+// Remainder	
+	'A' -> {
+	    val str = lin.substring(position)
+	    lexemeList.addAll (lexemeListOfAuthorLine (str, here))
+	    Done = true
+	    }
+	'D' -> {
+	    val str = lin.substring(position)
+	    lexemeList.addAll (lexemeListOfDateLine (str, here))
+	    Done = true
+	    }
+        'm' -> {
+	    val str = lin.substring(position)
+	    lexemeList.addAll (lexemeListOfMutableLine (str, here)) 
+	    Done = true
+	    }
+        'n' -> {
+	    val str = lin.substring(position)
+	    lexemeList.addAll (lexemeListOfNextLine (str, here)) 
+	    Done = true
+	    }
+	'p' -> {
+	    val nextCharacter = lin.get(position + 1)
+	    if (nextCharacter.equals ('a')){
+	       val str = lin.substring(position)
+	       lexemeList.addAll (lexemeListOfParentsLine (str, here)) 
+	    }
+	    else if (nextCharacter.equals ('r')){
+	       val str = lin.substring(position)
+	       lexemeList.addAll (lexemeListOfPreviousLine (str, here)) 
+	    }
+	    else {
+	    	 val message = "$here: Error next character '$nextCharacter' should be 'a' or 'r'"
+	    	 throw Exception(message)
+	    }
+	    Done = true  
+	    }
+        'q' -> {
+	    val str = lin.substring(position)
+	    lexemeList.addAll (lexemeListOfQmHashLine (str, here)) 
+	    Done = true
+	    }
+        's' -> {
+	    val str = lin.substring(position)
+	    lexemeList.addAll (lexemeListOfSpotLine (str, here)) 
+	    Done = true
+	    }
+        'S' -> {
+	    val nextCharacter = lin.get(position + 1)
+	    if (nextCharacter.equals ('i')){
+	       val str = lin.substring(position)
+	       lexemeList.addAll (lexemeListOfSignatureLine (str, here)) 
+	    }
+	    else if (nextCharacter.equals ('o')){
+	       val str = lin.substring(position)
+	       lexemeList.addAll (lexemeListOfSourceLine (str, here)) 
+	    }
+	    else {
+	    	 val message = "$here: Error next character '$nextCharacter' should be 'i' or 'o'"
+	    	 throw Exception(message)
+	    }
+	    Done = true  
+	    }
+        't' -> {
+	    val str = lin.substring(position)
+	    lexemeList.addAll (lexemeListOfTicLine (str, here)) 
+	    Done = true
+	    }
+	    else -> {
+	    	 val message = "$here: Error unexpected current character '$currentCharacter' at position $position"
+	    	 throw Exception(message)
+	    }
+	    }
+      }
+      catch (e: java.lang.StringIndexOutOfBoundsException) {
+	  	val previousCharacter = lin.get(position-1)
+	  	if (previousCharacter.equals('$')) {
+	     	   var lexeme = TokenEndOfLine
+             	   lexemeList.add (lexeme)
+	     	   if (debug) println("$here: setting End Of Line")
+	     	   Done = true			
+	     	}
+		else {
+		     val message = "$here: Error previous character '$previousCharacter' (position $position) should be '$'"
+	    throw Exception(message)
+		}
+	  }
+   }
+
+   println("$here: output lexemeList: "+ fullnameListOfLexemeList(lexemeList))
+   exiting(here)
+   return lexemeList
+}
+
+fun lexemeListOfTextRecord (rec: String, caller: String) : MutableList<Lexeme> {
+    val here = functionName()
+    entering(here, caller)
+
+    var lexemeList = mutableListOf<Lexeme>()
+    
+    println("$here: input rec '$rec'")
+    var stack = characterStackOfString (rec)
+    var cha = nullChar
+    var word = ""
+    
+    while (! stack.isEmpty()) {
+      cha = stack.pop()
+      println("$here: for cha '$cha'")
+
+      when (cha){
+      	' ' -> {
+	  var lexeme = TokenSpace
+	  lexemeList.add (lexeme)
+	  println("$here: cha '$cha' lexeme '$lexeme'")
+	  }
+	'$' -> {
+	    lexemeList.add (TokenDollar)
+	    
+// $variable$ to be substituted
+		  var (w, s) = nextWordAndStackOfEndCharOfCharacterStack('$', stack, here)
+		  stack = s
+		  word = w
+		  cha = stack.pop()
+		  if (! cha.equals('$')) {
+		     fatalErrorPrint ("current character were a '$'",
+  		                       cha.toString(),
+				      "Check that current record '$rec' is actual Text",
+				       here)
+		  }
+
+		  println("$here: for after word '$word'")
+		  if (isTextVariableOfString(word, here)) {
+		     val lexeme = TextVariableSubstituable(word)
+		     lexemeList.add (lexeme)
+		     lexemeList.add (TokenDollar)	
+		  }
+		  else {
+		     fatalErrorPrint ("word below followed Regexp \"\"\"\\w+\"\"\"",
+		                      word,
+				      "Check the Regular Expression",
+				      here)
+		  }
+		  }
+	  else -> {
+	       stack.push(cha)
+	       var (w, s) = nextWordAndStackOfEndCharOfCharacterStack(' ', stack, here)
+		  stack = s
+		  word = w
+		  println("$here: for else word '$word'")
+		  
+		  val lexeme = TextWordConstant(word)
+
+		  println("$here: for lexeme '$lexeme'")
+		  lexemeList.add (lexeme)
+	          }
+        }
+	println("$here: end for lexemeList '$lexemeList'")
+   } 
+
+   lexemeList.add (TokenEndOfLine)
+   println("$here: output lexemeList "+lexemeList)
+   exiting(here)
+   return lexemeList
+}
 
 
