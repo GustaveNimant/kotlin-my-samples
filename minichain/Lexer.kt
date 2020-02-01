@@ -1268,6 +1268,12 @@ fun lexemeListOfYmlFile (ymlFileName: String, caller: String): List<Lexeme> {
     return lexemeList
 }
 
+fun lexemeStackOfLexemeList (lex_l: List<Lexeme>, caller: String): Stack<Lexeme> {
+    var stack = Stack<Lexeme>()
+    lex_l.reversed().forEach { lex -> stack.push (lex)}
+    return stack
+}
+
 fun lexemeOfKeyword (keyword: String, caller: String) : Lexeme {
     val here = functionName()
     entering(here, caller)
@@ -1734,5 +1740,23 @@ fun lexemeListOfTextRecord (rec: String, caller: String) : MutableList<Lexeme> {
    exiting(here)
    return lexemeList
 }
+
+fun stackOfLexemeOfLexemeStack (lexeme: Lexeme, lex_s: Stack<Lexeme>, caller: String): Stack<Lexeme> {
+    val here = functionName()
+    entering(here, caller)
+
+    println ("$here: input lexeme '$lexeme'")
+    var lex = lex_s.pop()
+    
+    while (lex != lexeme) {
+      lex = lex_s.pop()
+      println ("$here: while lex '$lex'")
+    }
+    println ("$here: output lex_s '$lex_s'")
+	
+    exiting(here)
+    return lex_s
+}
+
 
 

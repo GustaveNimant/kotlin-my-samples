@@ -39,8 +39,30 @@ fun provideMetaLexemeList (caller: String) : List<Lexeme> {
 
     val lex_l = provideLexemeList (here)
 
-    var metaList = lex_l.filter { lex -> isInMetaOfLexeme(lex, here)}
+    var metaList = mutableListOf<Lexeme>()
+    var is_meta = false
 
+    for (lex in lex_l) {
+    	if (debug) println ("$here: for lex '$lex'")
+
+	if (lex is TokenSharp) {
+	   is_meta = true
+	}
+	
+	if (is_meta) {
+	   metaList.add (lex)
+	   if (debug) println ("$here: added lex '$lex'")
+	}
+	
+	if (is_meta && (lex is TokenEndOfLine)){
+	   is_meta = false
+	   if (debug) println ("$here: meta set to false")
+	}
+	
+    }
+    
+    println ("$here: output metaList "+ fullnameListOfLexemeList(metaList))
+    
     exiting(here)
     return metaList
 }
@@ -51,8 +73,30 @@ fun provideTextLexemeList (caller: String) : List<Lexeme> {
 
     val lex_l = provideLexemeList (here)
 
-    var textList = lex_l.filter { lex -> isInTextOfLexeme(lex, here) }
+    var textList = mutableListOf<Lexeme>()
+    var is_meta = false
 
+    for (lex in lex_l) {
+    	if (debug) println ("$here: for lex '$lex'")
+
+	if (lex is TokenSharp) {
+	   is_meta = true
+	}
+	
+	if (is_meta && (lex is TokenEndOfLine)){
+	   is_meta = false
+	   if (debug) println ("$here: meta set to false")
+	}
+
+	if (! is_meta) {
+	   textList.add (lex)
+	   if (debug) println ("$here: added lex '$lex'")
+	}
+	
+    }
+    
+    println ("$here: output textList "+ fullnameListOfLexemeList(textList))
+    
     exiting(here)
     return textList
 }
@@ -144,39 +188,39 @@ fun provideBlockTextTreeNode (caller: String) : TreeNode<String> {
     return tree
 }
 
-fun provideRecordNameList (caller: String) : List<String> {
-    val here = functionName()
-    entering(here, caller)
-
-    val lex_met_l = provideMetaLexemeList (here)
-
-    var nam_l = mutableListOf<String>()	  
-    for (lex in lex_met_l) {
-    	var nam = nameKeywordWithOfLexeme(lex, here)
-    	nam_l.add (nam)
-    }
-
-    val result = nam_l.toList()
-    println ("$here: output result '$result'")	
-    exiting(here)
-    return result
-}
-
 fun provideTreeMetaRecordList (caller: String) : List<TreeNode<String>> {
     val here = functionName()
     entering(here, caller)
 
 // <TreeMetaRecordList> ::= { <TreeMetaRecord> }
+// <TreeMetaRecord>     ::= Node(Record)-Leaf(value)
+//         Source        Date
+//           |            |
+//        file_path   dd/mm/yyyy
 
-    val nam_l = provideRecordNameList (here)
-
-    var rec_tl = mutableListOf<TreeNode<String>>()   
-    for (nam in nam_l) {
-        var nod = TreeNode<String>(nam)
-    	rec_tl.add (nod)
+    val lex_met_l = provideMetaLexemeList (here)
+    var lex_met_s = lexemeStackOfLexemeList (lex_met_l, here)
+    
+    var tree_l = mutableListOf<TreeNode<String>>()
+    var Done = false
+    
+    while (! Done) {
+      try {	  
+      	var lex = lex_met_s.pop()
+      	println ("$here: while lex '$lex'")
+      	if (lex is TokenSharp) {
+	  var (tree, lex_s) = treeAndStackOfLexemeMetaStack (lex_met_s, here)
+	  tree_l.add(tree)
+	  lex_met_s = lex_s
+	  println ("$here: while added tree '$tree")	
+	  println ("$here: while lex_met_s '$lex_met_s")	
+        }
+      }
+      catch (e:java.util.EmptyStackException) {
+        println ("$here: end of Stack reached")	
+        Done = true
+      }
     }
-
-    val tree_l = rec_tl.toList()
     println ("$here: output tree_l '$tree_l'")	
 
     exiting(here)
@@ -187,7 +231,7 @@ fun provideBlockMetaTreeNode (caller: String) : TreeNode<String> {
     val here = functionName()
     entering(here, caller)
 
-// <TreeMeta> ::= TreeMetaRecordList
+// <TreeMeta> ::= TreeMetaRecordList ::= { TreeMetaRecord }
 
     val tree = TreeNode<String> ("block-meta")
     val nod_l = provideTreeMetaRecordList (here)
@@ -235,6 +279,63 @@ fun provideBlockGenesisTreeNode (caller: String) : TreeNode<String> {
 
     exiting(here)
     return tree
+}
+
+fun treeAndStackOfLexemeMetaStack (lex_met_s: Stack<Lexeme>, caller: String): Pair<TreeNode<String>, Stack<Lexeme>> {
+// Set up a Leafed Node (ex.: qm / z2....)
+    val here = functionName()
+    entering(here, caller)
+
+    var node = TreeNode<String>("")
+    var Done = false
+    
+    while (! Done) {
+      try {
+        var lex = lex_met_s.pop()
+        println ("$here: while lex '$lex'")
+
+      	when (lex) {
+      	  is TokenEndOfLine -> {
+	     Done=true
+	     println ("$here: while EndOfLine reached")
+	  }
+	  is Z2Hash -> {
+	   var lea_val = lex.hash
+	   var leaf = TreeNode<String>(lea_val)
+	   node.addChild(leaf)
+	}
+     	is KeywordWithDate -> {
+	   var nod_nam = lex.name
+	   node = TreeNode<String>(nod_nam)
+	}
+     	is KeywordWithZ2Hash -> {
+	   var nod_nam = lex.name
+	   node = TreeNode<String>(nod_nam)
+	}
+     	is KeywordWithInteger -> {
+	   var nod_nam = lex.name
+	   node = TreeNode<String>(nod_nam)
+	}
+	is Tic -> {
+	   var lea_val = lex.value
+	   var leaf = TreeNode<String>(lea_val)
+	   node.addChild(leaf)
+	}
+	is DateValue -> {
+	   var lea_val = lex.value
+	   var leaf = TreeNode<String>(lea_val)
+	   node.addChild(leaf)
+	}
+	else -> {TreeNode<String>("skipped")}
+	}
+    }
+    catch (e:java.util.EmptyStackException) {Done = true }
+    }
+    println ("$here: output node '$node'")
+    println ("$here: output lex_met_s '$lex_met_s'")
+	
+    exiting(here)
+    return Pair (node, lex_met_s)
 }
 
 fun main(args: Array<String>) {
