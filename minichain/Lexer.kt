@@ -1537,7 +1537,6 @@ fun provideLexemeList(caller: String) : List<Lexeme> {
     return lex_l
 }
 
-
 fun lexemeListOfSharpedLine (lin: String, caller: String) : MutableList<Lexeme> {
 // Source: /my/perl/script/kwextract.pl,v$
     val here = functionName()

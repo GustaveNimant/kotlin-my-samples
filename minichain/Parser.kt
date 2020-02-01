@@ -122,6 +122,9 @@ fun provideRecordTextList (caller: String) : List<String> {
     entering(here, caller)
 
 // A record is enclosed between two TokenEndOfLine
+// Record are rebuilt from Lexemes and Not Parsed Yet
+// Need to interpolate variables
+
     val lex_l = provideTextLexemeList (here)
 
     var rec = ""
@@ -209,7 +212,7 @@ fun provideTreeMetaRecordList (caller: String) : List<TreeNode<String>> {
       	var lex = lex_met_s.pop()
       	println ("$here: while lex '$lex'")
       	if (lex is TokenSharp) {
-	  var (tree, lex_s) = treeAndStackOfLexemeMetaStack (lex_met_s, here)
+	  var (tree, lex_s) = leafedNodeAndStackOfLexemeMetaStack (lex_met_s, here)
 	  tree_l.add(tree)
 	  lex_met_s = lex_s
 	  println ("$here: while added tree '$tree")	
@@ -281,7 +284,7 @@ fun provideBlockGenesisTreeNode (caller: String) : TreeNode<String> {
     return tree
 }
 
-fun treeAndStackOfLexemeMetaStack (lex_met_s: Stack<Lexeme>, caller: String): Pair<TreeNode<String>, Stack<Lexeme>> {
+fun leafedNodeAndStackOfLexemeMetaStack (lex_met_s: Stack<Lexeme>, caller: String): Pair<TreeNode<String>, Stack<Lexeme>> {
 // Set up a Leafed Node (ex.: qm / z2....)
     val here = functionName()
     entering(here, caller)
@@ -299,38 +302,91 @@ fun treeAndStackOfLexemeMetaStack (lex_met_s: Stack<Lexeme>, caller: String): Pa
 	     Done=true
 	     println ("$here: while EndOfLine reached")
 	  }
+     	  is KeywordWithDate -> {
+	    var nod_nam = lex.name
+	    node = TreeNode<String>(nod_nam)
+	  }
+     	  is KeywordWithFile -> {
+	    var nod_nam = lex.name
+	    node = TreeNode<String>(nod_nam)
+	  }
+	  is KeywordWithQmHash -> {
+	    var nod_nam = lex.name
+	    node = TreeNode<String>(nod_nam)
+	  }
+	  is KeywordWithString -> {
+	    var nod_nam = lex.name
+	    node = TreeNode<String>(nod_nam)
+	  }
+	  is KeywordWithZ2Hash -> {
+	    var nod_nam = lex.name
+	    node = TreeNode<String>(nod_nam)
+	  }
+     	  is KeywordWithInteger -> {
+	    var nod_nam = lex.name
+	    node = TreeNode<String>(nod_nam)
+	  }
+	  is KeywordWithPersonName -> {
+	    var nod_nam = lex.name
+	    node = TreeNode<String>(nod_nam)
+	  }
+	  is AuthorName -> {
+	    var lea_val = lex.name
+	    var leaf = TreeNode<String>(lea_val)
+	    node.addChild(leaf)
+	  }
+	  is NextName -> {
+	    var lea_val = lex.name
+	    var leaf = TreeNode<String>(lea_val)
+	    node.addChild(leaf)
+	  }
+	  is FilePath -> {
+	    var lea_val = lex.name
+	    var leaf = TreeNode<String>(lea_val)
+	    node.addChild(leaf)
+          }
+	  is DateValue -> {
+	    var lea_val = lex.value
+	    var leaf = TreeNode<String>(lea_val)
+	    node.addChild(leaf)
+	  }
+	  is QmHash -> {
+	    var lea_val = lex.hash
+	    var leaf = TreeNode<String>(lea_val)
+	    node.addChild(leaf)
+	  }
 	  is Z2Hash -> {
-	   var lea_val = lex.hash
-	   var leaf = TreeNode<String>(lea_val)
-	   node.addChild(leaf)
-	}
-     	is KeywordWithDate -> {
-	   var nod_nam = lex.name
-	   node = TreeNode<String>(nod_nam)
-	}
-     	is KeywordWithZ2Hash -> {
-	   var nod_nam = lex.name
-	   node = TreeNode<String>(nod_nam)
-	}
-     	is KeywordWithInteger -> {
-	   var nod_nam = lex.name
-	   node = TreeNode<String>(nod_nam)
-	}
-	is Tic -> {
-	   var lea_val = lex.value
-	   var leaf = TreeNode<String>(lea_val)
-	   node.addChild(leaf)
-	}
-	is DateValue -> {
-	   var lea_val = lex.value
-	   var leaf = TreeNode<String>(lea_val)
-	   node.addChild(leaf)
-	}
-	else -> {TreeNode<String>("skipped")}
-	}
-    }
+	    var lea_val = lex.hash
+	    var leaf = TreeNode<String>(lea_val)
+	    node.addChild(leaf)
+	  }
+	  is Signature -> {
+	    var lea_val = lex.value
+	    var leaf = TreeNode<String>(lea_val)
+	    node.addChild(leaf)
+	  }
+	  is Spot -> {
+	    var lea_val = lex.value
+	    var leaf = TreeNode<String>(lea_val)
+	    node.addChild(leaf)
+	  }
+	  is Tic  -> {
+	    var lea_val = lex.value
+	    var leaf = TreeNode<String>(lea_val)
+	    node.addChild(leaf)
+	  }
+	  is TokenDollar, is TokenVee, is TokenSharp, is TokenSpace -> {
+	    println ("$here: lexeme skipped '$lex'")
+	    TreeNode<String>("skipped")
+	  }
+	  else -> {
+	    println ("$here: lexeme skipped '$lex'")
+	    TreeNode<String>("skipped")
+	  }
+       }
+       }
     catch (e:java.util.EmptyStackException) {Done = true }
-    }
+    } 
     println ("$here: output node '$node'")
     println ("$here: output lex_met_s '$lex_met_s'")
 	
