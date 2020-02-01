@@ -202,7 +202,7 @@ fun provideTreeMetaRecordList (caller: String) : List<TreeNode<String>> {
 //        file_path   dd/mm/yyyy
 
     val lex_met_l = provideMetaLexemeList (here)
-    var lex_met_s = lexemeStackOfLexemeList (lex_met_l, here)
+    var lex_met_s = teeStackOfTeeList (lex_met_l)
     
     var tree_l = mutableListOf<TreeNode<String>>()
     var Done = false

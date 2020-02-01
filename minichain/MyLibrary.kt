@@ -217,6 +217,12 @@ fun stringOfStringList (str_l: List<String>) : String {
  return str 
 }
 
+fun <T> teeStackOfTeeList (tee_l: List<T>): Stack<T> {
+    var stack = Stack<T>()
+    tee_l.reversed().forEach { t -> stack.push (t)}
+    return stack
+}
+
 fun wordListOfString (str: String): List<String> {
     val trimedString = str.trim(' ')    
     val regex = Regex("""\s+""")

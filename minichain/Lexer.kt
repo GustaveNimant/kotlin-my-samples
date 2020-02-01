@@ -67,7 +67,8 @@ object lexemeListRegister {
      fun retrieve (caller: String) : List<Lexeme> {
          val here = functionName()
     	 entering(here, caller)
-     	 var l = mutableListOf<Lexeme>()
+
+	 var l = mutableListOf<Lexeme>()
      	 list.forEach {e -> l.add(e)}
 
 	 exiting(here)
@@ -1268,12 +1269,6 @@ fun lexemeListOfYmlFile (ymlFileName: String, caller: String): List<Lexeme> {
     return lexemeList
 }
 
-fun lexemeStackOfLexemeList (lex_l: List<Lexeme>, caller: String): Stack<Lexeme> {
-    var stack = Stack<Lexeme>()
-    lex_l.reversed().forEach { lex -> stack.push (lex)}
-    return stack
-}
-
 fun lexemeOfKeyword (keyword: String, caller: String) : Lexeme {
     val here = functionName()
     entering(here, caller)
@@ -1673,15 +1668,13 @@ fun lexemeListOfTextRecord (rec: String, caller: String) : MutableList<Lexeme> {
     val here = functionName()
     entering(here, caller)
 
-    var lexemeList = mutableListOf<Lexeme>()
-    
     println("$here: input rec '$rec'")
     var stack = characterStackOfString (rec)
-    var cha = nullChar
-    var word = ""
+
+    var lexemeList = mutableListOf<Lexeme>()
     
     while (! stack.isEmpty()) {
-      cha = stack.pop()
+      var cha = stack.pop()
       println("$here: for cha '$cha'")
 
       when (cha){
@@ -1696,7 +1689,7 @@ fun lexemeListOfTextRecord (rec: String, caller: String) : MutableList<Lexeme> {
 // $variable$ to be substituted
 		  var (w, s) = nextWordAndStackOfEndCharOfCharacterStack('$', stack, here)
 		  stack = s
-		  word = w
+		  var word = w
 		  cha = stack.pop()
 		  if (! cha.equals('$')) {
 		     fatalErrorPrint ("current character were a '$'",
@@ -1722,7 +1715,7 @@ fun lexemeListOfTextRecord (rec: String, caller: String) : MutableList<Lexeme> {
 	       stack.push(cha)
 	       var (w, s) = nextWordAndStackOfEndCharOfCharacterStack(' ', stack, here)
 		  stack = s
-		  word = w
+		  var word = w
 		  println("$here: for else word '$word'")
 		  
 		  val lexeme = TextWordConstant(word)
