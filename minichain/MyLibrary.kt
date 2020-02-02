@@ -9,6 +9,27 @@ class MyLibrary
 
 // beginning of library
 
+class TreeNode<T>(value:T){
+    var value:T = value
+
+    var parent:TreeNode<T>? = null
+
+    var children:MutableList<TreeNode<T>> = mutableListOf()
+
+    fun addChild(node:TreeNode<T>){
+        children.add(node)
+        node.parent = this
+    }
+
+    override fun toString(): String {
+        var s = "${value}"
+        if (!children.isEmpty()) {
+            s += " {" + children.map { it.toString() } + " }"
+        }
+        return s
+    }
+}
+
 val debug = false
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
@@ -183,8 +204,8 @@ fun nextWordOfEndCharOfString(del: Char, str: String, caller: String): String {
 }
 
 fun notYetImplemented(fun_nam: String){
-    throw Exception("Error: function '$fun_nam' is not yet implemented")
-}
+    throw Exception("Error: function '$fun_nam' is not yet implemented")}
+
 
 fun provideAnyFileNameOfWhat(what: String, caller: String): String {
     val here = functionName()
@@ -193,7 +214,9 @@ fun provideAnyFileNameOfWhat(what: String, caller: String): String {
     val whatLc = what.toLowerCase()
     var anyFileName =
       when (whatLc) {
-        "lexeme" -> what+".lex"
+        "lexeme" -> "test.lex"
+	"block" -> what+".yml"
+	"yml" -> "test.yml"
         else -> what+".txt"
       }
     println("$here: enter file name for '$what'. Default '$anyFileName'")
@@ -221,6 +244,27 @@ fun <T> teeStackOfTeeList (tee_l: List<T>): Stack<T> {
     var stack = Stack<T>()
     tee_l.reversed().forEach { t -> stack.push (t)}
     return stack
+}
+
+fun <T> teeStackFromTeeOfTeeStack (tee:T, tee_s: Stack<T>): Stack<T> {
+// return the subStack where all elements untill tee (excluded) are poped-off
+
+   var cha = tee_s.pop()
+   var done = false
+   
+   if (cha == tee) {return tee_s}
+
+   while (! done) {
+      try {
+      	cha = tee_s.pop()
+	done = tee == cha
+      }
+      catch (e: java.util.EmptyStackException) {
+            done = true			       
+      }
+    }
+	
+    return tee_s
 }
 
 fun wordListOfString (str: String): List<String> {

@@ -40,6 +40,7 @@ sealed class Lexeme ()
   object TokenEmptySharpedLine : Lexeme ()
   object TokenEmptyLine : Lexeme ()
 
+  object TokenAt : Lexeme ()
   object TokenDollar : Lexeme ()
   object TokenSpace : Lexeme ()
   object TokenEndOfLine : Lexeme ()
@@ -107,6 +108,7 @@ fun fullnameOfLexeme (lexeme: Lexeme): String {
     	is KeywordWithString  -> "KeywordWithString("+lexeme.name+")"
         is KeywordWithPersonName -> "KeywordWithPersonName("+lexeme.name+")"
 
+	TokenAt	-> "TokenAt"
 	TokenColon	-> "TokenColon"
 	TokenComma	-> "TokenComma"
 	TokenDollar	-> "TokenDollar"
@@ -184,6 +186,7 @@ fun isInMetaOfLexeme(lex: Lexeme, caller: String): Boolean {
 	is TextVariableSubstituable  -> false
 	is TextWordConstant  -> false
 
+	TokenAt	         -> true
 	TokenColon	 -> true
 	TokenComma	 -> true
 	TokenDollar	 -> true
@@ -234,6 +237,7 @@ fun isInTextOfLexeme(lex: Lexeme, caller: String): Boolean {
 	is TextVariableSubstituable  -> true
 	is TextWordConstant  -> true
 
+	TokenAt		 -> true
 	TokenColon	 -> true
 	TokenComma	 -> true
 	TokenDollar	 -> true
@@ -1388,7 +1392,8 @@ fun stringValueOfLexeme (lexeme: Lexeme): String {
     	is KeywordWithString  -> lexeme.name
         is KeywordWithPersonName -> lexeme.name
 
-	TokenColon	-> ":"
+	TokenAt         -> "@"
+	TokenColon	-> ":"	
 	TokenComma	-> ","
 	TokenDollar	-> "\$"
 	TokenDot	-> "."
@@ -1418,6 +1423,7 @@ fun tokenOfChar(cha: Char, pos: Int, lin: String, caller: String) : Lexeme {
     println("$here: input cha '$cha'")
 
     val token = when (cha) {
+    		'@' -> TokenAt
 		'#' -> TokenSharp
 		'$' -> TokenDollar
 		' ' -> TokenSpace
@@ -1494,12 +1500,20 @@ fun writeLexemeList (caller: String) {
 
 // IRP
 
-fun buildLexemeList(ymlFileName: String, caller: String) : List<Lexeme> {
+fun lexemeListOfFileName(fil_nam: String, caller: String) : List<Lexeme> {
     val here = functionName()
     entering(here, caller)
 
-    val lex_l = lexemeListOfYmlFile (ymlFileName, here)
-
+    val file = File(fil_nam)
+    val ext = file.extension
+    val lex_l =
+      when (ext) {
+      "yml" -> lexemeListOfYmlFile (fil_nam, here)
+     else -> {
+       val message = "$here: file extension '$ext' should be 'yml'"
+       throw Exception(message)
+       }
+     }
     if (debug) println("$here: output lexeme List '$lex_l'")
     exiting(here)
     return lex_l
@@ -1510,7 +1524,7 @@ fun buildAndStoreLexemeList(caller: String) {
     entering(here, caller)
 
     val ymlFileName = provideAnyFileNameOfWhat ("Yml", here)
-    var lex_l = buildLexemeList(ymlFileName, here)
+    var lex_l = lexemeListOfFileName(ymlFileName, here)
     lexemeListRegister.store (lex_l)
 
     if (debug) println("$here: output lexeme List '$lex_l'")
@@ -1731,23 +1745,6 @@ fun lexemeListOfTextRecord (rec: String, caller: String) : MutableList<Lexeme> {
    println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
-}
-
-fun stackOfLexemeOfLexemeStack (lexeme: Lexeme, lex_s: Stack<Lexeme>, caller: String): Stack<Lexeme> {
-    val here = functionName()
-    entering(here, caller)
-
-    println ("$here: input lexeme '$lexeme'")
-    var lex = lex_s.pop()
-    
-    while (lex != lexeme) {
-      lex = lex_s.pop()
-      println ("$here: while lex '$lex'")
-    }
-    println ("$here: output lex_s '$lex_s'")
-	
-    exiting(here)
-    return lex_s
 }
 
 
