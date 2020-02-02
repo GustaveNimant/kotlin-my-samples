@@ -54,12 +54,6 @@ fun countOfCharOfString (cha: Char, str: String, caller: String) : Int {
     return count
 }
 
-fun fatalErrorPrint (expecting: String, found: String, cure: String, where: String):Unit {
-  val message: String = "\n$where: Expecting $expecting\n" + "$where: Found '$found'\n" + "$where: Cure: $cure\n"
-
-  throw Exception(message)
-}
-
 fun entering(here: String, caller: String):Unit {
     level = level + 1
     if (level > 70) {
@@ -74,6 +68,18 @@ fun exiting(here: String):Unit {
     var points = dots.substring(0, level)
     println("$points Exiting from $here")
     level = level - 1	
+}
+
+fun fatalErrorPrint (expecting: String, found: String, cure: String, where: String):Unit {
+  val message: String = "\n$where: Expecting $expecting\n" + "$where: Found '$found'\n" + "$where: Cure: $cure\n"
+
+  throw Exception(message)
+}
+
+fun fileExtensionOfFileName (fil_nam:String): String {
+    val file = File(fil_nam)
+    val ext = file.extension
+    return ext
 }
 
 fun functionName(): String {
@@ -205,7 +211,6 @@ fun nextWordOfEndCharOfString(del: Char, str: String, caller: String): String {
 
 fun notYetImplemented(fun_nam: String){
     throw Exception("Error: function '$fun_nam' is not yet implemented")}
-
 
 fun provideAnyFileNameOfWhat(what: String, caller: String): String {
     val here = functionName()

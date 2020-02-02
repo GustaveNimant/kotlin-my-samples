@@ -1,7 +1,2 @@
-# $Signature: n/a$
-
-line 1
-line 2 with a $variable$ embedded
-  line 3 starts with two spaces
-
- 
+# $Source: /my/perl/script/kwextract.pl,v$
+# $Date: 09/27/1998$

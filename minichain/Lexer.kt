@@ -1504,8 +1504,7 @@ fun lexemeListOfFileName(fil_nam: String, caller: String) : List<Lexeme> {
     val here = functionName()
     entering(here, caller)
 
-    val file = File(fil_nam)
-    val ext = file.extension
+    val ext = fileExtensionOfFileName(fil_nam)
     val lex_l =
       when (ext) {
       "yml" -> lexemeListOfYmlFile (fil_nam, here)
