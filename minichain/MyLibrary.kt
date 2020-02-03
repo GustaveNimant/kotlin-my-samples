@@ -30,6 +30,8 @@ class TreeNode<T>(value:T){
     }
 }
 
+data class pairString (val first: String, val second: String)
+
 val debug = false
 var level = 0
 var dots = "........|........|........|........|........|........|........|"

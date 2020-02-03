@@ -1,8 +1,11 @@
 #!/bin/bash
 kotlinc MyLibrary.kt -include-runtime -d MyLibrary.jar
-kotlinc -classpath MyLibrary.jar Lexer.kt -include-runtime -d Lexer.jar 
-kotlinc -classpath MyLibrary.jar:Lexer.jar Parser.kt -include-runtime -d Parser.jar 
+kotlinc -classpath MyLibrary.jar Lexeme.kt -include-runtime -d Lexeme.jar
+kotlinc -classpath MyLibrary.jar:Lexeme.jar Lexer.kt -include-runtime -d Lexer.jar
+kotlinc -classpath MyLibrary.jar:Lexeme.jar:Lexer.jar LexemeListProvider.kt -include-runtime -d LexemeListProvider.jar
+kotlinc -classpath MyLibrary.jar:Lexer.jar:Lexeme.jar:LexemeListProvider.jar  Parser.kt -include-runtime -d Parser.jar
+kotlinc -classpath MyLibrary.jar:Lexer.jar:Lexeme.jar:LexemeListProvider.jar:Parser.jar Main.kt -include-runtime -d Main.jar 
 
 
 
-java -esa --class-path MyLibrary.jar:Lexer.jar:Parser.jar ParserKt
+java -esa --class-path MyLibrary.jar:Lexer.jar:Lexeme.jar:LexemeListProvider.jar:Parser.jar:Main.jar MainKt

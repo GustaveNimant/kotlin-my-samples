@@ -5,126 +5,60 @@ import java.util.Stack
 import java.lang.Character.MIN_VALUE as nullChar
 
 import my.library.*
+import my.lexeme.*
 
 // kotlinc MyLibrary.kt -include-runtime -d MyLibrary.jar 
 // kotlinc -classpath MyLibrary.jar Lexer.kt -include-runtime -d Lexer.jar
 
-sealed class Lexeme ()
-  data class KeywordWithPersonName (val name: String) : Lexeme ()
-  data class KeywordWithDate (val name: String) : Lexeme ()
-  data class KeywordWithQmHash (val name: String) : Lexeme ()
-  data class KeywordWithZ2Hash (val name: String) : Lexeme () 
-  data class KeywordWithString (val name: String) : Lexeme ()
-  data class KeywordWithFile (val name: String) : Lexeme ()
-  data class KeywordWithInteger (val name: String) : Lexeme ()
+fun lexemeListOfYmlFile (ymlFileName: String, caller: String): List<Lexeme> {
+    val here = functionName()
+    entering(here, caller)
 
-  data class Comment (val name: String) : Lexeme ()
-  data class DateValue (val value: String) : Lexeme ()
-  data class AuthorName (val name: String) : Lexeme ()
-  data class NextName (val name: String) : Lexeme ()
-  data class FilePath (val name: String) : Lexeme ()
-  data class QmHash (val hash: String) : Lexeme ()
-  data class Z2Hash (val hash: String) : Lexeme ()
-  data class Signature (val value: String) : Lexeme ()
-  data class Spot (val value: String) : Lexeme ()
-  data class Tic (val value: String) : Lexeme ()	  
+    var lexemeList = mutableListOf<Lexeme>()
+    println("$here: input ymlFileName '$ymlFileName'")
+    val lineList = lineListOfFileName (ymlFileName, here)
 
-  data class TextRecordConstant (val record: String) : Lexeme ()
-  data class TextStringConstant (val string: String) : Lexeme ()
-  data class TextWordConstant (val word: String) : Lexeme ()
-  data class TextVariableSubstituable (val variable: String) : Lexeme ()
-	  
-  object TokenUnknown : Lexeme ()
-  object TokenSkipped : Lexeme ()
+    var count = 0
+    for (line in lineList) {
+      count = count + 1
+      if (debug) println("$here: for line # $count '$line'")
+      if (line.startsWith('#'))  {
+      	 val lexeme_l = lexemeListOfSharpedLine (line, here)
+	 lexemeList.addAll (lexeme_l)
+	 }		
+      else {
+	 val lexeme_l = lexemeListOfTextRecord (line, here)
+	 lexemeList.addAll (lexeme_l)
+	 }
+    }
+    
+    if (debug) println("$here: output lexemeList $lexemeList")
+    exiting(here)
 
-  object TokenEmptySharpedLine : Lexeme ()
-  object TokenEmptyLine : Lexeme ()
+    return lexemeList
+}
 
-  object TokenAt : Lexeme ()
-  object TokenDollar : Lexeme ()
-  object TokenSpace : Lexeme ()
-  object TokenEndOfLine : Lexeme ()
-  object TokenVee : Lexeme ()
-  object TokenComma : Lexeme ()
-  object TokenColon : Lexeme ()
-  object TokenSemicolon : Lexeme ()
-  object TokenSharp : Lexeme ()
-  object TokenDot : Lexeme ()
-  object TokenHyphen : Lexeme ()
+fun lexemeListOfFileName(fil_nam: String, caller: String) : List<Lexeme> {
+    val here = functionName()
+    entering(here, caller)
 
-data class pairString (val first: String, val second: String)
-
-object lexemeListRegister {
-     var list = mutableListOf<Lexeme>()
-
-     fun isEmpty () : Boolean {
-     	 return list.isEmpty()
+    val ext = fileExtensionOfFileName(fil_nam)
+    val lex_l =
+      when (ext) {
+      "yml" -> lexemeListOfYmlFile (fil_nam, here)
+     else -> {
+       val message = "$here: file extension '$ext' should be 'yml'"
+       throw Exception(message)
+       }
      }
-     
-     fun store (l:List<Lexeme>) {
-     	 l.forEach {e -> list.add(e)}
-     }
-     
-     fun retrieve (caller: String) : List<Lexeme> {
-         val here = functionName()
-    	 entering(here, caller)
-
-	 var l = mutableListOf<Lexeme>()
-     	 list.forEach {e -> l.add(e)}
-
-	 exiting(here)
-	 return l
-     }
+    if (debug) println("$here: output lexeme List '$lex_l'")
+    exiting(here)
+    return lex_l
 }
 
 fun fullnameListOfLexemeList (lex_l: List<Lexeme>) : List<String> {
   val str_l = lex_l.map({l -> fullnameOfLexeme (l) })
   return str_l 
-}
-
-fun fullnameOfLexeme (lexeme: Lexeme): String {
-    val string = when (lexeme) {
-
-	is AuthorName -> "AuthorName("+lexeme.name+")"
-	is Comment -> "Comment("+lexeme.name+")"
-	is DateValue -> "DateValue("+lexeme.value+")"
-	is FilePath -> "FilePath("+lexeme.name+")"
-	is KeywordWithZ2Hash -> "KeywordWithZ2Hash("+lexeme.name+")"
-	is NextName -> "NextName("+lexeme.name+")"
-	is QmHash -> "QmHash("+lexeme.hash+")"
-	is Signature -> "Signature("+lexeme.value+")"	
-	is Spot -> "Spot("+lexeme.value+")"
-	is TextRecordConstant -> "TextRecordConstant("+lexeme.record+")"
-	is TextStringConstant -> "TextStringConstant("+lexeme.string+")"
-	is TextVariableSubstituable -> "TextVariableSubstituable("+lexeme.variable+")"	
-	is TextWordConstant -> "TextWordConstant("+lexeme.word+")"
-	is Tic -> "Tic("+lexeme.value+")"	
-	is Z2Hash -> "Z2Hash("+lexeme.hash+")"
-
-	is KeywordWithDate    -> "KeywordWithDate("+lexeme.name+")"
-    	is KeywordWithFile    -> "KeywordWithFile("+lexeme.name+")"
-    	is KeywordWithInteger -> "KeywordWithInteger("+lexeme.name+")"
-    	is KeywordWithQmHash  -> "KeywordWithQmHash("+lexeme.name+")"
-    	is KeywordWithString  -> "KeywordWithString("+lexeme.name+")"
-        is KeywordWithPersonName -> "KeywordWithPersonName("+lexeme.name+")"
-
-	TokenAt	-> "TokenAt"
-	TokenColon	-> "TokenColon"
-	TokenComma	-> "TokenComma"
-	TokenDollar	-> "TokenDollar"
-	TokenDot	-> "TokenDot"
-	TokenEmptyLine  -> "TokenEmptyLine"
-	TokenEmptySharpedLine -> "TokenEmptySharpedLine"
-	TokenEndOfLine	-> "TokenEndOfLine"
-	TokenHyphen	-> "TokenHyphen"
-	TokenSemicolon	-> "TokenSemicolon"
-	TokenSharp	-> "TokenSharp"
-	TokenSkipped    -> "skipped "
-	TokenSpace	-> "TokenSpace"
-	TokenUnknown    -> "unknown "
-	TokenVee	-> "TokenVee"
-	}
-    return string
 }
 
 fun hasKeywordPreviousOfLexemeList (met_l: List<Lexeme>, caller: String): Boolean {
@@ -156,9 +90,12 @@ fun isDateOfString(str: String, caller: String): Boolean {
     entering(here, caller)
     
     println("$here: input str '$str'")
-    val pattern = Regex("[a-zA-Z_]+")
-    val result = pattern.matches(str)
-
+    val pattern_us = Regex("""\d\d\/\d\d\/\d\d\d\d""")
+    val result_us = pattern_us.matches(str)
+    val pattern_eu = Regex("""\d\d-\d\d-\d\d\d\d""")
+    val result_eu = pattern_eu.matches(str)
+    val result = result_us || result_eu
+    
     exiting(here + " with result '$result'")
     return result
 }
@@ -171,108 +108,6 @@ fun isFilePathOfString(str: String, caller: String): Boolean {
     val pattern = Regex("""^(/(\.)?\w[a-zA-Z_0-9]*)(/([a-zA-Z_0-9]+))*\.\w+$""")
     val result = pattern.matches(str)
 
-    exiting(here + " with result '$result'")
-    return result
-}
-
-fun isInMetaOfLexeme(lex: Lexeme, caller: String): Boolean {
-    val here = functionName()
-    entering(here, caller)
-
-    println("$here: input lex '$lex'")
-    val result = when (lex) {
-	is TextRecordConstant  -> false
-	is TextStringConstant  -> false
-	is TextVariableSubstituable  -> false
-	is TextWordConstant  -> false
-
-	TokenAt	         -> true
-	TokenColon	 -> true
-	TokenComma	 -> true
-	TokenDollar	 -> true
-	TokenDot	 -> true
-	TokenEndOfLine	 -> true
-	TokenHyphen	 -> true
-	TokenSemicolon	 -> true
-	TokenSharp	 -> true
-	TokenSpace	 -> true
-
-	is AuthorName  -> true
-	is Comment  -> true
-	is DateValue  -> true
-	is FilePath  -> true
-	is KeywordWithZ2Hash  -> true
-	is NextName  -> true
-	is QmHash  -> true
-	is Signature  -> true
-	is Spot  -> true
-	is Tic  -> true
-	is Z2Hash  -> true
-
-	is KeywordWithDate     -> true
-    	is KeywordWithFile     -> true
-    	is KeywordWithInteger  -> true
-    	is KeywordWithQmHash   -> true
-    	is KeywordWithString   -> true
-        is KeywordWithPersonName  -> true
-
-	TokenSkipped     -> true
-	TokenUnknown     -> true
-	TokenVee	 -> true
-	TokenEmptyLine   -> true
-	TokenEmptySharpedLine  -> true
-    }
-    exiting(here + " with result '$result'")
-    return result
-}
-
-fun isInTextOfLexeme(lex: Lexeme, caller: String): Boolean {
-    val here = functionName()
-    entering(here, caller)
-
-    println("$here: input lex '$lex'")
-    val result = when (lex) {
-	is TextRecordConstant  -> true
-	is TextStringConstant  -> true
-	is TextVariableSubstituable  -> true
-	is TextWordConstant  -> true
-
-	TokenAt		 -> true
-	TokenColon	 -> true
-	TokenComma	 -> true
-	TokenDollar	 -> true
-	TokenDot	 -> true
-	TokenEndOfLine	 -> true
-	TokenHyphen	 -> true
-	TokenSemicolon	 -> true
-	TokenSharp	 -> true
-	TokenSpace	 -> true
-
-	is AuthorName  -> false
-	is Comment  -> false
-	is DateValue  -> false
-	is FilePath  -> false
-	is KeywordWithZ2Hash  -> false
-	is NextName  -> false
-	is QmHash  -> false
-	is Signature  -> false
-	is Spot  -> false
-	is Tic  -> false
-	is Z2Hash  -> false
-
-	is KeywordWithDate     -> false
-    	is KeywordWithFile     -> false
-    	is KeywordWithInteger  -> false
-    	is KeywordWithQmHash   -> false
-    	is KeywordWithString   -> false
-        is KeywordWithPersonName  -> false
-
-	TokenSkipped     -> false
-	TokenUnknown     -> false
-	TokenVee	 -> false
-	TokenEmptyLine   -> false
-	TokenEmptySharpedLine  -> false
-    }
     exiting(here + " with result '$result'")
     return result
 }
@@ -305,25 +140,6 @@ fun isKeywordWithQmHashOfLexeme(lex: Lexeme, caller: String): Boolean {
 
     println("$here: input lex '$lex'")
     val result = lex is KeywordWithQmHash
-    exiting(here + " with result '$result'")
-    return result
-}
-
-fun isKeywordWithOfLexeme(lex: Lexeme, caller: String): Boolean {
-    val here = functionName()
-    entering(here, caller)
-
-    println("$here: input lex '$lex'")
-    val result = when (lex) {
-    	is KeywordWithZ2Hash -> true 
-	is KeywordWithDate -> true     
-    	is KeywordWithFile -> true 
-    	is KeywordWithInteger -> true 
-    	is KeywordWithQmHash -> true  
-    	is KeywordWithString -> true   
-        is KeywordWithPersonName -> true
-	else -> false
-    }
     exiting(here + " with result '$result'")
     return result
 }
@@ -413,31 +229,6 @@ fun isTicOfString(str: String, caller: String): Boolean {
     exiting(here + " with result '$result'")
     return result
 }
-
-fun isTokenOfChar(cha: Char, caller: String) : Boolean {
-    val here = functionName()
-    entering(here, caller)
-
-    if(debug) println("$here: input cha '$cha'")
-    val result = when (cha) {
-		'#' -> true
-		'$' -> true
-		' ' -> true 
-		'\n' -> true
-		'/' -> true
-		',' -> true
-		':' -> true
-		';' -> true
-		'.' -> true
-		'-' -> true
-		'a','z' -> true
-		else -> false
-    }
-    
-  if(debug) println ("$here: output result '$result'")	
-  exiting(here)
-  return result
- }
 
 fun isZ2HashOfString(str: String, caller: String): Boolean {
     val here = functionName()
@@ -583,10 +374,10 @@ fun lexemeListOfDateLine (lin: String, caller: String) : MutableList<Lexeme> {
     
     while (!Done) {
     	  try {
-    	      var currentCharacter = lin.get(position)
-	      val lexeme = when (currentCharacter) {
+    	      var cha = lin.get(position)
+	      val lexeme = when (cha) {
 	      ' ' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  }
 	      'D' -> {
 	      	  val str = lin
@@ -594,7 +385,7 @@ fun lexemeListOfDateLine (lin: String, caller: String) : MutableList<Lexeme> {
 	  	  position = position + word.length 
     	  	  lexemeOfKeyword (word, here)
 		  }
-	      'n' -> {
+	      '0', '1', '2','3','4','5','6','7','8','9' -> {
 	      	  val str = lin.substring(position)
 		  val word = nextWordOfEndCharOfString('$', str, here)
 		  if (isDateOfString(word, here)) {
@@ -602,13 +393,25 @@ fun lexemeListOfDateLine (lin: String, caller: String) : MutableList<Lexeme> {
     		     DateValue (word)
 		  }
 		  else {
-		       val message = "$here: Error word '$word' is not a valid date"
-		       throw Exception(message)
+		    val message = "$here: Error word '$word' is not a valid date"
+		    throw Exception(message)
+		  }
+		  }
+	      'n' -> {
+	      	  val str = lin.substring(position)
+		  val word = nextWordOfEndCharOfString('$', str, here)
+		  if (isDateOfString(word, here)) {
+		    position = position + word.length
+    		    DateValue (word)
+		  }
+		  else {
+		    val message = "$here: Error word '$word' is not a valid date"
+		    throw Exception(message)
 		  }
 	          }
 	       else -> {
-		     val message = "$here: Error unknown Character '$currentCharacter' at position $position"
-		     throw Exception(message)
+		    val message = "$here: Error unknown Character '$cha' at position $position of line '$lin'"
+		    throw Exception(message)
 	          }
 		}
 		position = position + 1
@@ -617,14 +420,14 @@ fun lexemeListOfDateLine (lin: String, caller: String) : MutableList<Lexeme> {
 	  catch (e: java.lang.StringIndexOutOfBoundsException) {
 	  	val previousCharacter = lin.get(position-1)
 	  	if (previousCharacter.equals('$')) {
-	     	   var lexeme = TokenEndOfLine
-		   lexemeList.add (lexeme)
-	     	   if (debug) println("$here: setting End Of Line")
-	     	   Done = true			
+	     	  var lexeme = TokenEndOfLine
+		  lexemeList.add (lexeme)
+	     	  if (debug) println("$here: setting End Of Line")
+	     	  Done = true			
 	     	}
 		else {
-		     val message = "$here: Error previous character '$previousCharacter' should be '$'"
-	    	     throw Exception(message)
+		  val message = "$here: Error previous character '$previousCharacter' should be '$'"
+	    	  throw Exception(message)
 		}
 	  }
    }
@@ -633,6 +436,65 @@ fun lexemeListOfDateLine (lin: String, caller: String) : MutableList<Lexeme> {
    exiting(here)
    return lexemeList
 }
+
+fun lexemeListOfMembersKeyword (lin: String, caller: String) : MutableList<Lexeme> {
+// $members: michelc@lausanne , emilea$ 
+    val here = functionName()
+    entering(here, caller)
+
+    println("$here: input lin '$lin'")
+    
+    val lexemeList = mutableListOf<Lexeme>()
+
+    var Done = false
+    var position = 0
+    
+    while (!Done) {
+    	  try {
+    	      var cha = lin.get(position)
+	      val lexeme: Lexeme = when (cha){
+	      ' ' -> {
+	      	  tokenOfChar(cha, position, lin, here)
+		  }
+	      '$' -> {
+	      	  tokenOfChar(cha, position, lin, here)
+		  }
+	      ',' -> {
+	      	  tokenOfChar(cha, position, lin, here)
+		  }
+	      'm' -> {
+	      	  val str = lin.substring(position)
+    	      	  val word = nextWordOfEndCharOfString(':', str, here)
+		  if (word == "members") {
+		     Done = true
+		  }
+		  else {
+		     val message = "$here: Error expecting word '$cha' were 'members'"
+		     throw Exception(message)
+		  }
+	  	  position = position + word.length
+    	  	  lexemeOfKeyword (word, here)
+		  }		  
+	       else -> {
+		     val message = "$here: Error unknown current Character '$cha' at position $position of line '$lin'"
+		     throw Exception(message)
+	          }
+		}
+	        position = position + 1
+		lexemeList.add (lexeme)
+   		}
+	  catch (e: java.lang.StringIndexOutOfBoundsException) {
+	    val message = "$here: Error unexpected End Of Line at position $position of line '$lin'"
+	    throw Exception(message)
+	  
+	  }
+   }
+
+   println("$here: output lexemeList "+lexemeList)
+   exiting(here)
+   return lexemeList
+}
+
 
 fun lexemeListOfMutableLine (lin: String, caller: String) : MutableList<Lexeme> {
 // mutable: /.brings/system/bin/kwextract.pl$
@@ -648,13 +510,13 @@ fun lexemeListOfMutableLine (lin: String, caller: String) : MutableList<Lexeme> 
     
     while (!Done) {
     	  try {
-    	      var currentCharacter = lin.get(position)
-	      val lexeme: Lexeme = when (currentCharacter){
+    	      var cha = lin.get(position)
+	      val lexeme: Lexeme = when (cha){
 	      ' ' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  }
 	      '$' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  }
 	      'm' -> {
 	      	  val str = lin.substring(position)
@@ -675,7 +537,7 @@ fun lexemeListOfMutableLine (lin: String, caller: String) : MutableList<Lexeme> 
 		  }
 	          }
 	       else -> {
-		     val message = "$here: Error unknown current Character '$currentCharacter' at position $position"
+		     val message = "$here: Error unknown current Character '$cha' at position $position"
 		     throw Exception(message)
 	          }
 		}
@@ -716,10 +578,10 @@ fun lexemeListOfNextLine (lin: String, caller: String) : MutableList<Lexeme> {
     
     while (!Done) {
     	  try {
-    	      var currentCharacter = lin.get(position)
-	      val lexeme: Lexeme = when (currentCharacter){
+    	      var cha = lin.get(position)
+	      val lexeme: Lexeme = when (cha){
 	      '$' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  }
 	      'n' -> {
 	      	  val str = lin.substring(position)
@@ -728,7 +590,7 @@ fun lexemeListOfNextLine (lin: String, caller: String) : MutableList<Lexeme> {
     	  	  lexemeOfKeyword (word, here)
 		  }
 	      ' ' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  position = position + 1
 	      	  val str = lin.substring(position)
 		  val word = nextWordOfEndCharOfString('$', str, here)
@@ -742,7 +604,7 @@ fun lexemeListOfNextLine (lin: String, caller: String) : MutableList<Lexeme> {
 		  }
 	          }
 	       else -> {
-		     val message = "$here: Error unknown current Character '$currentCharacter' at position $position"
+		     val message = "$here: Error unknown current Character '$cha' at position $position"
 		     throw Exception(message)
 	          }
 		}
@@ -783,13 +645,13 @@ fun lexemeListOfParentsLine (lin: String, caller: String) : MutableList<Lexeme> 
     
     while (!Done) {
     	  try {
-    	      var currentCharacter = lin.get(position)
-	      val lexeme: Lexeme = when (currentCharacter){
+    	      var cha = lin.get(position)
+	      val lexeme: Lexeme = when (cha){
 	      ' ' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  }
 	      '$' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  }
 	      'p' -> {
 	      	  val str = lin.substring(position)
@@ -810,7 +672,7 @@ fun lexemeListOfParentsLine (lin: String, caller: String) : MutableList<Lexeme> 
 		  }
 	          }
 	       else -> {
-		     val message = "$here: Error unknown current Character '$currentCharacter' at position $position"
+		     val message = "$here: Error unknown current Character '$cha' at position $position"
 		     throw Exception(message)
 	          }
 		}
@@ -851,13 +713,13 @@ fun lexemeListOfPreviousLine (lin: String, caller: String) : MutableList<Lexeme>
     
     while (!Done) {
     	  try {
-    	      var currentCharacter = lin.get(position)
-	      val lexeme: Lexeme = when (currentCharacter){
+    	      var cha = lin.get(position)
+	      val lexeme: Lexeme = when (cha){
 	      ' ' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  }
 	      '$' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  }
 	      'p' -> {
 	      	  val str = lin.substring(position)
@@ -878,7 +740,7 @@ fun lexemeListOfPreviousLine (lin: String, caller: String) : MutableList<Lexeme>
 		  }
 	          }
 	       else -> {
-		     val message = "$here: Error unknown current Character '$currentCharacter' at position $position"
+		     val message = "$here: Error unknown current Character '$cha' at position $position"
 		     throw Exception(message)
 	          }
 		}
@@ -919,13 +781,13 @@ fun lexemeListOfQmHashLine (lin: String, caller: String) : MutableList<Lexeme> {
     
     while (!Done) {
     	  try {
-    	      var currentCharacter = lin.get(position)
-	      val lexeme: Lexeme = when (currentCharacter){
+    	      var cha = lin.get(position)
+	      val lexeme: Lexeme = when (cha){
 	      ' ' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  }
 	      '$' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  }
 	      'q' -> {
 	      	  val str = lin.substring(position)
@@ -946,7 +808,7 @@ fun lexemeListOfQmHashLine (lin: String, caller: String) : MutableList<Lexeme> {
 		  }
 	          }
 	       else -> {
-		     val message = "$here: Error unknown current Character '$currentCharacter' at position $position"
+		     val message = "$here: Error unknown current Character '$cha' at position $position"
 		     throw Exception(message)
 	          }
 		}
@@ -987,16 +849,16 @@ fun lexemeListOfSourceLine (lin: String, caller: String) : MutableList<Lexeme> {
     
     while (!Done) {
     	  try {
-    	      var currentCharacter = lin.get(position)
-	      val lexeme: Lexeme = when (currentCharacter){
+    	      var cha = lin.get(position)
+	      val lexeme: Lexeme = when (cha){
 	      ' ' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  }
 	      'v' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  }
 	      '$' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  }
 	      'S' -> {
 	      	  val str = lin.substring(position)
@@ -1017,7 +879,7 @@ fun lexemeListOfSourceLine (lin: String, caller: String) : MutableList<Lexeme> {
 		  }
 	          }
 	       else -> {
-		     val message = "$here: Error unknown current Character '$currentCharacter' at position $position"
+		     val message = "$here: Error unknown current Character '$cha' at position $position"
 		     throw Exception(message)
 	          }
 		}
@@ -1058,10 +920,10 @@ fun lexemeListOfSignatureLine (lin: String, caller: String) : MutableList<Lexeme
     
     while (!Done) {
     	  try {
-    	      var currentCharacter = lin.get(position)
-	      val lexeme: Lexeme = when (currentCharacter){
+    	      var cha = lin.get(position)
+	      val lexeme: Lexeme = when (cha){
 	      '$' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  }
 	      'S' -> {
 	      	  val str = lin.substring(position)
@@ -1070,7 +932,7 @@ fun lexemeListOfSignatureLine (lin: String, caller: String) : MutableList<Lexeme
     	  	  lexemeOfKeyword (word, here)
 		  }
 	      ' ' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  position = position + 1
 	      	  val str = lin.substring(position)
 		  val word = nextWordOfEndCharOfString('$', str, here)
@@ -1084,7 +946,7 @@ fun lexemeListOfSignatureLine (lin: String, caller: String) : MutableList<Lexeme
 		  }
 	          }
 	       else -> {
-		     val message = "$here: Error unknown current Character '$currentCharacter' at position $position"
+		     val message = "$here: Error unknown current Character '$cha' at position $position"
 		     throw Exception(message)
 	          }
 		}
@@ -1125,10 +987,10 @@ fun lexemeListOfSpotLine (lin: String, caller: String) : MutableList<Lexeme> {
     
     while (!Done) {
     	  try {
-    	      var currentCharacter = lin.get(position)
-	      val lexeme: Lexeme = when (currentCharacter){
+    	      var cha = lin.get(position)
+	      val lexeme: Lexeme = when (cha){
 	      '$' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  }
 	      's' -> {
 	      	  val str = lin.substring(position)
@@ -1137,7 +999,7 @@ fun lexemeListOfSpotLine (lin: String, caller: String) : MutableList<Lexeme> {
     	  	  lexemeOfKeyword (word, here)
 		  }
 	      ' ' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  position = position + 1
 	      	  val str = lin.substring(position)
 		  val word = nextWordOfEndCharOfString('$', str, here)
@@ -1151,7 +1013,7 @@ fun lexemeListOfSpotLine (lin: String, caller: String) : MutableList<Lexeme> {
 		       }
 	           }    
 	       else -> {
-		     val message = "$here: Error unknown current Character '$currentCharacter' at position $position"
+		     val message = "$here: Error unknown current Character '$cha' at position $position"
 		     throw Exception(message)
 	          }
 		}
@@ -1192,10 +1054,10 @@ fun lexemeListOfTicLine (lin: String, caller: String) : MutableList<Lexeme> {
     
     while (!Done) {
     	  try {
-    	      var currentCharacter = lin.get(position)
-	      val lexeme: Lexeme = when (currentCharacter){
+    	      var cha = lin.get(position)
+	      val lexeme: Lexeme = when (cha){
 	      '$' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  }
 	      't' -> {
 	      	  val str = lin.substring(position)
@@ -1204,7 +1066,7 @@ fun lexemeListOfTicLine (lin: String, caller: String) : MutableList<Lexeme> {
     	  	  lexemeOfKeyword (word, here)
 		  }
 	      ' ' -> {
-	      	  tokenOfChar(currentCharacter, position, lin, here)
+	      	  tokenOfChar(cha, position, lin, here)
 		  position = position + 1
 	      	  val str = lin.substring(position)
 		  val word = nextWordOfEndCharOfString('$', str, here)
@@ -1218,7 +1080,7 @@ fun lexemeListOfTicLine (lin: String, caller: String) : MutableList<Lexeme> {
 		  }
 	          }
 	       else -> {
-		     val message = "$here: Error unknown current Character '$currentCharacter' at position $position"
+		     val message = "$here: Error unknown current Character '$cha' at position $position"
 		     throw Exception(message)
 	          }
 		}
@@ -1245,63 +1107,6 @@ fun lexemeListOfTicLine (lin: String, caller: String) : MutableList<Lexeme> {
    return lexemeList
 }
 
-fun lexemeListOfYmlFile (ymlFileName: String, caller: String): List<Lexeme> {
-    val here = functionName()
-    entering(here, caller)
-
-    var lexemeList = mutableListOf<Lexeme>()
-    println("$here: input ymlFileName '$ymlFileName'")
-    val lineList = lineListOfFileName (ymlFileName, here)
-
-    var count = 0
-    for (line in lineList) {
-      count = count + 1
-      if (debug) println("$here: for line # $count '$line'")
-      if (line.startsWith('#'))  {
-      	 val lexeme_l = lexemeListOfSharpedLine (line, here)
-	 lexemeList.addAll (lexeme_l)
-	 }		
-      else {
-	 val lexeme_l = lexemeListOfTextRecord (line, here)
-	 lexemeList.addAll (lexeme_l)
-	 }
-    }
-    
-    if (debug) println("$here: output lexemeList $lexemeList")
-    exiting(here)
-
-    return lexemeList
-}
-
-fun lexemeOfKeyword (keyword: String, caller: String) : Lexeme {
-    val here = functionName()
-    entering(here, caller)
-
-    println("$here: input keyword: '$keyword'")
-
-   var lexeme = when (keyword) {
-       "Author" -> KeywordWithPersonName (keyword)
-       "Date" -> KeywordWithDate (keyword)
-       "Source" -> KeywordWithFile (keyword)
-       "Signature" -> KeywordWithString (keyword)      
-       "mutable" -> KeywordWithFile (keyword)
-       "parents" -> KeywordWithQmHash (keyword)
-       "previous" -> KeywordWithQmHash (keyword)
-       "next" -> KeywordWithString (keyword)
-       "tic" -> KeywordWithInteger (keyword)       
-       "qm" -> KeywordWithZ2Hash (keyword)
-       "spot" -> KeywordWithInteger (keyword)       
-       else -> {
-       	    val message = "$here: Error unknown Keyword '$keyword'"
-	    throw Exception(message)
-	}
-  }
-  
-  println ("$here: output lexeme '$lexeme'")	
-  exiting(here)
-  return lexeme
- }
-
 fun nameKeywordWithOfLexeme(lex: Lexeme, caller: String): String {
     val here = functionName()
     entering(here, caller)
@@ -1320,28 +1125,6 @@ fun nameKeywordWithOfLexeme(lex: Lexeme, caller: String): String {
     
     exiting(here + " with result '$result'")
     return result
-}
-
-fun nextWordOfString(pos:Int, lin: String, caller: String): String {
-    val here = functionName()
-    entering(here, caller)
-
-    println("$here: input pos '$pos'")
-    println("$here: input lin '$lin'")
-    
-    val str = lin.substring(pos)
-    var word = ""    
-    for (c in str){
-	  if (debug) println("$here: c '$c'")
-	  if (isTokenOfChar(c, here)) {break}
-	  word = word.plus(c.toString())
-    }
-
-    assert (word.isNotEmpty())
-    
-    println("$here: output word '$word'")
-    exiting(here)
-    return word
 }
 
 fun printLexemeListOfYmlFile (ymlFileName: String, caller: String) {
@@ -1366,83 +1149,10 @@ fun printStringList (str_l: List<String>) {
     println (content)
 }
 
-fun stringValueOfLexeme (lexeme: Lexeme): String {
-    val string = when (lexeme) {
-
-	is AuthorName -> lexeme.name
-	is Comment -> lexeme.name
-	is DateValue -> lexeme.value
-	is FilePath -> lexeme.name
-	is KeywordWithZ2Hash -> lexeme.name
-	is NextName -> lexeme.name
-	is QmHash -> lexeme.hash
-	is Signature -> lexeme.value	
-	is Spot -> lexeme.value
-	is TextRecordConstant -> lexeme.record
-	is TextStringConstant -> lexeme.string
-	is TextVariableSubstituable -> lexeme.variable	
-	is TextWordConstant -> lexeme.word
-	is Tic -> lexeme.value	
-	is Z2Hash -> lexeme.hash
-
-	is KeywordWithDate    -> lexeme.name
-    	is KeywordWithFile    -> lexeme.name
-    	is KeywordWithInteger -> lexeme.name
-    	is KeywordWithQmHash  -> lexeme.name
-    	is KeywordWithString  -> lexeme.name
-        is KeywordWithPersonName -> lexeme.name
-
-	TokenAt         -> "@"
-	TokenColon	-> ":"	
-	TokenComma	-> ","
-	TokenDollar	-> "\$"
-	TokenDot	-> "."
-	TokenEmptyLine  -> ""
-	TokenEmptySharpedLine -> ""
-	TokenEndOfLine	-> "\n"
-	TokenHyphen	-> "-"
-	TokenSemicolon	-> ";"
-	TokenSharp	-> "#"
-	TokenSpace	-> " "
-	TokenVee	-> "v"
-	TokenUnknown    -> "unknown"
-	TokenSkipped    -> "skipped"
-	}
-    return string
-}
 
 fun stringValueListOfLexemeList (lex_l: List<Lexeme>) : List<String> {
   val str_l = lex_l.map({l -> stringValueOfLexeme (l) })
   return str_l 
-}
-
-fun tokenOfChar(cha: Char, pos: Int, lin: String, caller: String) : Lexeme {
-    val here = functionName()
-    entering(here, caller)
-
-    println("$here: input cha '$cha'")
-
-    val token = when (cha) {
-    		'@' -> TokenAt
-		'#' -> TokenSharp
-		'$' -> TokenDollar
-		' ' -> TokenSpace
-		'\n' -> TokenEndOfLine
-		'v' -> TokenVee
-		',' -> TokenComma
-		':' -> TokenColon
-		';' -> TokenSemicolon
-		'.' -> TokenDot	
-		'-' -> TokenHyphen
-	else -> {
-             val message = "$here: Error unknown Character '$cha' at position $pos of line '$lin'"
-    	     throw Exception(message)
-	     	}
-	}
-
-	println("$here: output token '$token'")
-	exiting(here)
-	return token
 }
 
 fun unknownCharacterOfMessage (mes: String?, caller: String): Char? {
@@ -1466,85 +1176,6 @@ fun unknownCharacterOfMessage (mes: String?, caller: String): Char? {
     return unknownCharacter
 }
 
-fun writeLexemeListOfYmlFileOfOuputFile (ymlFileName: String, lexFileName: String, caller: String) {
-    val here = functionName()
-    entering(here, caller)
-
-    println("$here: input ymlFileName '$ymlFileName'")
-    println("$here: input lexFileName '$lexFileName'")
-
-    val lex_l = lexemeListOfYmlFile (ymlFileName, here)
-    val str_l = fullnameListOfLexemeList (lex_l)
-    val content = stringOfGlueOfStringList ("\n", str_l)
-
-    outputWrite (lexFileName, content, here)
-
-    val siz = lex_l.size
-    println("$here: $siz lexemes written to File '$lexFileName'")
-}
-
-fun writeLexemeList (caller: String) {
-    val here = functionName()
-    entering(here, caller)
-
-    val lex_l = provideLexemeList (here)
-    val str_l = fullnameListOfLexemeList (lex_l)
-    val content = stringOfGlueOfStringList ("\n", str_l)
-
-    val lexFileName = provideAnyFileNameOfWhat("Lexeme", here)
-    outputWrite (lexFileName, content, here)
-
-    val siz = lex_l.size
-    println("$here: $siz lexemes written to File '$lexFileName'")
-}
-
-// IRP
-
-fun lexemeListOfFileName(fil_nam: String, caller: String) : List<Lexeme> {
-    val here = functionName()
-    entering(here, caller)
-
-    val ext = fileExtensionOfFileName(fil_nam)
-    val lex_l =
-      when (ext) {
-      "yml" -> lexemeListOfYmlFile (fil_nam, here)
-     else -> {
-       val message = "$here: file extension '$ext' should be 'yml'"
-       throw Exception(message)
-       }
-     }
-    if (debug) println("$here: output lexeme List '$lex_l'")
-    exiting(here)
-    return lex_l
-}
-
-fun buildAndStoreLexemeList(caller: String) {
-    val here = functionName()
-    entering(here, caller)
-
-    val ymlFileName = provideAnyFileNameOfWhat ("Yml", here)
-    var lex_l = lexemeListOfFileName(ymlFileName, here)
-    lexemeListRegister.store (lex_l)
-
-    if (debug) println("$here: output lexeme List '$lex_l'")
-    exiting(here)
-}
-
-fun provideLexemeList(caller: String) : List<Lexeme> {
-    val here = functionName()
-    entering(here, caller)
-
-    if (lexemeListRegister.isEmpty()){
-       buildAndStoreLexemeList(here)
-    }
-    
-    val lex_l = lexemeListRegister.retrieve(here)
-
-    if (debug) println("$here: output lexeme List '$lex_l'")
-    exiting(here)
-    return lex_l
-}
-
 fun lexemeListOfSharpedLine (lin: String, caller: String) : MutableList<Lexeme> {
 // Source: /my/perl/script/kwextract.pl,v$
     val here = functionName()
@@ -1559,12 +1190,12 @@ fun lexemeListOfSharpedLine (lin: String, caller: String) : MutableList<Lexeme> 
     
     while (!Done) {
       try {
-    	var currentCharacter = lin.get(position)	
- 	when (currentCharacter) {
+    	var cha = lin.get(position)	
+ 	when (cha) {
 // Header 
 	'#' -> {
 	    if (lin.length > 1) {
-	       val lexeme = tokenOfChar(currentCharacter, position, lin, here)
+	       val lexeme = tokenOfChar(cha, position, lin, here)
 	       lexemeList.add(lexeme)
 	       position = position + 1
 	    }
@@ -1574,12 +1205,12 @@ fun lexemeListOfSharpedLine (lin: String, caller: String) : MutableList<Lexeme> 
 	    }
 	}
 	' ' -> {
-	    val lexeme = tokenOfChar(currentCharacter, position, lin, here)
+	    val lexeme = tokenOfChar(cha, position, lin, here)
 	    lexemeList.add(lexeme)
 	    position = position + 1	 
 	}
 	'$' -> {
-	    val lexeme = tokenOfChar(currentCharacter, position, lin, here)
+	    val lexeme = tokenOfChar(cha, position, lin, here)
 	    lexemeList.add(lexeme)
 	    position = position + 1
 	}
@@ -1595,8 +1226,19 @@ fun lexemeListOfSharpedLine (lin: String, caller: String) : MutableList<Lexeme> 
 	    Done = true
 	    }
         'm' -> {
-	    val str = lin.substring(position)
-	    lexemeList.addAll (lexemeListOfMutableLine (str, here)) 
+            val nextCharacter = lin.get(position + 1)
+	    if (nextCharacter.equals ('e')){
+	       val str = lin.substring(position)
+	       lexemeList.addAll (lexemeListOfMembersKeyword (str, here)) 
+	    }
+	    else if (nextCharacter.equals ('u')){
+	       val str = lin.substring(position)
+	       lexemeList.addAll (lexemeListOfMutableLine (str, here)) 
+	    }
+	    else {
+	    	 val message = "$here: Error next character '$nextCharacter' should be 'e' or 'u'"
+	    	 throw Exception(message)
+	    }
 	    Done = true
 	    }
         'n' -> {
@@ -1652,7 +1294,7 @@ fun lexemeListOfSharpedLine (lin: String, caller: String) : MutableList<Lexeme> 
 	    Done = true
 	    }
 	    else -> {
-	    	 val message = "$here: Error unexpected current character '$currentCharacter' at position $position"
+	    	 val message = "$here: Error unexpected current character '$cha' at position $position"
 	    	 throw Exception(message)
 	    }
 	    }
@@ -1745,6 +1387,24 @@ fun lexemeListOfTextRecord (rec: String, caller: String) : MutableList<Lexeme> {
    exiting(here)
    return lexemeList
 }
+
+fun writeLexemeListOfYmlFileOfOuputFile (ymlFileName: String, lexFileName: String, caller: String) {
+    val here = functionName()
+    entering(here, caller)
+
+    println("$here: input ymlFileName '$ymlFileName'")
+    println("$here: input lexFileName '$lexFileName'")
+
+    val lex_l = lexemeListOfYmlFile (ymlFileName, here)
+    val str_l = fullnameListOfLexemeList (lex_l)
+    val content = stringOfGlueOfStringList ("\n", str_l)
+
+    outputWrite (lexFileName, content, here)
+
+    val siz = lex_l.size
+    println("$here: $siz lexemes written to File '$lexFileName'")
+}
+
 
 
 

@@ -1,3 +1,4 @@
+package my.parser
 // The Parser : List of Lexemes => Tree of Domain Entities
 
 import java.io.File
@@ -5,7 +6,9 @@ import java.util.Stack
 import java.lang.Character.MIN_VALUE as nullChar
 
 import my.library.*
+import my.lexeme.*
 import my.lexer.*
+import my.lexeme.list.provider.*
 
 // kotlinc MyLibrary.kt -include-runtime -d MyLibrary.jar 
 // kotlinc -classpath MyLibrary.jar Lexer.kt -include-runtime -d Lexer.jar
@@ -37,7 +40,6 @@ fun provideMetaLexemeList (caller: String) : List<Lexeme> {
 	   is_meta = false
 	   if (debug) println ("$here: meta set to false")
 	}
-	
     }
     
     println ("$here: output metaList "+ fullnameListOfLexemeList(metaList))
@@ -364,8 +366,9 @@ fun leafedNodeAndStackOfLexemeMetaStack (lex_met_s: Stack<Lexeme>, caller: Strin
 	  }
        }
        }
-    catch (e:java.util.EmptyStackException) {Done = true }
-    } 
+      catch (e:java.util.EmptyStackException) {Done = true }
+    }
+    
     println ("$here: output node '$node'")
     println ("$here: output lex_met_s '$lex_met_s'")
 	
@@ -373,22 +376,3 @@ fun leafedNodeAndStackOfLexemeMetaStack (lex_met_s: Stack<Lexeme>, caller: Strin
     return Pair (node, lex_met_s)
 }
 
-fun main(args: Array<String>) {
-    val here = functionName()
-    entering(here, "Parser")
-
-    writeLexemeList (here)
-
-    val lex_l = provideLexemeList (here)
-    
-    val tree =
-      if (hasKeywordPreviousOfLexemeList(lex_l, here)) {
-        provideBlockCurrentTreeNode(here)
-      } else {
-        provideBlockGenesisTreeNode(here)
-      }
-      
-    println ("$here: tree '$tree'")
-    println("\nnormal termination")
-    exiting(here)
-}
