@@ -9,6 +9,8 @@ class MyLibrary
 
 // beginning of library
 
+data class pairString (val first: String, val second: String)
+
 class TreeNode<T>(value:T){
     var value:T = value
 
@@ -30,11 +32,25 @@ class TreeNode<T>(value:T){
     }
 }
 
-data class pairString (val first: String, val second: String)
-
-val debug = false
+var debug = false
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
+
+fun characterListOfFileName (fil_nam: String) : List<Char> {
+    val here = functionName()
+    
+    val cha_l = mutableListOf<Char>()
+    val str_l = lineListOfFileName (fil_nam, here)
+    str_l.forEach({l ->
+    		  l.forEach ({c -> cha_l.add(c)})})
+    return cha_l
+}
+
+fun characterStackOfFileName (fil_nam: String) : Stack<Char> {
+    val cha_l = characterListOfFileName (fil_nam)
+    val cha_s = teeStackOfTeeList(cha_l)
+    return cha_s
+}
 
 fun characterStackOfString (str: String) : Stack<Char> {
     var stack = Stack<Char>()
@@ -159,6 +175,7 @@ fun lineStackOfLineList (str_l: List<String>) : Stack<String> {
     return stack
 }
 
+
 fun nextWordAndStackOfEndCharOfCharacterStack(del: Char, cha_s: Stack<Char>, caller: String): Pair<String, Stack<Char>> {
     val here = functionName()
     entering(here, caller)
@@ -190,6 +207,38 @@ fun nextWordAndStackOfEndCharOfCharacterStack(del: Char, cha_s: Stack<Char>, cal
     return Pair (word, cha_s)
 }
 
+fun WordAndStackOfEndCharOfStack(del: Char, input_cha_s: Stack<Char>, caller: String) : Pair<String, Stack<Char>> {
+    val here = functionName()
+    entering(here, caller)
+
+// input :
+    println("$here: input_cha_s '$input_cha_s'")
+    println("$here: input del '$del'")
+
+// output :
+    var Done = false
+    
+    var word = ""    
+    while (! Done){
+      try {
+    	var cha = input_cha_s.pop()	
+      	println("$here: cha '$cha'")
+	  if (cha.equals(del)) {break}
+	  word = word.plus(cha.toString())
+    	  }
+      catch (e: java.util.EmptyStackException) {
+        val message = "$here: Error Character '$del' is missing in Stack"
+        throw Exception(message)
+      }
+    }
+    assert (word.isNotEmpty())
+    
+    println("$here: output word '$word'")
+    println("$here: output_cha_s '$input_cha_s'")
+    exiting(here)
+    return Pair (word, input_cha_s)
+}
+
 fun nextWordOfEndCharOfString(del: Char, str: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
@@ -211,29 +260,13 @@ fun nextWordOfEndCharOfString(del: Char, str: String, caller: String): String {
     return word
 }
 
-fun nextWordOfEndCharListOfString(cha_l: List<Char>, str: String, caller: String): String {
-    val here = functionName()
-    entering(here, caller)
-
-    println("$here: input cha_l '$cha_l'")
-    println("$here: input str '$str'")
-    
-    var word = ""    
-    for (c in str){
-	  if (debug) println("$here: c '$c'")
-	  if (cha_l.contains(c)) {break}
-	  word = word.plus(c.toString())
-    }
-
-    assert (word.isNotEmpty())
-    
-    println("$here: output word '$word'")
-    exiting(here)
-    return word
-}
-
 fun notYetImplemented(fun_nam: String){
     throw Exception("Error: function '$fun_nam' is not yet implemented")}
+
+fun printStringList (str_l: List<String>) {
+    val content = stringOfGlueOfStringList ("\n", str_l)
+    println (content)
+}
 
 fun provideAnyFileNameOfWhat(what: String, caller: String): String {
     val here = functionName()
@@ -293,6 +326,27 @@ fun <T> teeStackFromTeeOfTeeStack (tee:T, tee_s: Stack<T>): Stack<T> {
     }
 	
     return tee_s
+}
+
+fun unknownCharacterOfMessage (mes: String?, caller: String): Char? {
+    val here = functionName()
+    entering(here, caller)
+
+    val messageType : String?
+    
+    println("$here: input mes '$mes'")
+    
+    var unknownCharacter = try {
+    	messageType = mes?.substring (0, 36)
+	println("$here: messageType '$messageType'")
+	mes?.get (38)
+	}
+    catch (e: Exception) {nullChar}
+
+    println("$here: output character '$unknownCharacter'")
+    exiting(here)
+
+    return unknownCharacter
 }
 
 fun wordListOfString (str: String): List<String> {

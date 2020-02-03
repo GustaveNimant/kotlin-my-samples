@@ -8,4 +8,4 @@ kotlinc -classpath MyLibrary.jar:Lexer.jar:Lexeme.jar:LexemeListProvider.jar:Par
 
 
 
-java -esa --class-path MyLibrary.jar:Lexer.jar:Lexeme.jar:LexemeListProvider.jar:Parser.jar:Main.jar MainKt
+java -esa --class-path MyLibrary.jar:Lexer.jar:Lexeme.jar:LexemeListProvider.jar:Parser.jar:Main.jar MainKt | tee o
