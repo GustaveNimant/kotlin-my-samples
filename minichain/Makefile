@@ -11,7 +11,7 @@ MyLibrary.jar: MyLibrary.kt
 	kotlinc $< $(KFLAGS) -d $@
 
 $(run): $(JAR_FILES)
-	java -esa --class-path MyLibrary.jar:$(run).jar $(run)Kt
+	java -esa --class-path MyLibrary.jar:$(run).jar $(run)Kt -debug main 
 
 %Kt.class: %.kt
 	kotlinc $<

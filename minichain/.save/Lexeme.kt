@@ -249,7 +249,7 @@ fun isTokenOfChar(cha: Char, caller: String) : Boolean {
     val here = functionName()
     entering(here, caller)
 
-    if (isTrace(here)) println("$here: input cha '$cha'")
+    if (isDebug(here)) println("$here: input cha '$cha'")
     val result = when (cha) {
 		'#' -> true
 		'$' -> true

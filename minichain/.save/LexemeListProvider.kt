@@ -39,7 +39,7 @@ fun buildAndStoreLexemeList(caller: String) {
     var lex_l = lexemeListOfFileName(ymlFileName, here)
     lexemeListRegister.store (lex_l)
 
-    if (isTrace(here)) println("$here: output lexeme List '$lex_l'")
+    if (isDebug(here)) println("$here: output lexeme List '$lex_l'")
     exiting(here)
 }
 
@@ -53,7 +53,7 @@ fun provideLexemeList(caller: String) : List<Lexeme> {
     
     val lex_l = lexemeListRegister.retrieve(here)
 
-    if (isTrace(here)) println("$here: output lexeme List '$lex_l'")
+    if (isDebug(here)) println("$here: output lexeme List '$lex_l'")
     exiting(here)
     return lex_l
 }

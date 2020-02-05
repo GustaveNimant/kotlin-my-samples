@@ -9,21 +9,27 @@ import my.lexeme.list.provider.*
 import my.parser.*
 
 fun main(args: Array<String>) {
-    val here = functionName()
-    entering(here, "Parser")
+  val here = functionName()
+  entering(here, "Parser")
 
-    writeLexemeList (here)
+  ParameterMap = parameterMapOfArguments(args, here)
 
-    val lex_l = provideLexemeList (here)
-    
-    val tree =
+  println ("Parameters are:")
+  for ( (k, v) in ParameterMap) {
+       println ("$k => $v")
+  }
+
+  writeLexemeList (here)
+
+  val lex_l = provideLexemeList (here)
+  val tree =
       if (hasKeywordPreviousOfLexemeList(lex_l, here)) {
         provideBlockCurrentTreeNode(here)
       } else {
         provideBlockGenesisTreeNode(here)
       }
       
-    println ("$here: tree '$tree'")
+    if (isDebug(here)) println ("$here: tree '$tree'")
     println("\nnormal termination")
     exiting(here)
 }
