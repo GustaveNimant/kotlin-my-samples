@@ -25,7 +25,7 @@ fun provideMetaLexemeList (caller: String) : List<Lexeme> {
     var is_meta = false
 
     for (lex in lex_l) {
-    	if (isDebug(here)) println ("$here: for lex '$lex'")
+    	if (isDebug(here)) if (isDebug(here)) println ("$here: for lex '$lex'")
 
 	if (lex is TokenSharp) {
 	   is_meta = true
@@ -42,7 +42,7 @@ fun provideMetaLexemeList (caller: String) : List<Lexeme> {
 	}
     }
     
-    println ("$here: output metaList "+ fullnameListOfLexemeList(metaList))
+    if (isTrace(here)) println ("$here: output metaList "+ fullnameListOfLexemeList(metaList))
     
     exiting(here)
     return metaList
@@ -58,7 +58,7 @@ fun provideTextLexemeList (caller: String) : List<Lexeme> {
     var is_meta = false
 
     for (lex in lex_l) {
-    	if (isDebug(here)) println ("$here: for lex '$lex'")
+    	if (isDebug(here)) if (isDebug(here)) println ("$here: for lex '$lex'")
 
 	if (lex is TokenSharp) {
 	   is_meta = true
@@ -76,7 +76,7 @@ fun provideTextLexemeList (caller: String) : List<Lexeme> {
 	
     }
     
-    println ("$here: output textList "+ fullnameListOfLexemeList(textList))
+    if (isTrace(here)) println ("$here: output textList "+ fullnameListOfLexemeList(textList))
     
     exiting(here)
     return textList
@@ -112,7 +112,7 @@ fun provideRecordTextList (caller: String) : List<String> {
     var rec_l = mutableListOf<String>()
 	
     for (lex in lex_l) {
-        println ("$here: for lex '$lex'")	
+        if (isDebug(here)) println ("$here: for lex '$lex'")	
         when (lex) {
        	   is TokenEndOfLine -> {
 	      rec_l.add (rec)
@@ -121,14 +121,14 @@ fun provideRecordTextList (caller: String) : List<String> {
 	   else -> {
 	        var str = stringValueOfLexeme (lex) 
 	   	rec = rec + str
-		println ("$here: for str '$str'")	
-		println ("$here: for rec '$rec'")	
+		if (isDebug(here)) println ("$here: for str '$str'")	
+		if (isDebug(here)) println ("$here: for rec '$rec'")	
 		}
       }
     }
 
     val result = rec_l.toList()
-    println ("$here: output result '$result'")	
+    if (isTrace(here)) println ("$here: output result '$result'")	
     exiting(here)
     return result
 }
@@ -148,7 +148,7 @@ fun provideTreeTextRecordList (caller: String) : List<TreeNode<String>> {
     }
 
     val tree_l = rec_tl.toList()
-    println ("$here: output tree_l '$tree_l'")	
+    if (isTrace(here)) println ("$here: output tree_l '$tree_l'")	
 
     exiting(here)
     return tree_l
@@ -167,7 +167,7 @@ fun provideBlockTextTreeNode (caller: String) : TreeNode<String> {
     	tree.addChild (nod)
     }
 
-    println ("$here: output tree '$tree'")	
+    if (isTrace(here)) println ("$here: output tree '$tree'")	
     exiting(here)
     return tree
 }
@@ -191,13 +191,13 @@ fun provideTreeMetaRecordList (caller: String) : List<TreeNode<String>> {
     while (! Done) {
       try {	  
       	var lex = lex_met_s.pop()
-      	println ("$here: while lex '$lex'")
+      	if (isDebug(here)) println ("$here: while lex '$lex'")
       	if (lex is TokenSharp) {
 	  var (tree, lex_s) = leafedNodeAndStackOfLexemeMetaStack (lex_met_s, here)
 	  tree_l.add(tree)
 	  lex_met_s = lex_s
-	  println ("$here: while added tree '$tree")	
-	  println ("$here: while lex_met_s '$lex_met_s")	
+	  if (isDebug(here)) println ("$here: while added tree '$tree")	
+	  if (isDebug(here)) println ("$here: while lex_met_s '$lex_met_s")	
         }
       }
       catch (e:java.util.EmptyStackException) {
@@ -205,7 +205,7 @@ fun provideTreeMetaRecordList (caller: String) : List<TreeNode<String>> {
         Done = true
       }
     }
-    println ("$here: output tree_l '$tree_l'")	
+    if (isTrace(here)) println ("$here: output tree_l '$tree_l'")	
 
     exiting(here)
     return tree_l
@@ -224,7 +224,7 @@ fun provideBlockMetaTreeNode (caller: String) : TreeNode<String> {
     	tree.addChild (nod)
     }
 
-    println ("$here: output tree '$tree'")	
+    if (isTrace(here)) println ("$here: output tree '$tree'")	
     exiting(here)
     return tree
 }
@@ -242,7 +242,7 @@ fun provideBlockCurrentTreeNode (caller: String) : TreeNode<String> {
     tree.addChild (treeMeta)
     tree.addChild (treeText)
 
-    println ("$here: output tree '$tree'")	
+    if (isTrace(here)) println ("$here: output tree '$tree'")	
     exiting(here)
     return tree
 }
@@ -276,12 +276,12 @@ fun leafedNodeAndStackOfLexemeMetaStack (lex_met_s: Stack<Lexeme>, caller: Strin
     while (! Done) {
       try {
         var lex = lex_met_s.pop()
-        println ("$here: while lex '$lex'")
+        if (isDebug(here)) println ("$here: while lex '$lex'")
 
       	when (lex) {
       	  is TokenEndOfLine -> {
 	     Done=true
-	     println ("$here: while EndOfLine reached")
+	     if (isDebug(here)) println ("$here: while EndOfLine reached")
 	  }
      	  is KeywordWithDate -> {
 	    var nod_nam = lex.name
@@ -369,8 +369,8 @@ fun leafedNodeAndStackOfLexemeMetaStack (lex_met_s: Stack<Lexeme>, caller: Strin
       catch (e:java.util.EmptyStackException) {Done = true }
     }
     
-    println ("$here: output node '$node'")
-    println ("$here: output lex_met_s '$lex_met_s'")
+    if (isTrace(here)) println ("$here: output node '$node'")
+    if (isTrace(here)) println ("$here: output lex_met_s '$lex_met_s'")
 	
     exiting(here)
     return Pair (node, lex_met_s)

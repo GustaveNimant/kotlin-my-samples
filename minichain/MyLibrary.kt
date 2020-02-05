@@ -59,13 +59,35 @@ fun countOfCharOfString (cha: Char, str: String, caller: String) : Int {
 }
 
 fun isDebug(here:String): Boolean {
-  val debug_l = ParameterMap.getValue("debug")
-  return debug_l.contains(here)
+  if (ParameterMap.containsKey("debug")) { 
+    val debug_l = ParameterMap.getValue("debug")
+    return debug_l.contains(here)
+  }
+  else {return false}
+}  
+
+fun isLoop(here:String): Boolean {
+  if (ParameterMap.containsKey("loop")) { 
+    val loop_l = ParameterMap.getValue("loop")
+    return loop_l.contains(here)
+  }
+  else {return false}
 }  
 
 fun isTrace(here:String): Boolean {
-  val debug_l = ParameterMap.getValue("trace")
-  return debug_l.contains(here)
+  if (ParameterMap.containsKey("trace")) { 
+    val trace_l = ParameterMap.getValue("trace")
+    return trace_l.contains(here)
+  }
+  else {return false}
+}  
+
+fun isWhen(here:String): Boolean {
+  if (ParameterMap.containsKey("when")) { 
+    val when_l = ParameterMap.getValue("when")
+    return when_l.contains(here)
+  }
+  else {return false}
 }  
 
 fun entering(here: String, caller: String):Unit {

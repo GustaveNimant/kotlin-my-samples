@@ -34,7 +34,7 @@ data class pairString (val first: String, val second: String)
 
 var ParameterMap = mutableMapOf<String, MutableList<String>>() 
 
-var debug = false
+
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
 
@@ -60,9 +60,17 @@ fun countOfCharOfString (cha: Char, str: String, caller: String) : Int {
 
 fun isDebug(here:String): Boolean {
   val debug_l = ParameterMap.getValue("debug")
-  debug = debug_l.contains(here)
-  println ("isDebug debug '$debug'")
-  return debug
+  return debug_l.contains(here)
+}  
+
+fun isLoop(here:String): Boolean {
+  val debug_l = ParameterMap.getValue("loop")
+  return debug_l.contains(here)
+}  
+
+fun isTrace(here:String): Boolean {
+  val debug_l = ParameterMap.getValue("trace")
+  return debug_l.contains(here)
 }  
 
 fun entering(here: String, caller: String):Unit {
@@ -114,7 +122,7 @@ fun isAlphabeticalOfChar(cha: Char, caller: String): Boolean {
     entering(here, caller)
     
     val pattern = Regex("[a-zA-Z_]")
-    println("$here: input cha '$cha'")
+    if (isTrace(here)) println("$here: input cha '$cha'")
     val result = pattern.matches(cha.toString())
 
     exiting(here + " with result '$result'")
@@ -126,7 +134,7 @@ fun isAlphanumericalOfChar(cha: Char, caller: String): Boolean {
     entering(here, caller)
     
     val pattern = Regex("[a-zA-Z_0-9]")
-    println("$here: input cha '$cha'")
+    if (isTrace(here)) println("$here: input cha '$cha'")
     val result = pattern.matches(cha.toString())
 
     exiting(here + " with result '$result'")
@@ -138,7 +146,7 @@ fun isNumericalOfChar(cha: Char, caller: String): Boolean {
     entering(here, caller)
     
     val pattern = Regex("[0-9]")
-    println("$here: input cha '$cha'")
+    if (isTrace(here)) println("$here: input cha '$cha'")
     val result = pattern.matches(cha.toString())
 
     exiting(here + " with result '$result'")
@@ -149,7 +157,7 @@ fun lineListOfFileName (nof: String, caller: String) : MutableList<String> {
     val here = functionName()
     entering(here, caller)
 
-    println("$here: input nof '$nof'")
+    if (isTrace(here)) println("$here: input nof '$nof'")
 
     val result = mutableListOf<String>()
  
@@ -157,7 +165,7 @@ fun lineListOfFileName (nof: String, caller: String) : MutableList<String> {
     	lines -> lines.forEach { result.add(it)}
 	}
 
-  println ("$here: output result '$result'")	
+  if (isTrace(here)) println ("$here: output result '$result'")	
   exiting(here)
   return result
 }
@@ -172,14 +180,14 @@ fun nextWordAndStackOfEndCharOfCharacterStack(del: Char, cha_s: Stack<Char>, cal
     val here = functionName()
     entering(here, caller)
 
-    if (debug) println("$here: input del '$del'")
-    if (debug) println("$here: input cha_s '$cha_s'")
+    if (isTrace(here)) println("$here: input del '$del'")
+    if (isTrace(here)) println("$here: input cha_s '$cha_s'")
     var done = false
     var word = ""
     var cha = cha_s.pop()
     
     while (! done){
-      if (debug) println("$here: cha '$cha'")
+      if (isDebug(here)) println("$here: cha '$cha'")
       word = word.plus(cha.toString())
       try {
       	  cha = cha_s.pop()
@@ -193,8 +201,8 @@ fun nextWordAndStackOfEndCharOfCharacterStack(del: Char, cha_s: Stack<Char>, cal
 
     assert (word.isNotEmpty())
     
-    if (debug) println("$here: output word '$word'")
-    if (debug) println("$here: output cha_s '$cha_s'")
+    if (isTrace(here)) println("$here: output word '$word'")
+    if (isTrace(here)) println("$here: output cha_s '$cha_s'")
     exiting(here)
     return Pair (word, cha_s)
 }
@@ -203,19 +211,19 @@ fun nextWordOfEndCharOfString(del: Char, str: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
 
-    println("$here: input del '$del'")
-    println("$here: input str '$str'")
+    if (isTrace(here)) println("$here: input del '$del'")
+    if (isTrace(here)) println("$here: input str '$str'")
     
     var word = ""    
     for (c in str){
-	  if (debug) println("$here: c '$c'")
+	  if (isDebug(here)) println("$here: c '$c'")
 	  if (c.equals(del)) {break}
 	  word = word.plus(c.toString())
     }
 
     assert (word.isNotEmpty())
     
-    println("$here: output word '$word'")
+    if (isTrace(here)) println("$here: output word '$word'")
     exiting(here)
     return word
 }
@@ -224,19 +232,19 @@ fun nextWordOfEndCharListOfString(cha_l: List<Char>, str: String, caller: String
     val here = functionName()
     entering(here, caller)
 
-    println("$here: input cha_l '$cha_l'")
-    println("$here: input str '$str'")
+    if (isTrace(here)) println("$here: input cha_l '$cha_l'")
+    if (isTrace(here)) println("$here: input str '$str'")
     
     var word = ""    
     for (c in str){
-	  if (debug) println("$here: c '$c'")
+	  if (isDebug(here)) println("$here: c '$c'")
 	  if (cha_l.contains(c)) {break}
 	  word = word.plus(c.toString())
     }
 
     assert (word.isNotEmpty())
     
-    println("$here: output word '$word'")
+    if (isTrace(here)) println("$here: output word '$word'")
     exiting(here)
     return word
 }

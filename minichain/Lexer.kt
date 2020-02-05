@@ -32,7 +32,7 @@ fun lexemeListOfYmlFile (ymlFileName: String, caller: String): List<Lexeme> {
 	 }
     }
     
-    if (isTrace(here)) println("$here: output lexemeList $lexemeList")
+    if (isTrace(here)) if (isTrace(here)) println("$here: output lexemeList $lexemeList")
     exiting(here)
 
     return lexemeList
@@ -51,7 +51,7 @@ fun lexemeListOfFileName(fil_nam: String, caller: String) : List<Lexeme> {
        throw Exception(message)
        }
      }
-    if (isTrace(here)) println("$here: output lexeme List '$lex_l'")
+    if (isTrace(here)) if (isTrace(here)) println("$here: output lexeme List '$lex_l'")
     exiting(here)
     return lex_l
 }
@@ -355,7 +355,7 @@ fun lexemeListOfAuthorLine (lin: String, caller: String) : MutableList<Lexeme> {
 	  }
    }
 
-   println("$here: output lexemeList "+lexemeList)
+   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
 }
@@ -432,7 +432,7 @@ fun lexemeListOfDateLine (lin: String, caller: String) : MutableList<Lexeme> {
 	  }
    }
 
-   println("$here: output lexemeList "+lexemeList)
+   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
 }
@@ -516,7 +516,7 @@ fun lexemeListOfMembersRemainderString (str: String, caller: String) : MutableLi
 	  }
    }
 
-   println("$here: output lexemeList "+lexemeList)
+   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
 }
@@ -578,7 +578,7 @@ fun lexemeListOfMembersKeyword (lin: String, caller: String) : MutableList<Lexem
 	  }
    }
 
-   println("$here: output lexemeList "+lexemeList)
+   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
 }
@@ -647,7 +647,7 @@ fun lexemeListOfMutableLine (lin: String, caller: String) : MutableList<Lexeme> 
 	  }
    }
 
-   println("$here: output lexemeList "+lexemeList)
+   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
 }
@@ -714,7 +714,7 @@ fun lexemeListOfNextLine (lin: String, caller: String) : MutableList<Lexeme> {
 	  }
    }
 
-   println("$here: output lexemeList "+lexemeList)
+   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
 }
@@ -782,7 +782,7 @@ fun lexemeListOfParentsLine (lin: String, caller: String) : MutableList<Lexeme> 
 	  }
    }
 
-   println("$here: output lexemeList "+lexemeList)
+   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
 }
@@ -850,7 +850,7 @@ fun lexemeListOfPreviousLine (lin: String, caller: String) : MutableList<Lexeme>
 	  }
    }
 
-   println("$here: output lexemeList "+lexemeList)
+   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
 }
@@ -918,7 +918,7 @@ fun lexemeListOfQmHashLine (lin: String, caller: String) : MutableList<Lexeme> {
 	  }
    }
 
-   println("$here: output lexemeList "+lexemeList)
+   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
 }
@@ -989,7 +989,7 @@ fun lexemeListOfSourceLine (lin: String, caller: String) : MutableList<Lexeme> {
 	  }
    }
 
-   println("$here: output lexemeList "+lexemeList)
+   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
 }
@@ -1056,7 +1056,7 @@ fun lexemeListOfSignatureLine (lin: String, caller: String) : MutableList<Lexeme
 	  }
    }
 
-   println("$here: output lexemeList "+lexemeList)
+   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
 }
@@ -1123,7 +1123,7 @@ fun lexemeListOfSpotLine (lin: String, caller: String) : MutableList<Lexeme> {
 	  }
    }
 
-   println("$here: output lexemeList "+lexemeList)
+   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
 }
@@ -1190,7 +1190,7 @@ fun lexemeListOfTicLine (lin: String, caller: String) : MutableList<Lexeme> {
 	  }
    }
 
-   println("$here: output lexemeList "+lexemeList)
+   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
 }
@@ -1258,7 +1258,7 @@ fun unknownCharacterOfMessage (mes: String?, caller: String): Char? {
 	}
     catch (e: Exception) {nullChar}
 
-    println("$here: output character '$unknownCharacter'")
+    if (isTrace(here)) println("$here: output character '$unknownCharacter'")
     exiting(here)
 
     return unknownCharacter
@@ -1402,7 +1402,7 @@ fun lexemeListOfSharpedLine (lin: String, caller: String) : MutableList<Lexeme> 
 	  }
    }
 
-   println("$here: output lexemeList: "+ fullnameListOfLexemeList(lexemeList))
+   if (isTrace(here)) println("$here: output lexemeList: "+ fullnameListOfLexemeList(lexemeList))
    exiting(here)
    return lexemeList
 }
@@ -1418,13 +1418,13 @@ fun lexemeListOfTextRecord (rec: String, caller: String) : MutableList<Lexeme> {
     
     while (! stack.isEmpty()) {
       var cha = stack.pop()
-      println("$here: for cha '$cha'")
+      if (isLoop(here)) println("$here: for cha '$cha'")
 
       when (cha){
       	' ' -> {
 	  var lexeme = TokenSpace
 	  lexemeList.add (lexeme)
-	  println("$here: cha '$cha' lexeme '$lexeme'")
+	  if (isWhen(here)) println("$here: when cha '$cha' lexeme '$lexeme'")
 	  }
 	'$' -> {
 	    lexemeList.add (TokenDollar)
@@ -1441,7 +1441,7 @@ fun lexemeListOfTextRecord (rec: String, caller: String) : MutableList<Lexeme> {
 				       here)
 		  }
 
-		  println("$here: for after word '$word'")
+		  if (isWhen(here)) println("$here: when after word '$word'")
 		  if (isTextVariableOfString(word, here)) {
 		     val lexeme = TextVariableSubstituable(word)
 		     lexemeList.add (lexeme)
@@ -1459,11 +1459,11 @@ fun lexemeListOfTextRecord (rec: String, caller: String) : MutableList<Lexeme> {
 	       var (w, s) = nextWordAndStackOfEndCharOfCharacterStack(' ', stack, here)
 		  stack = s
 		  var word = w
-		  println("$here: for else word '$word'")
+		  if (isWhen(here)) println("$here: when  else word '$word'")
 		  
 		  val lexeme = TextWordConstant(word)
 
-		  println("$here: for lexeme '$lexeme'")
+		  if (isWhen(here)) println("$here: when else lexeme '$lexeme'")
 		  lexemeList.add (lexeme)
 	          }
         }
@@ -1471,7 +1471,7 @@ fun lexemeListOfTextRecord (rec: String, caller: String) : MutableList<Lexeme> {
    } 
 
    lexemeList.add (TokenEndOfLine)
-   println("$here: output lexemeList "+lexemeList)
+   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
    exiting(here)
    return lexemeList
 }
@@ -1480,8 +1480,8 @@ fun writeLexemeListOfYmlFileOfOuputFile (ymlFileName: String, lexFileName: Strin
     val here = functionName()
     entering(here, caller)
 
-    println("$here: input ymlFileName '$ymlFileName'")
-    println("$here: input lexFileName '$lexFileName'")
+    if (isTrace(here)) println("$here: input ymlFileName '$ymlFileName'")
+    if (isTrace(here)) println("$here: input lexFileName '$lexFileName'")
 
     val lex_l = lexemeListOfYmlFile (ymlFileName, here)
     val str_l = fullnameListOfLexemeList (lex_l)

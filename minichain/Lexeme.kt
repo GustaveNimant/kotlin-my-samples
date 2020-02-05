@@ -221,7 +221,7 @@ fun lexemeOfKeyword (keyword: String, caller: String) : Lexeme {
 	}
   }
   
-  println ("$here: output lexeme '$lexeme'")	
+  if (isTrace(here)) println ("$here: output lexeme '$lexeme'")	
   exiting(here)
   return lexeme
  }
@@ -265,7 +265,7 @@ fun isTokenOfChar(cha: Char, caller: String) : Boolean {
 		else -> false
     }
     
-  if (isTrace(here)) println ("$here: output result '$result'")	
+  if (isTrace(here)) if (isTrace(here)) println ("$here: output result '$result'")	
   exiting(here)
   return result
  }
@@ -287,7 +287,7 @@ fun nextWordOfString(pos:Int, lin: String, caller: String): String {
 
     assert (word.isNotEmpty())
     
-    println("$here: output word '$word'")
+    if (isTrace(here)) println("$here: output word '$word'")
     exiting(here)
     return word
 }
@@ -361,7 +361,7 @@ fun tokenOfChar(cha: Char, pos: Int, lin: String, caller: String) : Lexeme {
 	     	}
 	}
 
-	println("$here: output token '$token'")
+	if (isTrace(here)) println("$here: output token '$token'")
 	exiting(here)
 	return token
 }

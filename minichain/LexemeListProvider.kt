@@ -2,7 +2,6 @@ package my.lexeme.list.provider
 
 import java.io.File
 import java.util.Stack
-import java.lang.Character.MIN_VALUE as nullChar
 
 import my.library.*
 import my.lexeme.*
@@ -15,19 +14,19 @@ object lexemeListRegister {
      	 return list.isEmpty()
      }
      
-     fun store (l:List<Lexeme>) {
-     	 l.forEach {e -> list.add(e)}
+     fun store (lex_l:List<Lexeme>) {
+     	 lex_l.forEach {lex -> list.add(lex)}
      }
      
      fun retrieve (caller: String) : List<Lexeme> {
          val here = functionName()
     	 entering(here, caller)
 
-	 var l = mutableListOf<Lexeme>()
-     	 list.forEach {e -> l.add(e)}
+	 var lex_l = mutableListOf<Lexeme>()
+     	 list.forEach {lex -> lex_l.add(lex)}
 
 	 exiting(here)
-	 return l
+	 return lex_l
      }
 }
 

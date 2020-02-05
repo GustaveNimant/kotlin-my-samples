@@ -1,6 +1,6 @@
 # $Signature: n/a$
 
-line 1
+line 1 with a keyword in text $something: somevalue$  
 line 2 with a $variable$ embedded
   line 3 starts with two spaces
 
