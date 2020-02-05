@@ -7,4 +7,4 @@ kotlinc -classpath MyLibrary.jar:Lexer.jar:Lexeme.jar:LexemeListProvider.jar Mai
 
 
 
-java -esa --class-path MyLibrary.jar:Lexer.jar:Lexeme.jar:LexemeListProvider.jar:MainLexer.jar MainLexerKt -debug main | tee o
+java -esa --class-path MyLibrary.jar:Lexer.jar:Lexeme.jar:LexemeListProvider.jar:MainLexer.jar MainLexerKt -trace all -loop all -when all  | tee o

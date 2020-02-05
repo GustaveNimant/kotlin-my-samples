@@ -4,7 +4,7 @@ mfs/.ipms/bin/ipms
 config.sh
 *.sw*
 .jekyll-cache
-.save/
+.save
 .gradle/
 _site
 _ipfs

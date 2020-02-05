@@ -14,17 +14,20 @@ sealed class Lexeme ()
   data class KeywordWithString (val name: String) : Lexeme ()
   data class KeywordWithFile (val name: String) : Lexeme ()
   data class KeywordWithInteger (val name: String) : Lexeme ()
-
+  data class KeywordFromUser (val name: String) : Lexeme ()
+  
+  data class AuthorName (val name: String) : Lexeme ()
   data class Comment (val name: String) : Lexeme ()
   data class DateValue (val value: String) : Lexeme ()
-  data class AuthorName (val name: String) : Lexeme ()
-  data class NextName (val name: String) : Lexeme ()
   data class FilePath (val name: String) : Lexeme ()
+  data class NextName (val name: String) : Lexeme ()
   data class QmHash (val hash: String) : Lexeme ()
-  data class Z2Hash (val hash: String) : Lexeme ()
   data class Signature (val value: String) : Lexeme ()
   data class Spot (val value: String) : Lexeme ()
-  data class Tic (val value: String) : Lexeme ()	  
+  data class Tic (val value: String) : Lexeme ()
+  data class Z2Hash (val hash: String) : Lexeme ()
+
+  data class FromUserKeywordValue (val name: String) : Lexeme ()
 
   data class TextRecordConstant (val record: String) : Lexeme ()
   data class TextStringConstant (val string: String) : Lexeme ()
@@ -56,7 +59,7 @@ fun fullnameOfLexeme (lexeme: Lexeme): String {
 	is Comment -> "Comment("+lexeme.name+")"
 	is DateValue -> "DateValue("+lexeme.value+")"
 	is FilePath -> "FilePath("+lexeme.name+")"
-	is KeywordWithZ2Hash -> "KeywordWithZ2Hash("+lexeme.name+")"
+	is FromUserKeywordValue -> "FromUserKeywordValue("+lexeme.name+")"
 	is NextName -> "NextName("+lexeme.name+")"
 	is QmHash -> "QmHash("+lexeme.hash+")"
 	is Signature -> "Signature("+lexeme.value+")"	
@@ -74,6 +77,9 @@ fun fullnameOfLexeme (lexeme: Lexeme): String {
     	is KeywordWithQmHash  -> "KeywordWithQmHash("+lexeme.name+")"
     	is KeywordWithString  -> "KeywordWithString("+lexeme.name+")"
         is KeywordWithPersonName -> "KeywordWithPersonName("+lexeme.name+")"
+	is KeywordWithZ2Hash -> "KeywordWithZ2Hash("+lexeme.name+")"
+
+	is KeywordFromUser -> "KeywordFromUser("+lexeme.name+")"
 
 	TokenAt	-> "TokenAt"
 	TokenColon	-> "TokenColon"
@@ -98,12 +104,14 @@ fun isInMetaOfLexeme(lex: Lexeme, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
 
-    println("$here: input lex '$lex'")
+    if (isTrace(here)) println("$here: input lex '$lex'")
     val result = when (lex) {
 	is TextRecordConstant  -> false
 	is TextStringConstant  -> false
 	is TextVariableSubstituable  -> false
 	is TextWordConstant  -> false
+
+	is FromUserKeywordValue  -> false
 
 	TokenAt	         -> true
 	TokenColon	 -> true
@@ -120,7 +128,6 @@ fun isInMetaOfLexeme(lex: Lexeme, caller: String): Boolean {
 	is Comment  -> true
 	is DateValue  -> true
 	is FilePath  -> true
-	is KeywordWithZ2Hash  -> true
 	is NextName  -> true
 	is QmHash  -> true
 	is Signature  -> true
@@ -133,7 +140,10 @@ fun isInMetaOfLexeme(lex: Lexeme, caller: String): Boolean {
     	is KeywordWithInteger  -> true
     	is KeywordWithQmHash   -> true
     	is KeywordWithString   -> true
-        is KeywordWithPersonName  -> true
+        is KeywordWithPersonName -> true
+	is KeywordWithZ2Hash  -> true
+
+	is KeywordFromUser -> false
 
 	TokenSkipped     -> true
 	TokenUnknown     -> true
@@ -149,7 +159,7 @@ fun isInTextOfLexeme(lex: Lexeme, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
 
-    println("$here: input lex '$lex'")
+    if (isTrace(here)) println("$here: input lex '$lex'")
     val result = when (lex) {
 	is TextRecordConstant  -> true
 	is TextStringConstant  -> true
@@ -179,12 +189,16 @@ fun isInTextOfLexeme(lex: Lexeme, caller: String): Boolean {
 	is Tic  -> false
 	is Z2Hash  -> false
 
+	is FromUserKeywordValue  -> true
+	
 	is KeywordWithDate     -> false
     	is KeywordWithFile     -> false
     	is KeywordWithInteger  -> false
     	is KeywordWithQmHash   -> false
     	is KeywordWithString   -> false
         is KeywordWithPersonName  -> false
+
+        is KeywordFromUser  -> true
 
 	TokenSkipped     -> false
 	TokenUnknown     -> false
@@ -200,7 +214,7 @@ fun lexemeOfKeyword (keyword: String, caller: String) : Lexeme {
     val here = functionName()
     entering(here, caller)
 
-    println("$here: input keyword: '$keyword'")
+    if (isTrace(here)) println("$here: input keyword: '$keyword'")
 
    var lexeme = when (keyword) {
        "Author" -> KeywordWithPersonName (keyword)
@@ -216,8 +230,7 @@ fun lexemeOfKeyword (keyword: String, caller: String) : Lexeme {
        "qm" -> KeywordWithZ2Hash (keyword)
        "spot" -> KeywordWithInteger (keyword)       
        else -> {
-       	    val message = "$here: Error unknown Keyword '$keyword'"
-	    throw Exception(message)
+       	    KeywordFromUser (keyword)
 	}
   }
   
@@ -230,7 +243,7 @@ fun isKeywordWithOfLexeme(lex: Lexeme, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
 
-    println("$here: input lex '$lex'")
+    if (isTrace(here)) println("$here: input lex '$lex'")
     val result = when (lex) {
     	is KeywordWithZ2Hash -> true 
 	is KeywordWithDate -> true     
@@ -265,7 +278,7 @@ fun isTokenOfChar(cha: Char, caller: String) : Boolean {
 		else -> false
     }
     
-  if (isTrace(here)) if (isTrace(here)) println ("$here: output result '$result'")	
+  if (isTrace(here)) println ("$here: output result '$result'")	
   exiting(here)
   return result
  }
@@ -274,8 +287,8 @@ fun nextWordOfString(pos:Int, lin: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
 
-    println("$here: input pos '$pos'")
-    println("$here: input lin '$lin'")
+    if (isTrace(here)) println("$here: input pos '$pos'")
+    if (isTrace(here)) println("$here: input lin '$lin'")
     
     val str = lin.substring(pos)
     var word = ""    
@@ -299,7 +312,7 @@ fun stringValueOfLexeme (lexeme: Lexeme): String {
 	is Comment -> lexeme.name
 	is DateValue -> lexeme.value
 	is FilePath -> lexeme.name
-	is KeywordWithZ2Hash -> lexeme.name
+	is FromUserKeywordValue -> lexeme.name
 	is NextName -> lexeme.name
 	is QmHash -> lexeme.hash
 	is Signature -> lexeme.value	
@@ -317,6 +330,8 @@ fun stringValueOfLexeme (lexeme: Lexeme): String {
     	is KeywordWithQmHash  -> lexeme.name
     	is KeywordWithString  -> lexeme.name
         is KeywordWithPersonName -> lexeme.name
+        is KeywordFromUser -> lexeme.name	
+	is KeywordWithZ2Hash -> lexeme.name
 
 	TokenAt         -> "@"
 	TokenColon	-> ":"	
@@ -341,7 +356,7 @@ fun tokenOfChar(cha: Char, pos: Int, lin: String, caller: String) : Lexeme {
     val here = functionName()
     entering(here, caller)
 
-    println("$here: input cha '$cha'")
+    if (isTrace(here)) println("$here: input cha '$cha'")
 
     val token = when (cha) {
     		'@' -> TokenAt

@@ -2,9 +2,6 @@ TokenSharp
 TokenSpace
 TokenDollar
 KeywordWithInteger(tic)
-TokenColon
-TokenSpace
 Tic(1579373044)
-TokenDollar
 TokenEndOfLine
 TokenEndOfLine
