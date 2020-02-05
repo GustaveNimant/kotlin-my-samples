@@ -1,10 +1,9 @@
 TokenSharp
 TokenSpace
 TokenDollar
-KeywordWithInteger(tic)
+KeywordWithPersonName(Author)
 TokenColon
-TokenSpace
-Tic(1579373044)
+AuthorName(michelc@lausanne)
 TokenDollar
 TokenEndOfLine
 TokenEndOfLine
