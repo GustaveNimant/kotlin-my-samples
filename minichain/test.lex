@@ -1,9 +1,8 @@
-TokenSharp
+TextWordConstant(line)
 TokenSpace
-TokenDollar
-KeywordWithPersonName(Author)
-TokenColon
-AuthorName(michelc@lausanne)
-TokenDollar
-TokenEndOfLine
+TextWordConstant(1)
+TokenSpace
+TextWordConstant(with)
+TokenSpace
+TextWordConstant(space)
 TokenEndOfLine

@@ -335,8 +335,6 @@ fun lexemeListOfAuthorLine (lin: String, caller: String) : Pair<List<Lexeme>, In
 	  	  position = position + word.length
 		  }
 	      in 'a'..'z', in 'A' .. 'Z' -> {
-	      	  tokenOfChar(cha, position, lin, here)
-		  position = position + 1
 	      	  val str = lin.substring(position)
 		  val word = nextWordOfEndCharOfString('$', str, here)
 		  if (isAuthorNameOfString(word, here)) {
@@ -395,7 +393,7 @@ fun lexemeListOfDateLine (lin: String, caller: String) : Pair<List<Lexeme>, Int>
     	      var cha = lin.get(position)
 	      if (isLoop(here)) println ("$here: while position $position cha '$cha'")
 	      when (cha) {
-	      ' ' -> {
+	      ' ', ':', '$' -> {
 	          val lex = tokenOfChar(cha, position, lin, here)
 		  lexemeList.add (lex)
 		  position = position + 1
@@ -407,9 +405,10 @@ fun lexemeListOfDateLine (lin: String, caller: String) : Pair<List<Lexeme>, Int>
 		  lexemeList.add (lex)
 		  position = position + word.length 
 		  }
-	      '0', '1', '2','3','4','5','6','7','8','9' -> {
+	      in '0' .. '9' -> {
 	      	  val str = lin.substring(position)
-		  val word = nextWordOfEndCharOfString('$', str, here)
+		  val cha_l = listOf(' ','$')
+		  val word = nextWordOfEndCharListOfString(cha_l, str, here)
 		  if (isDateOfString(word, here)) {
     		     val lex = DateValue (word)
 		     lexemeList.add (lex)
@@ -460,7 +459,6 @@ fun lexemeListOfDateLine (lin: String, caller: String) : Pair<List<Lexeme>, Int>
 
    exiting(here)
    return result
-
 }
 
 fun lexemeListOfDollarStringDollar (dol_dol: String, caller: String): List<Lexeme> {
@@ -491,12 +489,12 @@ fun lexemeListOfDollarStringDollar (dol_dol: String, caller: String): List<Lexem
   lexemeList.add(lexeme)
 
   if ( isKeywordWithOfLexeme (lexeme, here) ) {
-     val lex_l = lexemeListFromUserKeywordValueOfStringDollared (str, here)
-     lexemeList.addAll(lex_l)
+    val lex_l = lexemeListMetaValueOfStringDollared (str, here)
+    lexemeList.addAll(lex_l)
   }
   else {
-    val lex_l = lexemeListMetaValueOfStringDollared (str, here)
-    lexemeList.addAll (lex_l)
+    val lex_l = lexemeListFromUserKeywordValueOfStringDollared (str, here)
+    lexemeList.addAll(lex_l)
 }
   
   
@@ -1747,10 +1745,12 @@ fun lexemeListMetaValueOfStringDollared (lin: String, caller: String) : List<Lex
 	      ' ' -> {
 	      	  val lex = tokenOfChar(cha, position, lin, here)
 		  lexemeList.add(lex)
+		  position = position + 1
 		  }
 	      '$' -> {
 	      	  val lex = tokenOfChar(cha, position, lin, here)
 		  lexemeList.add(lex)
+		  position = position + 1
 		  }
 	      else -> {
 	      	  val str = lin.substring(position)
@@ -1766,7 +1766,6 @@ fun lexemeListMetaValueOfStringDollared (lin: String, caller: String) : List<Lex
 		  }
 	          }
 		}
-	        position = position + 1
    		}
 	  catch (e: java.lang.StringIndexOutOfBoundsException) {
 	  	val previousCharacter = lin.get(position-1)

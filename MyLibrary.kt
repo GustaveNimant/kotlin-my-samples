@@ -34,7 +34,6 @@ data class pairString (val first: String, val second: String)
 
 var ParameterMap = mutableMapOf<String, MutableList<String>>() 
 
-
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
 
@@ -57,21 +56,6 @@ fun countOfCharOfString (cha: Char, str: String, caller: String) : Int {
     exiting(here + " with count " + count.toString())
     return count
 }
-
-fun isDebug(here:String): Boolean {
-  val debug_l = ParameterMap.getValue("debug")
-  return debug_l.contains(here)
-}  
-
-fun isLoop(here:String): Boolean {
-  val debug_l = ParameterMap.getValue("loop")
-  return debug_l.contains(here)
-}  
-
-fun isTrace(here:String): Boolean {
-  val debug_l = ParameterMap.getValue("trace")
-  return debug_l.contains(here)
-}  
 
 fun entering(here: String, caller: String):Unit {
     level = level + 1
@@ -116,6 +100,42 @@ fun inputRead(caller: String): String {
     exiting(here)
     return str
 }
+
+fun isDebug(here:String): Boolean {
+  if (ParameterMap.containsKey("debug")) { 
+    val debug_l = ParameterMap.getValue("debug")
+    val result = debug_l.contains("all") || debug_l.contains(here)
+    return result 
+  }
+  else {return false}
+}  
+
+fun isLoop(here:String): Boolean {
+  if (ParameterMap.containsKey("loop")) { 
+    val loop_l = ParameterMap.getValue("loop")
+    val result = loop_l.contains("all") || loop_l.contains(here)
+    return result 
+  }
+  else {return false}
+}  
+
+fun isTrace(here:String): Boolean {
+  if (ParameterMap.containsKey("trace")) { 
+    val trace_l = ParameterMap.getValue("trace")
+    val result = trace_l.contains("all") || trace_l.contains(here)
+    return result
+  }
+  else {return false}
+}  
+
+fun isWhen(here:String): Boolean {
+  if (ParameterMap.containsKey("when")) {
+    val when_l = ParameterMap.getValue("when")
+    val result = when_l.contains("all") || when_l.contains(here)
+    return result
+  }
+  else {return false}
+}  
 
 fun isAlphabeticalOfChar(cha: Char, caller: String): Boolean {
     val here = functionName()
@@ -176,19 +196,44 @@ fun lineStackOfLineList (str_l: List<String>) : Stack<String> {
     return stack
 }
 
-fun nextWordAndStackOfEndCharOfCharacterStack(del: Char, cha_s: Stack<Char>, caller: String): Pair<String, Stack<Char>> {
+fun nextWordAndEndCharOfEndCharListOfString(cha_l: List<Char>, str: String, caller: String): Pair<String, Char> {
+    val here = functionName()
+    entering(here, caller)
+
+    if (isTrace(here)) println("$here: input cha_l '$cha_l'")
+    if (isTrace(here)) println("$here: input str '$str'")
+    
+    var word = ""
+    var end_cha = 'x'
+    for (c in str){
+	  if (isDebug(here)) println("$here: c '$c'")
+	  if (cha_l.contains(c)) {
+	  end_cha = c
+	  break
+	  }
+	  word = word.plus(c.toString())
+    }
+
+    assert (word.isNotEmpty())
+    
+    if (isTrace(here)) println("$here: output word '$word'")
+    exiting(here)
+    return Pair(word, end_cha)
+}
+
+fun nextStringAndStackOfEndCharOfCharacterStack(del: Char, cha_s: Stack<Char>, caller: String): Pair<String, Stack<Char>> {
     val here = functionName()
     entering(here, caller)
 
     if (isTrace(here)) println("$here: input del '$del'")
     if (isTrace(here)) println("$here: input cha_s '$cha_s'")
     var done = false
-    var word = ""
+    var str = ""
     var cha = cha_s.pop()
     
     while (! done){
       if (isDebug(here)) println("$here: cha '$cha'")
-      word = word.plus(cha.toString())
+      str = str.plus(cha.toString())
       try {
       	  cha = cha_s.pop()
           done = cha.equals(del)
@@ -199,13 +244,50 @@ fun nextWordAndStackOfEndCharOfCharacterStack(del: Char, cha_s: Stack<Char>, cal
       }
     }
 
-    assert (word.isNotEmpty())
+    assert (str.isNotEmpty())
     
-    if (isTrace(here)) println("$here: output word '$word'")
+    if (isTrace(here)) println("$here: output str '$str'")
     if (isTrace(here)) println("$here: output cha_s '$cha_s'")
     exiting(here)
-    return Pair (word, cha_s)
+    return Pair (str, cha_s)
 }
+
+fun nextWordAndStackOfEndCharOfCharacterStack(del: Char, cha_s: Stack<Char>, caller: String): Pair<String, Stack<Char>> {
+    val here = functionName()
+    entering(here, caller)
+
+    if (isTrace(here)) println("$here: input del '$del'")
+    if (isTrace(here)) println("$here: input cha_s '$cha_s'")
+    var done = false
+    var str = ""
+    var cha = cha_s.pop()
+    
+    while (! done){
+      if (isDebug(here)) println("$here: cha '$cha'")
+      str = str.plus(cha.toString())
+      try {
+      	  cha = cha_s.pop()
+          done = cha.equals(del)
+
+	  if (cha.equals(' ')) {
+	    fatalErrorPrint ("word ends with '$del'", "a blank", "Check", here)
+	  }
+
+	  if (done) {cha_s.push(cha)}
+      }
+      catch (e: java.util.EmptyStackException) {
+            done = true			       
+      }
+    }
+
+    assert (str.isNotEmpty())
+    
+    if (isTrace(here)) println("$here: output str '$str'")
+    if (isTrace(here)) println("$here: output cha_s '$cha_s'")
+    exiting(here)
+    return Pair (str, cha_s)
+}
+
 
 fun nextWordOfEndCharOfString(del: Char, str: String, caller: String): String {
     val here = functionName()

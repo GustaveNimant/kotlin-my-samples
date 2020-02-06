@@ -196,6 +196,31 @@ fun lineStackOfLineList (str_l: List<String>) : Stack<String> {
     return stack
 }
 
+fun nextWordAndEndCharOfEndCharListOfString(cha_l: List<Char>, str: String, caller: String): Pair<String, Char> {
+    val here = functionName()
+    entering(here, caller)
+
+    if (isTrace(here)) println("$here: input cha_l '$cha_l'")
+    if (isTrace(here)) println("$here: input str '$str'")
+    
+    var word = ""
+    var end_cha = 'x'
+    for (c in str){
+	  if (isDebug(here)) println("$here: c '$c'")
+	  if (cha_l.contains(c)) {
+	  end_cha = c
+	  break
+	  }
+	  word = word.plus(c.toString())
+    }
+
+    assert (word.isNotEmpty())
+    
+    if (isTrace(here)) println("$here: output word '$word'")
+    exiting(here)
+    return Pair(word, end_cha)
+}
+
 fun nextStringAndStackOfEndCharOfCharacterStack(del: Char, cha_s: Stack<Char>, caller: String): Pair<String, Stack<Char>> {
     val here = functionName()
     entering(here, caller)
