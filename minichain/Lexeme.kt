@@ -155,6 +155,59 @@ fun isInMetaOfLexeme(lex: Lexeme, caller: String): Boolean {
     return result
 }
 
+fun isMetaKeywordOfString (str: String, caller: String): Boolean {
+  val here = functionName()
+  entering(here, caller)
+
+  if (isTrace(here)) println("$here: str '$str'")
+
+    val result = when (str) {
+       "Author" -> true
+       "Date" -> true
+       "Source" -> true
+       "Signature" -> true
+       "members" -> true 
+       "mutable" -> true 
+       "parents" -> true 
+       "previous" -> true
+       "next" -> true 
+       "tic" -> true 
+       "qm" -> true 
+       "spot" -> true
+       else -> {
+       	    false
+	}
+  }
+
+  if (isTrace(here)) println("$here: output result $result")
+
+  exiting(here)
+  return result
+}
+
+fun isMetaKeywordValueOfDollarStringDollar (dol_dol: String, caller: String): Boolean {
+// $keywordFromUser: anything$
+// $keyword: value$  
+  val here = functionName()
+  entering(here, caller)
+  
+   if (! dol_dol.contains(':')){
+    fatalErrorPrint ("A string enclosed with '$' contains a ':'", "'"+dol_dol+"'", "check", here)
+  }
+
+  val (keyword, str) = dol_dol.split(':')
+  if (isDebug(here)) println("$here: keyword '$keyword'")
+  if (isDebug(here)) println("$here: str '$str'")
+
+  val lex = lexemeOfWord (keyword, here)
+  val result = isKeywordWithOfLexeme (lex, here)
+  
+  if (isTrace(here)) println("$here: output result $result")
+
+  exiting(here)
+  return result
+}
+
 fun isInTextOfLexeme(lex: Lexeme, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
@@ -210,7 +263,7 @@ fun isInTextOfLexeme(lex: Lexeme, caller: String): Boolean {
     return result
 }
 
-fun lexemeOfKeyword (keyword: String, caller: String) : Lexeme {
+fun lexemeOfWord (keyword: String, caller: String) : Lexeme {
     val here = functionName()
     entering(here, caller)
 

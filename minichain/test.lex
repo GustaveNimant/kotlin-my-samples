@@ -5,4 +5,5 @@ TokenSpace
 TextWordConstant(with)
 TokenSpace
 TextWordConstant(space)
+TokenSpace
 TokenEndOfLine

@@ -6,8 +6,9 @@ fun main(args: Array<String>) {
       1 -> print("x == 1")
       in 2..6 -> print("x == 2 or 3 or 4 or 5 or 6\n")
       
-      else -> { // Note the block
+      else -> {
          print("x is neither 1 nor 2\n")
       }
 
+  }// when
 }
