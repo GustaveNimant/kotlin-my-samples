@@ -308,15 +308,15 @@ fun lexemeListOfAuthorLine (lin: String, caller: String) : Pair<List<Lexeme>, In
 		}
    		}
 	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	val previousCharacter = lin.get(position-1)
-	  	if (previousCharacter.equals('$')) {
+	  	val cha = lin.get(position-1)
+	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
 		   lexemeList.add (lex)	
 	     	   if (isDebug(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
-		     val message = "$here: Error previous character '$previousCharacter' should be '$'"
+		     val message = "$here: Error previous character '$cha' should be '$'"
 	    	     throw Exception(message)
 		}
 	  }
@@ -393,15 +393,15 @@ fun lexemeListOfDateLine (lin: String, caller: String) : Pair<List<Lexeme>, Int>
 		}
    		}
 	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	val previousCharacter = lin.get(position-1)
-	  	if (previousCharacter.equals('$')) {
+	  	val cha = lin.get(position-1)
+	  	if (cha.equals('$')) {
 	     	  val lex = TokenEndOfLine
 		  lexemeList.add (lex)
 	     	  if (isDebug(here)) println("$here: setting End Of Line")
 	     	  Done = true			
 	     	}
 		else {
-		  val message = "$here: Error previous character '$previousCharacter' should be '$'"
+		  val message = "$here: Error previous character '$cha' should be '$'"
 	    	  throw Exception(message)
 		}
 	  }
@@ -532,20 +532,19 @@ fun lexemeListOfMembersRemainderString (str: String, caller: String) : Pair<List
 		}
               }
           }
-	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	val previousCharacter = str.get(position-1)
-	  	if (previousCharacter.equals('$')) {
-	     	   val lex = TokenEndOfLine
-		   lexemeList.add (lex)
-	     	   if (isDebug(here)) println("$here: setting End Of Line")
-	     	   Done = true			
-	     	}
-		else {
-		val ind = previousCharacter.toInt()
-		     val message = "$here: Error previous character '$previousCharacter' ($ind) should be '$' in str '$str'"
-	    	     throw Exception(message)
-		}
+        catch (e: java.lang.StringIndexOutOfBoundsException) {
+	  val cha = str.get(position-1)
+	  val cha_l = listOf('$', ' ', '\'', '"')
+	  if (cha_l.contains(cha)) { 
+	    val lex = TokenEndOfLine
+            lexemeList.add (lex)
+	    if (isDebug(here)) println("$here: setting End Of Line")
+	      Done = true			
+	   }
+	  else {
+	    fatalErrorPrint("last character '$cha' (position $position) should in list '$cha_l'", "string '$str'", "Correct record", here)
 	  }
+         } // catch
    }
 
    if (isTrace(here)) println("$here: output position $position")
@@ -668,15 +667,15 @@ fun lexemeListOfMutableLine (lin: String, caller: String) : Pair<List<Lexeme>, I
 		} // when
    		} // try
 	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	val previousCharacter = lin.get(position-1)
-	  	if (previousCharacter.equals('$')) {
+	  	val cha = lin.get(position-1)
+	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
 		   lexemeList.add (lex)
 	     	   if (isLoop(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
-		     val message = "$here: Error previous character '$previousCharacter' should be '$'"
+		     val message = "$here: Error previous character '$cha' should be '$'"
 	    	     throw Exception(message)
 		}
 	  }
@@ -744,15 +743,15 @@ fun lexemeListOfNextLine (lin: String, caller: String) : Pair<List<Lexeme>, Int>
 		}
    		}
 	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	val previousCharacter = lin.get(position-1)
-	  	if (previousCharacter.equals('$')) {
+	  	val cha = lin.get(position-1)
+	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
 		   lexemeList.add (lex)		
 	     	   if (isDebug(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
-		     val message = "$here: Error previous character '$previousCharacter' should be '$'"
+		     val message = "$here: Error previous character '$cha' should be '$'"
 	    	     throw Exception(message)
 		}
 	  }
@@ -799,6 +798,14 @@ fun lexemeListOfNonSharpedLine (lin: String, caller: String) : List<Lexeme> {
 	    position = position + word.length
 
 	}
+	'{' -> {
+	    val str = lin.substring(position)
+	    val word = nextWordInBracketsOfString (str, here)
+            val lex = TextVariableSubstituable(word)
+            val lex_l = listOf(TokenLeftCurvedBracket, TokenLeftCurvedBracket, lex, TokenRightCurvedBracket, TokenRightCurvedBracket)
+	    lexemeList.addAll(lex_l)
+	    position = position + word.length + 4
+	}
 	'$' -> {
 	    val lexeme = tokenOfChar(cha, position, lin, here)
 	    lexemeList.add(lexeme)
@@ -819,7 +826,6 @@ somekeyword: somevalue$  '
 	    }
 	    else {
 	       val (lex_l, pos) = lexemeListOfTextString(word, here)
-	       if (isLoop(here)) println("$here: ICI when pos $pos lex_l '$lex_l'")
 	       lexemeList.addAll(lex_l)
 	       position = position + pos
 	    }
@@ -833,11 +839,20 @@ somekeyword: somevalue$  '
         } // when
       } // try
       catch (e: java.lang.StringIndexOutOfBoundsException) {
-      	    val pos = position-1 
-            val cha = lin.get(pos)
+
+      	val (cha, pos) =
+      	    if (lin.isNullOrBlank()) {
+	       Pair (nullChar, 0)
+    	    }
+	    else {
+      	       val pos = position-1 
+               val cha = lin.get(pos)
+	       Pair (cha, pos)
+	    }
+      	      if (isLoop(here)) println ("$here: while Done at previous position $pos with cha '$cha' in lin '$lin'")
+
 	    val lex = TokenEndOfLine
 	    lexemeList.add(lex)
-      	    if (isLoop(here)) println ("$here: while Done at previous position $pos with cha '$cha' in lin '$lin'")
 	    if (isLoop(here)) println ("$here: EndOfLine added")
       	    Done = true			
        } // catch
@@ -868,7 +883,7 @@ fun lexemeListOfParentsLine (lin: String, caller: String) : Pair<List<Lexeme>, I
     	      var cha = lin.get(position)
 	       if (isLoop(here)) println ("$here: while position $position cha '$cha'")
 	      when (cha){
-	      ' ', '$' -> {
+	      ' ', '$', ':' -> {
 	      	  val lex = tokenOfChar(cha, position, lin, here)
 		  lexemeList.add (lex)
 		  position = position + 1
@@ -900,15 +915,15 @@ fun lexemeListOfParentsLine (lin: String, caller: String) : Pair<List<Lexeme>, I
 		}
    		}
 	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	val previousCharacter = lin.get(position-1)
-	  	if (previousCharacter.equals('$')) {
+	  	val cha = lin.get(position-1)
+	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
 		   lexemeList.add (lex)
 	     	   if (isDebug(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
-		     val message = "$here: Error previous character '$previousCharacter' should be '$'"
+		     val message = "$here: Error previous character '$cha' should be '$'"
 	    	     throw Exception(message)
 		}
 	  }
@@ -972,15 +987,15 @@ fun lexemeListOfPreviousLine (lin: String, caller: String) : Pair<List<Lexeme>, 
 		}
    		}
 	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	val previousCharacter = lin.get(position-1)
-	  	if (previousCharacter.equals('$')) {
+	  	val cha = lin.get(position-1)
+	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
 		   lexemeList.add (lex)
 	     	   if (isLoop(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
-		     val message = "$here: Error previous character '$previousCharacter' should be '$'"
+		     val message = "$here: Error previous character '$cha' should be '$'"
 	    	     throw Exception(message)
 		}
 	  }
@@ -1011,7 +1026,7 @@ fun lexemeListOfQmHashLine (lin: String, caller: String) : Pair<List<Lexeme>, In
     	      var cha = lin.get(position)
 	      if (isLoop(here)) println ("$here: while position $position cha '$cha'")
 	      when (cha){
-	      ' ', '$' -> {
+	      ' ', '$', ':' -> {
 	      	  val lex = tokenOfChar(cha, position, lin, here)
 		  lexemeList.add (lex)
 		  position = position + 1
@@ -1043,15 +1058,15 @@ fun lexemeListOfQmHashLine (lin: String, caller: String) : Pair<List<Lexeme>, In
 		}
    		}
 	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	val previousCharacter = lin.get(position-1)
-	  	if (previousCharacter.equals('$')) {
+	  	val cha = lin.get(position-1)
+	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
              	   lexemeList.add (lex)
 	     	   if (isLoop(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
-		     val message = "$here: Error previous character '$previousCharacter' should be '$'"
+		     val message = "$here: Error previous character '$cha' should be '$'"
 	    	     throw Exception(message)
 		}
 	  }
@@ -1108,15 +1123,15 @@ fun lexemeListOfSignatureLine (lin: String, caller: String) : Pair<List<Lexeme>,
 		} // when
    		} // try
 	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	val previousCharacter = lin.get(position-1)
-	  	if (previousCharacter.equals('$')) {
+	  	val cha = lin.get(position-1)
+	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
              	   lexemeList.add (lex)
 	     	   if (isDebug(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
-		     val message = "$here: Error previous character '$previousCharacter' should be '$'"
+		     val message = "$here: Error previous character '$cha' should be '$'"
 	    	     throw Exception(message)
 		}
 	  }
@@ -1168,6 +1183,7 @@ fun lexemeListOfSharpedLine (lin: String, caller: String) : List<Lexeme> {
 	    val lexeme = tokenOfChar(cha, position, lin, here)
 	    lexemeList.add(lexeme)
 	    position = position + 1
+	    
 	    val str = lin.substring(position)
 	    if (isLoop(here)) println("$here: while str '$str'")
 	    
@@ -1183,16 +1199,16 @@ fun lexemeListOfSharpedLine (lin: String, caller: String) : List<Lexeme> {
         } // when
       } // try
       catch (e: java.lang.StringIndexOutOfBoundsException) {
-	val previousCharacter = lin.get(position-1)
-	if (previousCharacter.equals('$')) {
+	val cha = lin.get(position-1)
+	val cha_l = listOf('$', ' ', '\'', '"')
+	if (cha_l.contains(cha)) { 
 	  val lex = TokenEndOfLine
           lexemeList.add (lex)
 	  if (isDebug(here)) println("$here: setting End Of Line")
 	    Done = true			
 	  }
 	  else {
-	    val message = "$here: Error previous character '$previousCharacter' (position $position) should be '$'"
-	    throw Exception(message)
+	    fatalErrorPrint("last character '$cha' (position $position) should in list '$cha_l'", "string '$lin'", "Correct record", here)
 	  }
        } // catch
    } // while
@@ -1254,15 +1270,15 @@ fun lexemeListOfSourceLine (lin: String, caller: String) : Pair<List<Lexeme>, In
 		}
    		}
 	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	val previousCharacter = lin.get(position-1)
-	  	if (previousCharacter.equals('$')) {
+	  	val cha = lin.get(position-1)
+	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
              	   lexemeList.add (lex)
 	     	   if (isLoop(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
-		     val message = "$here: Error previous character '$previousCharacter' should be '$'"
+		     val message = "$here: Error previous character '$cha' should be '$'"
 	    	     throw Exception(message)
 		}
 	  }
@@ -1330,15 +1346,15 @@ fun lexemeListOfSpotLine (lin: String, caller: String) : Pair<List<Lexeme>, Int>
 		}
    		}
 	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	val previousCharacter = lin.get(position-1)
-	  	if (previousCharacter.equals('$')) {
+	  	val cha = lin.get(position-1)
+	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
              	   lexemeList.add (lex)
 	     	   if (isDebug(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
-		     val message = "$here: Error at end of line previous character '$previousCharacter' should be '$'"
+		     val message = "$here: Error at end of line previous character '$cha' should be '$'"
 	    	     throw Exception(message)
 		}
 	  }
@@ -1419,13 +1435,9 @@ fun lexemeListOfTextString (str: String, caller: String) : Pair<List<Lexeme>, In
     	  	val lex = TextWordConstant (word)
 		lexemeList.add (lex)
 	  	position = position + word.length
-		if (isLoop(here)) println ("$here: ICI str '$str'")
-		if (isLoop(here)) println ("$here: ICI word '$word'")
-		if (isLoop(here)) println ("$here: ICI while position $position lex added '$lex'")
 
                 Done = word == str
-				if (isLoop(here)) println ("$here: ICI Done '$Done'")
-// HERE 
+		if (isLoop(here)) println ("$here: Done '$Done'")
 		  }
 	      else -> {
 		val message = "$here: Error unknown Character '$cha' at position $position of str '$str'"
@@ -1508,15 +1520,15 @@ fun lexemeListOfTicLine (lin: String, caller: String) : Pair<List<Lexeme>, Int> 
 		}
    		}
 	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	val previousCharacter = lin.get(position-1)
-	  	if (previousCharacter.equals('$')) {
+	  	val cha = lin.get(position-1)
+	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
              	   lexemeList.add (lex)
 	     	   if (isDebug(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
-		     val message = "$here: Error previous character '$previousCharacter' should be '$'"
+		     val message = "$here: Error previous character '$cha' should be '$'"
 	    	     throw Exception(message)
 		}
 	  }
@@ -1744,15 +1756,15 @@ fun lexemeListMetaOfDollarString (lin: String, caller: String) : Pair<List<Lexem
 	    } // when
       } // try
       catch (e: java.lang.StringIndexOutOfBoundsException) {
-	val previousCharacter = lin.get(position-1)
-	if (previousCharacter.equals('$')) {
+	val cha = lin.get(position-1)
+	if (cha.equals('$')) {
 	  val lex = TokenEndOfLine
           lexemeList.add (lex)
 	  if (isDebug(here)) println("$here: setting End Of Line")
 	    Done = true			
 	  }
 	  else {
-	    val message = "$here: Error previous character '$previousCharacter' (position $position) should be '$'"
+	    val message = "$here: Error previous character '$cha' (position $position) should be '$'"
 	    throw Exception(message)
 	  }
        } // catch

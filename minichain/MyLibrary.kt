@@ -310,6 +310,28 @@ fun nextWordOfEndCharOfString(del: Char, str: String, caller: String): String {
     return word
 }
 
+fun nextWordInBracketsOfString(str: String, caller: String): String {
+    val here = functionName()
+    entering(here, caller)
+// {someword}
+
+    if (isTrace(here)) println("$here: input str '$str'")
+    
+    var word = ""    
+    for (c in str){
+	  if (isDebug(here)) println("$here: c '$c'")
+	  if (c.equals('{')) {continue}
+	  if (c.equals('}')) {break}
+	  word = word.plus(c.toString())
+    }
+
+    assert (word.isNotEmpty())
+    
+    if (isTrace(here)) println("$here: output word '$word'")
+    exiting(here)
+    return word
+}
+
 fun nextWordOfEndCharListOfString(cha_l: List<Char>, str: String, caller: String): String {
     val here = functionName()
     entering(here, caller)

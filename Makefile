@@ -4,7 +4,7 @@ run = $(basename $(arg))
 
 all: $(run)
 
-MyLibrary.jar: MyLibrary.kt
+MyLibrary.jar: ./minichain/MyLibrary.kt
 	$(CC) $< -include-runtime -d $@
 
 $(run): MyLibrary.jar $(run).jar

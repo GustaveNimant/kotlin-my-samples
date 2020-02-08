@@ -1,5 +1,5 @@
 # $Source: /my/perl/script/kwextract.pl,v$
-# $Date: now$
+# $Date: 22-03-1995$
 # $mutable: /.brings/system/bin/kwextract.pl$
 # $previous: QmU1RDLsAGNPVuwDjKD3RQx7R6aEuQfcmSiubviDZ2XRVC$
 # $members: michelc@lausanne , emilea$ 
@@ -11,7 +11,7 @@
 # $Signature: n/a$
 
 line 1
-line 2 with a $variable {{mutable}} $ embedded
+line 2 with a variable {{mutable}} embedded
 line 3
 
 # $Author: michel$

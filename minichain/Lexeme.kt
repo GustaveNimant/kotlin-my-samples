@@ -51,6 +51,10 @@ sealed class Lexeme ()
   object TokenSharp : Lexeme ()
   object TokenDot : Lexeme ()
   object TokenHyphen : Lexeme ()
+  object TokenLeftCurvedBracket : Lexeme ()
+  object TokenLeftSquareBracket : Lexeme ()
+  object TokenRightCurvedBracket : Lexeme ()
+  object TokenRightSquareBracket : Lexeme ()
 
 fun fullnameOfLexeme (lexeme: Lexeme): String {
     val string = when (lexeme) {
@@ -82,6 +86,10 @@ fun fullnameOfLexeme (lexeme: Lexeme): String {
 	is KeywordFromUser -> "KeywordFromUser("+lexeme.name+")"
 
 	TokenAt	-> "TokenAt"
+	TokenLeftCurvedBracket -> "TokenLeftCurvedBracket"
+	TokenLeftSquareBracket -> "TokenLeftSquareBracket"
+	TokenRightCurvedBracket -> "TokenRightCurvedBracket"
+	TokenRightSquareBracket -> "TokenRightSquareBracket"
 	TokenColon	-> "TokenColon"
 	TokenComma	-> "TokenComma"
 	TokenDollar	-> "TokenDollar"
@@ -122,6 +130,10 @@ fun isInMetaOfLexeme(lex: Lexeme, caller: String): Boolean {
 	TokenHyphen	 -> true
 	TokenSemicolon	 -> true
 	TokenSharp	 -> true
+	TokenLeftCurvedBracket -> true
+        TokenLeftSquareBracket -> true
+	TokenRightCurvedBracket -> true
+        TokenRightSquareBracket -> true
 	TokenSpace	 -> true
 
 	is AuthorName  -> true
@@ -221,6 +233,10 @@ fun isInTextOfLexeme(lex: Lexeme, caller: String): Boolean {
 
 	TokenAt		 -> true
 	TokenColon	 -> true
+	TokenLeftSquareBracket -> true
+	TokenLeftCurvedBracket -> true
+	TokenRightSquareBracket -> true
+	TokenRightCurvedBracket -> true
 	TokenComma	 -> true
 	TokenDollar	 -> true
 	TokenDot	 -> true
@@ -324,6 +340,10 @@ fun isTokenOfChar(cha: Char, caller: String) : Boolean {
 		'/' -> true
 		',' -> true
 		':' -> true
+		']' -> true
+		'[' -> true
+		'}' -> true
+		'{' -> true
 		';' -> true
 		'.' -> true
 		'-' -> true
@@ -399,6 +419,10 @@ fun stringValueOfLexeme (lexeme: Lexeme): String {
 	TokenSharp	-> "#"
 	TokenSpace	-> " "
 	TokenVee	-> "v"
+	TokenLeftSquareBracket	-> "["
+	TokenLeftCurvedBracket	-> "{"
+	TokenRightSquareBracket	-> "]"
+	TokenRightCurvedBracket	-> "}"
 	TokenUnknown    -> "unknown"
 	TokenSkipped    -> "skipped"
 	}
