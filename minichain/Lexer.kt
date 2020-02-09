@@ -7,9 +7,6 @@ import java.lang.Character.MIN_VALUE as nullChar
 import my.library.*
 import my.lexeme.*
 
-// kotlinc MyLibrary.kt -include-runtime -d MyLibrary.jar 
-// kotlinc -classpath MyLibrary.jar Lexer.kt -include-runtime -d Lexer.jar
-
 fun fullnameListOfLexemeList (lex_l: List<Lexeme>) : List<String> {
   val str_l = lex_l.map({l -> fullnameOfLexeme (l) })
   return str_l 
@@ -54,18 +51,6 @@ fun isDateOfString(str: String, caller: String): Boolean {
     return result
 }
 
-fun isFromUserKeywordValueOfString(str: String, caller: String): Boolean {
-    val here = functionName()
-    entering(here, caller)
-    
-    if (isTrace(here)) println("$here: input str '$str'")
-    val pattern = Regex("""\w+""")
-    val result = pattern.matches(str)
-    
-    exiting(here + " with result '$result'")
-    return result
-}
-
 fun isFilePathOfString(str: String, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
@@ -78,13 +63,14 @@ fun isFilePathOfString(str: String, caller: String): Boolean {
     return result
 }
 
-fun isKeywordOfString(str: String, caller: String): Boolean {
+fun isFromUserKeywordValueOfString(str: String, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
-
+    
     if (isTrace(here)) println("$here: input str '$str'")
-    val result = str.startsWith('$') && str.endsWith(':')
-
+    val pattern = Regex("""\w+""")
+    val result = pattern.matches(str)
+    
     exiting(here + " with result '$result'")
     return result
 }
@@ -95,6 +81,17 @@ fun isKeywordNameOfString(str: String, caller: String): Boolean {
 
     if (isTrace(here)) println("$here: input str '$str'")
     val result = str.endsWith('$')
+
+    exiting(here + " with result '$result'")
+    return result
+}
+
+fun isKeywordOfString(str: String, caller: String): Boolean {
+    val here = functionName()
+    entering(here, caller)
+
+    if (isTrace(here)) println("$here: input str '$str'")
+    val result = str.startsWith('$') && str.endsWith(':')
 
     exiting(here + " with result '$result'")
     return result
@@ -257,6 +254,296 @@ fun keywordOfString(str: String, caller: String): String {
 
     exiting(here + " with result '$result'")
     return result
+}
+
+fun lexemeListFromUserKeywordValueOfStringDollared (str: String, caller: String) : List<Lexeme> {
+// 'any_string'$
+    val here = functionName()
+    entering(here, caller)
+
+    val end_cha = str.last()
+    val lin = if (! end_cha.equals('$')) {
+       str.plus("$")
+    }
+    else {
+       str
+    }
+    if (isTrace(here)) println("$here: input lin '$lin'")
+
+    var Done = false
+    var position = 0
+    var lexemeList = mutableListOf<Lexeme>()
+    
+    while (!Done) {
+    	  try {
+    	      var cha = lin.get(position)
+	      if (isLoop(here)) println ("$here: while position $position cha '$cha'")
+	      when (cha){
+	      ' ' -> {
+	      	  val lex = tokenOfChar(cha, position, lin, here)
+		  lexemeList.add (lex)
+		  position = position + 1
+		  }
+	      '$' -> {
+	      	  val lex = tokenOfChar(cha, position, lin, here)
+		  lexemeList.add (lex)
+		  Done = true
+		  }
+	      in 'a' .. 'z', in 'A' .. 'Z' -> {
+	      	  val sub = lin.substring(position)
+		  val word = nextWordOfEndCharOfString('$', sub, here)
+		  if (isFromUserKeywordValueOfString(word, here)) {
+    		    val lex = FromUserKeywordValue(word)
+		    lexemeList.add (lex)	
+		    position = position + word.length 
+		  }
+		  else {
+		       val message = "$here: Error word '$word' is not a valid FromUserKeywordValue"
+		       throw Exception(message)
+		  }
+	          }
+		  else -> {
+		    val message = "$here: Error unknown character '$cha' at $position in lin '$lin'"
+		       throw Exception(message)
+  
+		} 
+   		} // when
+		} // try
+	  catch (e: java.lang.StringIndexOutOfBoundsException) {
+	  	val cha = lin.get(position)
+	  	if (cha.equals('$')) {
+	     	   val lex = TokenEndOfLine
+		   lexemeList.add (lex)
+	     	   if (isDebug(here)) println("$here: setting End Of Line")
+	     	   Done = true			
+	     	}
+		else {
+		     val message = "$here: Error character '$cha' should be '$' at $position in lin '$lin'"
+	    	     throw Exception(message)
+		}
+	  }
+   }
+
+   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
+   val result = lexemeList.toList()
+
+   exiting(here)
+   return result
+}
+
+fun lexemeListMetaOfDollarString (lin: String, caller: String) : Pair<List<Lexeme>, Int> {
+// $keyword: specific_value
+// keyword is well defined Meta
+
+    val here = functionName()
+    entering(here, caller)
+
+    if (isTrace(here)) println("$here: input lin '$lin'")
+    
+    val lexemeList = mutableListOf<Lexeme>()
+
+    var Done = false
+    var position = 0
+    
+    while (!Done) {
+      try {
+    	var cha = lin.get(position)	
+ 	when (cha) {
+// Remainder	
+	'A' -> {
+	    val str = lin.substring(position)
+	    val (lex_l, pos) = lexemeListOfAuthorLine (str, here)
+	    lexemeList.addAll (lex_l) 
+	    position = position + pos
+	    Done = true
+	    }
+	'D' -> {
+	    val str = lin.substring(position)
+	    val (lex_l, pos) = lexemeListOfDateLine (str, here)
+	    lexemeList.addAll (lex_l)
+	    position = position + pos
+	    Done = true
+	    }
+        'm' -> {
+            val nextCharacter = lin.get(position + 1)
+	    if (nextCharacter.equals ('e')){
+	       val str = lin.substring(position)
+	       val (lex_l, pos) = lexemeListOfMembersKeyword (str, here)
+	       lexemeList.addAll (lex_l)
+	       position = position + pos
+	    }
+	    else if (nextCharacter.equals ('u')){
+	       val str = lin.substring(position)
+	       val (lex_l, pos) = lexemeListOfMutableLine (str, here)
+	       lexemeList.addAll (lex_l)
+	       position = position + pos
+	    }
+	    else {
+	    	 val message = "$here: Error next character '$nextCharacter' should be 'e' or 'u'"
+	    	 throw Exception(message)
+	    }
+	    Done = true
+	    }
+        'n' -> {
+	    val str = lin.substring(position)
+	    val (lex_l, pos) = lexemeListOfNextLine (str, here)
+	    lexemeList.addAll (lex_l)
+	    position = position + pos
+	    Done = true
+	    }
+	'p' -> {
+	    val nextCharacter = lin.get(position + 1)
+	    if (nextCharacter.equals ('a')){
+	       val str = lin.substring(position)
+	       val (lex_l, pos) = lexemeListOfParentsLine (str, here) 
+	       lexemeList.addAll (lex_l)
+	       position = position + pos
+	    }
+	    else if (nextCharacter.equals ('r')){
+	       val str = lin.substring(position)
+	       val (lex_l, pos) = lexemeListOfPreviousLine (str, here)
+	       lexemeList.addAll (lex_l)
+	       position = position + pos
+	    }
+	    else {
+	    	 val message = "$here: Error next character '$nextCharacter' should be 'a' or 'r'"
+	    	 throw Exception(message)
+	    }
+	    Done = true  
+	    }
+        'q' -> {
+	    val str = lin.substring(position)
+	    val (lex_l, pos) = lexemeListOfQmHashLine (str, here) 
+	    lexemeList.addAll (lex_l)
+	    position = position + pos
+	    Done = true
+	    }
+        's' -> {
+	    val str = lin.substring(position)
+	    val (lex_l, pos) = lexemeListOfSpotLine (str, here) 
+	    lexemeList.addAll (lex_l)
+	    position = position + pos
+	    Done = true
+	    }
+        'S' -> {
+	    val nextCharacter = lin.get(position + 1)
+	    if (nextCharacter.equals ('i')){
+	       val str = lin.substring(position)
+	       val (lex_l, pos) = lexemeListOfSignatureLine (str, here)
+	       lexemeList.addAll (lex_l)
+	       position = position + pos
+	    }
+	    else if (nextCharacter.equals ('o')){
+	       val str = lin.substring(position)
+	       val (lex_l, pos) = lexemeListOfSourceLine (str, here)
+	       lexemeList.addAll(lex_l)
+	       position = position + pos
+	    }
+	    else {
+	    	 val message = "$here: Error next character '$nextCharacter' should be 'i' or 'o'"
+	    	 throw Exception(message)
+	    }
+	    Done = true  
+	    }
+        't' -> {
+	    val str = lin.substring(position)
+	    val (lex_l, pos) = lexemeListOfTicLine (str, here)
+	    lexemeList.addAll (lex_l)
+	    position = position + pos
+	    Done = true
+	    }
+	else -> {
+	    	 val message = "$here: Error unexpected current character '$cha' at position $position"
+	    	 throw Exception(message)
+	    }
+	    } // when
+      } // try
+      catch (e: java.lang.StringIndexOutOfBoundsException) {
+	val cha = lin.get(position-1)
+	if (cha.equals('$')) {
+	  val lex = TokenEndOfLine
+          lexemeList.add (lex)
+	  if (isDebug(here)) println("$here: setting End Of Line")
+	    Done = true			
+	  }
+	  else {
+	    val message = "$here: Error previous character '$cha' (position $position) should be '$'"
+	    throw Exception(message)
+	  }
+       } // catch
+   } // while
+   
+   if (isTrace(here)) println("$here: output position $position")
+   if (isTrace(here)) println("$here: output lexemeList: "+ fullnameListOfLexemeList(lexemeList))
+
+   val result = Pair (lexemeList.toList(), position)
+   exiting(here)
+   return result
+
+}
+
+fun lexemeListMetaValueOfStringDollared (lin: String, caller: String) : List<Lexeme> {
+// $KeywordMeta: MetaValue$
+    val here = functionName()
+    entering(here, caller)
+
+    if (isTrace(here)) println("$here: input lin '$lin'")
+    
+    val lexemeList = mutableListOf<Lexeme>()
+
+    var Done = false
+    var position = 0
+    
+    while (!Done) {
+    	  try {
+    	      var cha = lin.get(position)
+	      when (cha){
+	      ' ' -> {
+	      	  val lex = tokenOfChar(cha, position, lin, here)
+		  lexemeList.add(lex)
+		  position = position + 1
+		  }
+	      '$' -> {
+	      	  val lex = tokenOfChar(cha, position, lin, here)
+		  lexemeList.add(lex)
+		  position = position + 1
+		  }
+	      else -> {
+	      	  val str = lin.substring(position)
+		  val word = nextWordOfEndCharOfString('$', str, here)
+		  if (isSpotOfString(word, here)) {
+		     position = position + word.length 
+    		      val lex = Spot (word)
+		      lexemeList.add(lex)
+		  }
+		  else {
+		       val message = "$here: Error word '$word' is not a valid Qm Hash"
+		       throw Exception(message)
+		  }
+	          }
+		}
+   		}
+	  catch (e: java.lang.StringIndexOutOfBoundsException) {
+	  	val cha = lin.get(position-1)
+	  	if (cha.equals('$')) {
+	     	   val lex = TokenEndOfLine
+		   lexemeList.add (lex)
+	     	   if (isDebug(here)) println("$here: setting End Of Line")
+	     	   Done = true			
+	     	}
+		else {
+		     val message = "$here: Error previous character '$cha' should be '$'"
+	    	     throw Exception(message)
+		}
+	  }
+   }
+
+   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
+
+   val result = lexemeList.toList()
+
+   exiting(here)
+   return result 
 }
 
 fun lexemeListOfAuthorLine (lin: String, caller: String) : Pair<List<Lexeme>, Int> {
@@ -469,6 +756,67 @@ fun lexemeListOfFileName(fil_nam: String, caller: String) : List<Lexeme> {
     return lex_l
 }
 
+fun lexemeListOfMembersKeyword (lin: String, caller: String) : Pair<List<Lexeme>, Int> {
+// $members: michelc@lausanne , emilea$ 
+    val here = functionName()
+    entering(here, caller)
+
+    if (isTrace(here)) println("$here: input lin '$lin'")
+    
+    val lexemeList = mutableListOf<Lexeme>()
+
+    var Done = false
+    var position = 0
+    
+    while (!Done) {
+    	  try {
+    	      var cha = lin.get(position)
+	      if (isLoop(here)) println ("$here: while position $position cha '$cha'")
+	      when (cha){
+	      ' ', '$' -> {
+	      	 val lex = tokenOfChar(cha, position, lin, here)
+		 lexemeList.add (lex)
+		 position = position + 1
+		  }
+	      'm' -> {
+	      	  var str = lin.substring(position)
+    	      	  val word = nextWordOfEndCharOfString(':', str, here)
+		  if (word != "members") {
+		     fatalErrorPrint ("word were 'members'", word, "Check", here)
+		  }
+
+	  	  position = position + word.length + 1
+    	  	  val lex = lexemeOfWord (word, here)
+		  lexemeList.add (lex)
+
+	      	  str = (lin.substring(position)).dropLastWhile({c -> c.equals(' ')})
+		  val (lex_l, pos) = lexemeListOfMembersRemainderString (str, here)
+		  lexemeList.addAll (lex_l)
+		  position = position + pos
+		  Done = true
+		  }		  
+	       else -> {
+		  val message = "$here: Error unknown current Character '$cha' at position $position of line '$lin'"
+		  throw Exception(message)
+	          }
+		}
+   		}
+	  catch (e: java.lang.StringIndexOutOfBoundsException) {
+	    val message = "$here: Error unexpected End Of Line at position $position of line '$lin'"
+	    throw Exception(message)
+	  
+	  }
+   }
+
+   if (isTrace(here)) println("$here: output position $position")
+   if (isTrace(here)) println("$here: output lexemeList: "+ fullnameListOfLexemeList(lexemeList))
+   val result = Pair(lexemeList.toList(), position)
+
+   exiting(here)
+   return result
+
+}
+
 fun lexemeListOfMembersRemainderString (str: String, caller: String) : Pair<List<Lexeme>, Int> {
 // " emilea@paris, michelc@lausanne$ "
 // " jules, alain@champagne$ "
@@ -554,69 +902,6 @@ fun lexemeListOfMembersRemainderString (str: String, caller: String) : Pair<List
    exiting(here)
    return result
 }
-
-
-fun lexemeListOfMembersKeyword (lin: String, caller: String) : Pair<List<Lexeme>, Int> {
-// $members: michelc@lausanne , emilea$ 
-    val here = functionName()
-    entering(here, caller)
-
-    if (isTrace(here)) println("$here: input lin '$lin'")
-    
-    val lexemeList = mutableListOf<Lexeme>()
-
-    var Done = false
-    var position = 0
-    
-    while (!Done) {
-    	  try {
-    	      var cha = lin.get(position)
-	      if (isLoop(here)) println ("$here: while position $position cha '$cha'")
-	      when (cha){
-	      ' ', '$' -> {
-	      	 val lex = tokenOfChar(cha, position, lin, here)
-		 lexemeList.add (lex)
-		 position = position + 1
-		  }
-	      'm' -> {
-	      	  var str = lin.substring(position)
-    	      	  val word = nextWordOfEndCharOfString(':', str, here)
-		  if (word != "members") {
-		     fatalErrorPrint ("word were 'members'", word, "Check", here)
-		  }
-
-	  	  position = position + word.length + 1
-    	  	  val lex = lexemeOfWord (word, here)
-		  lexemeList.add (lex)
-
-	      	  str = (lin.substring(position)).dropLastWhile({c -> c.equals(' ')})
-		  val (lex_l, pos) = lexemeListOfMembersRemainderString (str, here)
-		  lexemeList.addAll (lex_l)
-		  position = position + pos
-		  Done = true
-		  }		  
-	       else -> {
-		  val message = "$here: Error unknown current Character '$cha' at position $position of line '$lin'"
-		  throw Exception(message)
-	          }
-		}
-   		}
-	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	    val message = "$here: Error unexpected End Of Line at position $position of line '$lin'"
-	    throw Exception(message)
-	  
-	  }
-   }
-
-   if (isTrace(here)) println("$here: output position $position")
-   if (isTrace(here)) println("$here: output lexemeList: "+ fullnameListOfLexemeList(lexemeList))
-   val result = Pair(lexemeList.toList(), position)
-
-   exiting(here)
-   return result
-
-}
-
 
 fun lexemeListOfMutableLine (lin: String, caller: String) : Pair<List<Lexeme>, Int> {
 // mutable: /.brings/system/bin/kwextract.pl$
@@ -866,296 +1151,6 @@ somekeyword: somevalue$  '
    return result
 }
 
-fun lexemeListMetaOfDollarString (lin: String, caller: String) : Pair<List<Lexeme>, Int> {
-// $keyword: specific_value
-// keyword is well defined Meta
-
-    val here = functionName()
-    entering(here, caller)
-
-    if (isTrace(here)) println("$here: input lin '$lin'")
-    
-    val lexemeList = mutableListOf<Lexeme>()
-
-    var Done = false
-    var position = 0
-    
-    while (!Done) {
-      try {
-    	var cha = lin.get(position)	
- 	when (cha) {
-// Remainder	
-	'A' -> {
-	    val str = lin.substring(position)
-	    val (lex_l, pos) = lexemeListOfAuthorLine (str, here)
-	    lexemeList.addAll (lex_l) 
-	    position = position + pos
-	    Done = true
-	    }
-	'D' -> {
-	    val str = lin.substring(position)
-	    val (lex_l, pos) = lexemeListOfDateLine (str, here)
-	    lexemeList.addAll (lex_l)
-	    position = position + pos
-	    Done = true
-	    }
-        'm' -> {
-            val nextCharacter = lin.get(position + 1)
-	    if (nextCharacter.equals ('e')){
-	       val str = lin.substring(position)
-	       val (lex_l, pos) = lexemeListOfMembersKeyword (str, here)
-	       lexemeList.addAll (lex_l)
-	       position = position + pos
-	    }
-	    else if (nextCharacter.equals ('u')){
-	       val str = lin.substring(position)
-	       val (lex_l, pos) = lexemeListOfMutableLine (str, here)
-	       lexemeList.addAll (lex_l)
-	       position = position + pos
-	    }
-	    else {
-	    	 val message = "$here: Error next character '$nextCharacter' should be 'e' or 'u'"
-	    	 throw Exception(message)
-	    }
-	    Done = true
-	    }
-        'n' -> {
-	    val str = lin.substring(position)
-	    val (lex_l, pos) = lexemeListOfNextLine (str, here)
-	    lexemeList.addAll (lex_l)
-	    position = position + pos
-	    Done = true
-	    }
-	'p' -> {
-	    val nextCharacter = lin.get(position + 1)
-	    if (nextCharacter.equals ('a')){
-	       val str = lin.substring(position)
-	       val (lex_l, pos) = lexemeListOfParentsLine (str, here) 
-	       lexemeList.addAll (lex_l)
-	       position = position + pos
-	    }
-	    else if (nextCharacter.equals ('r')){
-	       val str = lin.substring(position)
-	       val (lex_l, pos) = lexemeListOfPreviousLine (str, here)
-	       lexemeList.addAll (lex_l)
-	       position = position + pos
-	    }
-	    else {
-	    	 val message = "$here: Error next character '$nextCharacter' should be 'a' or 'r'"
-	    	 throw Exception(message)
-	    }
-	    Done = true  
-	    }
-        'q' -> {
-	    val str = lin.substring(position)
-	    val (lex_l, pos) = lexemeListOfQmHashLine (str, here) 
-	    lexemeList.addAll (lex_l)
-	    position = position + pos
-	    Done = true
-	    }
-        's' -> {
-	    val str = lin.substring(position)
-	    val (lex_l, pos) = lexemeListOfSpotLine (str, here) 
-	    lexemeList.addAll (lex_l)
-	    position = position + pos
-	    Done = true
-	    }
-        'S' -> {
-	    val nextCharacter = lin.get(position + 1)
-	    if (nextCharacter.equals ('i')){
-	       val str = lin.substring(position)
-	       val (lex_l, pos) = lexemeListOfSignatureLine (str, here)
-	       lexemeList.addAll (lex_l)
-	       position = position + pos
-	    }
-	    else if (nextCharacter.equals ('o')){
-	       val str = lin.substring(position)
-	       val (lex_l, pos) = lexemeListOfSourceLine (str, here)
-	       lexemeList.addAll(lex_l)
-	       position = position + pos
-	    }
-	    else {
-	    	 val message = "$here: Error next character '$nextCharacter' should be 'i' or 'o'"
-	    	 throw Exception(message)
-	    }
-	    Done = true  
-	    }
-        't' -> {
-	    val str = lin.substring(position)
-	    val (lex_l, pos) = lexemeListOfTicLine (str, here)
-	    lexemeList.addAll (lex_l)
-	    position = position + pos
-	    Done = true
-	    }
-	else -> {
-	    	 val message = "$here: Error unexpected current character '$cha' at position $position"
-	    	 throw Exception(message)
-	    }
-	    } // when
-      } // try
-      catch (e: java.lang.StringIndexOutOfBoundsException) {
-	val cha = lin.get(position-1)
-	if (cha.equals('$')) {
-	  val lex = TokenEndOfLine
-          lexemeList.add (lex)
-	  if (isDebug(here)) println("$here: setting End Of Line")
-	    Done = true			
-	  }
-	  else {
-	    val message = "$here: Error previous character '$cha' (position $position) should be '$'"
-	    throw Exception(message)
-	  }
-       } // catch
-   } // while
-   
-   if (isTrace(here)) println("$here: output position $position")
-   if (isTrace(here)) println("$here: output lexemeList: "+ fullnameListOfLexemeList(lexemeList))
-
-   val result = Pair (lexemeList.toList(), position)
-   exiting(here)
-   return result
-
-}
-
-fun lexemeListFromUserKeywordValueOfStringDollared (str: String, caller: String) : List<Lexeme> {
-// 'any_string'$
-    val here = functionName()
-    entering(here, caller)
-
-    val end_cha = str.last()
-    val lin = if (! end_cha.equals('$')) {
-       str.plus("$")
-    }
-    else {
-       str
-    }
-    if (isTrace(here)) println("$here: input lin '$lin'")
-
-    var Done = false
-    var position = 0
-    var lexemeList = mutableListOf<Lexeme>()
-    
-    while (!Done) {
-    	  try {
-    	      var cha = lin.get(position)
-	      if (isLoop(here)) println ("$here: while position $position cha '$cha'")
-	      when (cha){
-	      ' ' -> {
-	      	  val lex = tokenOfChar(cha, position, lin, here)
-		  lexemeList.add (lex)
-		  position = position + 1
-		  }
-	      '$' -> {
-	      	  val lex = tokenOfChar(cha, position, lin, here)
-		  lexemeList.add (lex)
-		  Done = true
-		  }
-	      in 'a' .. 'z', in 'A' .. 'Z' -> {
-	      	  val sub = lin.substring(position)
-		  val word = nextWordOfEndCharOfString('$', sub, here)
-		  if (isFromUserKeywordValueOfString(word, here)) {
-    		    val lex = FromUserKeywordValue(word)
-		    lexemeList.add (lex)	
-		    position = position + word.length 
-		  }
-		  else {
-		       val message = "$here: Error word '$word' is not a valid FromUserKeywordValue"
-		       throw Exception(message)
-		  }
-	          }
-		  else -> {
-		    val message = "$here: Error unknown character '$cha' at $position in lin '$lin'"
-		       throw Exception(message)
-  
-		} 
-   		} // when
-		} // try
-	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	val cha = lin.get(position)
-	  	if (cha.equals('$')) {
-	     	   val lex = TokenEndOfLine
-		   lexemeList.add (lex)
-	     	   if (isDebug(here)) println("$here: setting End Of Line")
-	     	   Done = true			
-	     	}
-		else {
-		     val message = "$here: Error character '$cha' should be '$' at $position in lin '$lin'"
-	    	     throw Exception(message)
-		}
-	  }
-   }
-
-   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
-   val result = lexemeList.toList()
-
-   exiting(here)
-   return result
-}
-
-fun lexemeListMetaValueOfStringDollared (lin: String, caller: String) : List<Lexeme> {
-// $KeywordMeta: MetaValue$
-    val here = functionName()
-    entering(here, caller)
-
-    if (isTrace(here)) println("$here: input lin '$lin'")
-    
-    val lexemeList = mutableListOf<Lexeme>()
-
-    var Done = false
-    var position = 0
-    
-    while (!Done) {
-    	  try {
-    	      var cha = lin.get(position)
-	      when (cha){
-	      ' ' -> {
-	      	  val lex = tokenOfChar(cha, position, lin, here)
-		  lexemeList.add(lex)
-		  position = position + 1
-		  }
-	      '$' -> {
-	      	  val lex = tokenOfChar(cha, position, lin, here)
-		  lexemeList.add(lex)
-		  position = position + 1
-		  }
-	      else -> {
-	      	  val str = lin.substring(position)
-		  val word = nextWordOfEndCharOfString('$', str, here)
-		  if (isSpotOfString(word, here)) {
-		     position = position + word.length 
-    		      val lex = Spot (word)
-		      lexemeList.add(lex)
-		  }
-		  else {
-		       val message = "$here: Error word '$word' is not a valid Qm Hash"
-		       throw Exception(message)
-		  }
-	          }
-		}
-   		}
-	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	val cha = lin.get(position-1)
-	  	if (cha.equals('$')) {
-	     	   val lex = TokenEndOfLine
-		   lexemeList.add (lex)
-	     	   if (isDebug(here)) println("$here: setting End Of Line")
-	     	   Done = true			
-	     	}
-		else {
-		     val message = "$here: Error previous character '$cha' should be '$'"
-	    	     throw Exception(message)
-		}
-	  }
-   }
-
-   if (isTrace(here)) println("$here: output lexemeList "+lexemeList)
-
-   val result = lexemeList.toList()
-
-   exiting(here)
-   return result 
-}
-
 fun lexemeListOfParentsLine (lin: String, caller: String) : Pair<List<Lexeme>, Int> {
 // parents: QmU1RDLsAGNPVuwDjKD3RQx7R6aEuQfcmSiubviDZ2XRVC$
     val here = functionName()
@@ -1370,71 +1365,6 @@ fun lexemeListOfQmHashLine (lin: String, caller: String) : Pair<List<Lexeme>, In
    return result
 }
 
-fun lexemeListOfSignatureLine (lin: String, caller: String) : Pair<List<Lexeme>, Int> {
-// # $signature: n/a$'
-    val here = functionName()
-    entering(here, caller)
-
-    if (isTrace(here)) println("$here: input lin '$lin'")
-    
-    val lexemeList = mutableListOf<Lexeme>()
-
-    var Done = false
-    var position = 0
-    
-    while (!Done) {
-    	  try {
-    	      var cha = lin.get(position)
-	      if (isLoop(here)) println ("$here: while position $position cha '$cha'")
-	      when (cha){
-	      ' ', '$' -> {
-	      	  val lex = tokenOfChar(cha, position, lin, here)
-		  lexemeList.add (lex)
-		  position = position + 1
-		  }
-	      'S' -> {
-	      	  val str = lin.substring(position)
-    	      	  val word = nextWordOfEndCharOfString(':', str, here)
-	  	  position = position + word.length
-    	  	  lexemeOfWord (word, here)
-		  }
-	      else -> {
-	      	  val str = lin.substring(position)
-		  val word = nextWordOfEndCharOfString('$', str, here)
-		  if (isSignatureOfString(word, here)) {
-		     position = position + word.length 
-    		     Signature (word)
-		  }
-		  else {
-		       val message = "$here: Error word '$word' is not a valid Spot field"
-		       throw Exception(message)
-		  }
-	          }
-		} // when
-   		} // try
-	  catch (e: java.lang.StringIndexOutOfBoundsException) {
-	  	val cha = lin.get(position-1)
-	  	if (cha.equals('$')) {
-	     	   val lex = TokenEndOfLine
-             	   lexemeList.add (lex)
-	     	   if (isDebug(here)) println("$here: setting End Of Line")
-	     	   Done = true			
-	     	}
-		else {
-		     val message = "$here: Error previous character '$cha' should be '$'"
-	    	     throw Exception(message)
-		}
-	  }
-   }
-
-   if (isTrace(here)) println("$here: output position $position")
-   if (isTrace(here)) println("$here: output lexemeList: "+ fullnameListOfLexemeList(lexemeList))
-   val result = Pair(lexemeList.toList(), position)
-
-   exiting(here)
-   return result
-}
-
 fun lexemeListOfSharpedLine (lin: String, caller: String) : List<Lexeme> {
 // Source: /my/perl/script/kwextract.pl,v$
     val here = functionName()
@@ -1506,6 +1436,71 @@ fun lexemeListOfSharpedLine (lin: String, caller: String) : List<Lexeme> {
    if (isTrace(here)) println("$here: output position $position")
    if (isTrace(here)) println("$here: output lexemeList: "+ fullnameListOfLexemeList(lexemeList))
    val result = lexemeList.toList()
+
+   exiting(here)
+   return result
+}
+
+fun lexemeListOfSignatureLine (lin: String, caller: String) : Pair<List<Lexeme>, Int> {
+// # $signature: n/a$'
+    val here = functionName()
+    entering(here, caller)
+
+    if (isTrace(here)) println("$here: input lin '$lin'")
+    
+    val lexemeList = mutableListOf<Lexeme>()
+
+    var Done = false
+    var position = 0
+    
+    while (!Done) {
+    	  try {
+    	      var cha = lin.get(position)
+	      if (isLoop(here)) println ("$here: while position $position cha '$cha'")
+	      when (cha){
+	      ' ', '$' -> {
+	      	  val lex = tokenOfChar(cha, position, lin, here)
+		  lexemeList.add (lex)
+		  position = position + 1
+		  }
+	      'S' -> {
+	      	  val str = lin.substring(position)
+    	      	  val word = nextWordOfEndCharOfString(':', str, here)
+	  	  position = position + word.length
+    	  	  lexemeOfWord (word, here)
+		  }
+	      else -> {
+	      	  val str = lin.substring(position)
+		  val word = nextWordOfEndCharOfString('$', str, here)
+		  if (isSignatureOfString(word, here)) {
+		     position = position + word.length 
+    		     Signature (word)
+		  }
+		  else {
+		       val message = "$here: Error word '$word' is not a valid Spot field"
+		       throw Exception(message)
+		  }
+	          }
+		} // when
+   		} // try
+	  catch (e: java.lang.StringIndexOutOfBoundsException) {
+	  	val cha = lin.get(position-1)
+	  	if (cha.equals('$')) {
+	     	   val lex = TokenEndOfLine
+             	   lexemeList.add (lex)
+	     	   if (isDebug(here)) println("$here: setting End Of Line")
+	     	   Done = true			
+	     	}
+		else {
+		     val message = "$here: Error previous character '$cha' should be '$'"
+	    	     throw Exception(message)
+		}
+	  }
+   }
+
+   if (isTrace(here)) println("$here: output position $position")
+   if (isTrace(here)) println("$here: output lexemeList: "+ fullnameListOfLexemeList(lexemeList))
+   val result = Pair(lexemeList.toList(), position)
 
    exiting(here)
    return result
@@ -1657,34 +1652,6 @@ fun lexemeListOfSpotLine (lin: String, caller: String) : Pair<List<Lexeme>, Int>
    return result
 }
 
-fun lexemeListOfYmlFile (ymlFileName: String, caller: String): List<Lexeme> {
-    val here = functionName()
-    entering(here, caller)
-
-    var lexemeList = mutableListOf<Lexeme>()
-    println("$here: input ymlFileName '$ymlFileName'")
-    val lineList = lineListOfFileName (ymlFileName, here)
-
-    var count = 0
-    for (line in lineList) {
-      count = count + 1
-      if (isDebug(here)) println("$here: for line # $count '$line'")
-      if (line.startsWith('#'))  {
-      	 val lex_l = lexemeListOfSharpedLine (line, here)
-	 lexemeList.addAll (lex_l)
-	 }		
-      else {
-	 val lex_l = lexemeListOfNonSharpedLine (line, here)
-	 lexemeList.addAll (lex_l)
-	 }
-    }
-    
-    if (isTrace(here)) if (isTrace(here)) println("$here: output lexemeList $lexemeList")
-    exiting(here)
-
-    return lexemeList
-}
-
 fun lexemeListOfTextString (str: String, caller: String) : Pair<List<Lexeme>, Int> {
 /*
  variable 
@@ -1749,7 +1716,6 @@ fun lexemeListOfTextString (str: String, caller: String) : Pair<List<Lexeme>, In
    exiting(here)
    return result
 }
-
 
 fun lexemeListOfTicLine (lin: String, caller: String) : Pair<List<Lexeme>, Int> {
 // # $tic: 1579373044$'
@@ -1832,6 +1798,34 @@ fun lexemeListOfTicLine (lin: String, caller: String) : Pair<List<Lexeme>, Int> 
    return result
 }
 
+fun lexemeListOfYmlFile (ymlFileName: String, caller: String): List<Lexeme> {
+    val here = functionName()
+    entering(here, caller)
+
+    var lexemeList = mutableListOf<Lexeme>()
+    println("$here: input ymlFileName '$ymlFileName'")
+    val lineList = lineListOfFileName (ymlFileName, here)
+
+    var count = 0
+    for (line in lineList) {
+      count = count + 1
+      if (isDebug(here)) println("$here: for line # $count '$line'")
+      if (line.startsWith('#'))  {
+      	 val lex_l = lexemeListOfSharpedLine (line, here)
+	 lexemeList.addAll (lex_l)
+	 }		
+      else {
+	 val lex_l = lexemeListOfNonSharpedLine (line, here)
+	 lexemeList.addAll (lex_l)
+	 }
+    }
+    
+    if (isTrace(here)) if (isTrace(here)) println("$here: output lexemeList $lexemeList")
+    exiting(here)
+
+    return lexemeList
+}
+
 fun nameKeywordWithOfLexeme(lex: Lexeme, caller: String): String {
     val here = functionName()
     entering(here, caller)
@@ -1877,8 +1871,4 @@ fun unknownCharacterOfMessage (mes: String?, caller: String): Char? {
 
     return unknownCharacter
 }
-
-
-
-
 

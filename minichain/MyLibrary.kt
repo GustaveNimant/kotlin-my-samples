@@ -37,6 +37,34 @@ var ParameterMap = mutableMapOf<String, MutableList<String>>()
 var level = 0
 var dots = "........|........|........|........|........|........|........|"
 
+fun <T> teeStackOfTeeList (tee_l: List<T>): Stack<T> {
+    var stack = Stack<T>()
+    tee_l.reversed().forEach { t -> stack.push (t)}
+    return stack
+
+}
+
+fun <T> teeStackFromTeeOfTeeStack (tee:T, tee_s: Stack<T>): Stack<T> {
+// return the subStack where all elements untill tee (excluded) are poped-off
+
+   var cha = tee_s.pop()
+   var done = false
+   
+   if (cha == tee) {return tee_s}
+
+   while (! done) {
+      try {
+      	cha = tee_s.pop()
+	done = tee == cha
+      }
+      catch (e: java.util.EmptyStackException) {
+            done = true			       
+      }
+    }
+	
+    return tee_s
+}
+
 fun characterStackOfString (str: String) : Stack<Char> {
     var stack = Stack<Char>()
     str.reversed().forEach { c -> stack.push(c)}
@@ -101,42 +129,6 @@ fun inputRead(caller: String): String {
     return str
 }
 
-fun isDebug(here:String): Boolean {
-  if (ParameterMap.containsKey("debug")) { 
-    val debug_l = ParameterMap.getValue("debug")
-    val result = debug_l.contains("all") || debug_l.contains(here)
-    return result 
-  }
-  else {return false}
-}  
-
-fun isLoop(here:String): Boolean {
-  if (ParameterMap.containsKey("loop")) { 
-    val loop_l = ParameterMap.getValue("loop")
-    val result = loop_l.contains("all") || loop_l.contains(here)
-    return result 
-  }
-  else {return false}
-}  
-
-fun isTrace(here:String): Boolean {
-  if (ParameterMap.containsKey("trace")) { 
-    val trace_l = ParameterMap.getValue("trace")
-    val result = trace_l.contains("all") || trace_l.contains(here)
-    return result
-  }
-  else {return false}
-}  
-
-fun isWhen(here:String): Boolean {
-  if (ParameterMap.containsKey("when")) {
-    val when_l = ParameterMap.getValue("when")
-    val result = when_l.contains("all") || when_l.contains(here)
-    return result
-  }
-  else {return false}
-}  
-
 fun isAlphabeticalOfChar(cha: Char, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
@@ -161,6 +153,24 @@ fun isAlphanumericalOfChar(cha: Char, caller: String): Boolean {
     return result
 }
 
+fun isDebug(here:String): Boolean {
+  if (ParameterMap.containsKey("debug")) { 
+    val debug_l = ParameterMap.getValue("debug")
+    val result = debug_l.contains("all") || debug_l.contains(here)
+    return result 
+  }
+  else {return false}
+}
+
+fun isLoop(here:String): Boolean {
+  if (ParameterMap.containsKey("loop")) { 
+    val loop_l = ParameterMap.getValue("loop")
+    val result = loop_l.contains("all") || loop_l.contains(here)
+    return result 
+  }
+  else {return false}
+}
+
 fun isNumericalOfChar(cha: Char, caller: String): Boolean {
     val here = functionName()
     entering(here, caller)
@@ -171,6 +181,24 @@ fun isNumericalOfChar(cha: Char, caller: String): Boolean {
 
     exiting(here + " with result '$result'")
     return result
+}
+
+fun isTrace(here:String): Boolean {
+  if (ParameterMap.containsKey("trace")) { 
+    val trace_l = ParameterMap.getValue("trace")
+    val result = trace_l.contains("all") || trace_l.contains(here)
+    return result
+  }
+  else {return false}
+}
+
+fun isWhen(here:String): Boolean {
+  if (ParameterMap.containsKey("when")) {
+    val when_l = ParameterMap.getValue("when")
+    val result = when_l.contains("all") || when_l.contains(here)
+    return result
+  }
+  else {return false}
 }
 
 fun lineListOfFileName (nof: String, caller: String) : MutableList<String> {
@@ -194,31 +222,6 @@ fun lineStackOfLineList (str_l: List<String>) : Stack<String> {
     var stack = Stack<String>()
     str_l.reversed().forEach { l -> stack.push(l) }
     return stack
-}
-
-fun nextWordAndEndCharOfEndCharListOfString(cha_l: List<Char>, str: String, caller: String): Pair<String, Char> {
-    val here = functionName()
-    entering(here, caller)
-
-    if (isTrace(here)) println("$here: input cha_l '$cha_l'")
-    if (isTrace(here)) println("$here: input str '$str'")
-    
-    var word = ""
-    var end_cha = 'x'
-    for (c in str){
-	  if (isDebug(here)) println("$here: c '$c'")
-	  if (cha_l.contains(c)) {
-	  end_cha = c
-	  break
-	  }
-	  word = word.plus(c.toString())
-    }
-
-    assert (word.isNotEmpty())
-    
-    if (isTrace(here)) println("$here: output word '$word'")
-    exiting(here)
-    return Pair(word, end_cha)
 }
 
 fun nextStringAndStackOfEndCharOfCharacterStack(del: Char, cha_s: Stack<Char>, caller: String): Pair<String, Stack<Char>> {
@@ -250,6 +253,31 @@ fun nextStringAndStackOfEndCharOfCharacterStack(del: Char, cha_s: Stack<Char>, c
     if (isTrace(here)) println("$here: output cha_s '$cha_s'")
     exiting(here)
     return Pair (str, cha_s)
+}
+
+fun nextWordAndEndCharOfEndCharListOfString(cha_l: List<Char>, str: String, caller: String): Pair<String, Char> {
+    val here = functionName()
+    entering(here, caller)
+
+    if (isTrace(here)) println("$here: input cha_l '$cha_l'")
+    if (isTrace(here)) println("$here: input str '$str'")
+    
+    var word = ""
+    var end_cha = 'x'
+    for (c in str){
+	  if (isDebug(here)) println("$here: c '$c'")
+	  if (cha_l.contains(c)) {
+	  end_cha = c
+	  break
+	  }
+	  word = word.plus(c.toString())
+    }
+
+    assert (word.isNotEmpty())
+    
+    if (isTrace(here)) println("$here: output word '$word'")
+    exiting(here)
+    return Pair(word, end_cha)
 }
 
 fun nextWordAndStackOfEndCharOfCharacterStack(del: Char, cha_s: Stack<Char>, caller: String): Pair<String, Stack<Char>> {
@@ -288,28 +316,6 @@ fun nextWordAndStackOfEndCharOfCharacterStack(del: Char, cha_s: Stack<Char>, cal
     return Pair (str, cha_s)
 }
 
-
-fun nextWordOfEndCharOfString(del: Char, str: String, caller: String): String {
-    val here = functionName()
-    entering(here, caller)
-
-    if (isTrace(here)) println("$here: input del '$del'")
-    if (isTrace(here)) println("$here: input str '$str'")
-    
-    var word = ""    
-    for (c in str){
-	  if (isDebug(here)) println("$here: c '$c'")
-	  if (c.equals(del)) {break}
-	  word = word.plus(c.toString())
-    }
-
-    assert (word.isNotEmpty())
-    
-    if (isTrace(here)) println("$here: output word '$word'")
-    exiting(here)
-    return word
-}
-
 fun nextWordInBracketsOfString(str: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
@@ -343,6 +349,27 @@ fun nextWordOfEndCharListOfString(cha_l: List<Char>, str: String, caller: String
     for (c in str){
 	  if (isDebug(here)) println("$here: c '$c'")
 	  if (cha_l.contains(c)) {break}
+	  word = word.plus(c.toString())
+    }
+
+    assert (word.isNotEmpty())
+    
+    if (isTrace(here)) println("$here: output word '$word'")
+    exiting(here)
+    return word
+}
+
+fun nextWordOfEndCharOfString(del: Char, str: String, caller: String): String {
+    val here = functionName()
+    entering(here, caller)
+
+    if (isTrace(here)) println("$here: input del '$del'")
+    if (isTrace(here)) println("$here: input str '$str'")
+    
+    var word = ""    
+    for (c in str){
+	  if (isDebug(here)) println("$here: c '$c'")
+	  if (c.equals(del)) {break}
 	  word = word.plus(c.toString())
     }
 
@@ -407,6 +434,15 @@ fun parameterMapOfArguments(args: Array<String>, caller: String): MutableMap<Str
    return ParameterMap
 }
 
+fun outputWrite(fileName: String, content: String, caller: String) {
+    val here = functionName()
+    entering(here, caller)
+	
+    File(fileName).bufferedWriter().use { out -> out.write(content)}
+    
+    exiting(here)
+}
+
 fun printStringList (str_l: List<String>) {
     val content = stringOfGlueOfStringList ("\n", str_l)
 
@@ -446,33 +482,6 @@ fun stringOfStringList (str_l: List<String>) : String {
  return str 
 }
 
-fun <T> teeStackOfTeeList (tee_l: List<T>): Stack<T> {
-    var stack = Stack<T>()
-    tee_l.reversed().forEach { t -> stack.push (t)}
-    return stack
-}
-
-fun <T> teeStackFromTeeOfTeeStack (tee:T, tee_s: Stack<T>): Stack<T> {
-// return the subStack where all elements untill tee (excluded) are poped-off
-
-   var cha = tee_s.pop()
-   var done = false
-   
-   if (cha == tee) {return tee_s}
-
-   while (! done) {
-      try {
-      	cha = tee_s.pop()
-	done = tee == cha
-      }
-      catch (e: java.util.EmptyStackException) {
-            done = true			       
-      }
-    }
-	
-    return tee_s
-}
-
 fun wordListOfString (str: String): List<String> {
     val trimedString = str.trim(' ')    
     val regex = Regex("""\s+""")
@@ -489,13 +498,3 @@ fun wordStackOfLine (lin: String) : Stack<String> {
     return stack
 }
 
-fun outputWrite(fileName: String, content: String, caller: String) {
-    val here = functionName()
-    entering(here, caller)
-	
-    File(fileName).bufferedWriter().use { out -> out.write(content)}
-    
-    exiting(here)
-}
-
-// end of library
