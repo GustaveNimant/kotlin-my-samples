@@ -57,6 +57,19 @@ fun provideLexemeList(caller: String) : List<Lexeme> {
     return lex_l
 }
 
+fun printLexemeList (caller: String) {
+    val here = functionName()
+    entering(here, caller)
+
+    val lex_l = provideLexemeList (here)
+    val str_l = fullnameListOfLexemeList (lex_l)
+    val content = stringOfGlueOfStringList ("\n", str_l)
+
+    println ("List of Lexemes from Yml file")
+    println (content)
+    exiting(here)
+}
+
 fun writeLexemeList (caller: String) {
     val here = functionName()
     entering(here, caller)
@@ -70,5 +83,6 @@ fun writeLexemeList (caller: String) {
 
     val siz = lex_l.size
     println("$here: $siz lexemes written to File '$lexFileName'")
+    exiting(here)
 }
 

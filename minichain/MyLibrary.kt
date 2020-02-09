@@ -407,6 +407,12 @@ fun parameterMapOfArguments(args: Array<String>, caller: String): MutableMap<Str
    return ParameterMap
 }
 
+fun printStringList (str_l: List<String>) {
+    val content = stringOfGlueOfStringList ("\n", str_l)
+
+    println (content)
+}
+
 fun provideAnyFileNameOfWhat(what: String, caller: String): String {
     val here = functionName()
     entering(here, caller)
