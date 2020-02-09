@@ -2,10 +2,10 @@ import java.io.File
 import java.util.Stack
 import java.lang.Character.MIN_VALUE as nullChar
 
-import my.library.*
 import my.lexeme.*
-import my.lexer.*
 import my.lexeme.list.provider.*
+import my.lexer.*
+import my.library.*
 import my.parser.*
 
 fun main(args: Array<String>) {

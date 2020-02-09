@@ -16,9 +16,12 @@ fun hasKeywordPreviousOfLexemeList (met_l: List<Lexeme>, caller: String): Boolea
     val here = functionName()
     entering(here, caller)
 
+    if (isTrace(here)) println("$here: input met_l '$met_l'")
+    
     val lex = KeywordWithQmHash("previous")
     val result = met_l.contains(lex)
 
+    if (isTrace(here)) println("$here: output result '$result'")
     exiting(here)
     return result
 }
@@ -32,7 +35,8 @@ fun isAuthorNameOfString(str: String, caller: String): Boolean {
     val pattern = Regex("""[a-zA-Z]\w*(@?)(\w*)""")
     val result = pattern.matches(str)
 
-    exiting(here + " with result '$result'")
+    if (isTrace(here)) println("$here: output result '$result'")
+    exiting(here)
     return result
 }
 
@@ -41,13 +45,15 @@ fun isDateOfString(str: String, caller: String): Boolean {
     entering(here, caller)
     
     if (isTrace(here)) println("$here: input str '$str'")
+    
     val pattern_us = Regex("""\d\d\/\d\d\/\d\d\d\d""")
     val result_us = pattern_us.matches(str)
     val pattern_eu = Regex("""\d\d-\d\d-\d\d\d\d""")
     val result_eu = pattern_eu.matches(str)
     val result = result_us || result_eu
-    
-    exiting(here + " with result '$result'")
+
+    if (isTrace(here)) println("$here: output result '$result'")
+    exiting(here)
     return result
 }
 
@@ -59,7 +65,8 @@ fun isFilePathOfString(str: String, caller: String): Boolean {
     val pattern = Regex("""^(/(\.)?\w[a-zA-Z_0-9]*)(/([a-zA-Z_0-9]+))*\.\w+$""")
     val result = pattern.matches(str)
 
-    exiting(here + " with result '$result'")
+    if (isTrace(here)) println("$here: output result '$result'")
+    exiting(here)
     return result
 }
 
@@ -71,7 +78,8 @@ fun isFromUserKeywordValueOfString(str: String, caller: String): Boolean {
     val pattern = Regex("""\w+""")
     val result = pattern.matches(str)
     
-    exiting(here + " with result '$result'")
+    if (isTrace(here)) println("$here: output result '$result'")
+    exiting(here)
     return result
 }
 
@@ -82,7 +90,8 @@ fun isKeywordNameOfString(str: String, caller: String): Boolean {
     if (isTrace(here)) println("$here: input str '$str'")
     val result = str.endsWith('$')
 
-    exiting(here + " with result '$result'")
+    if (isTrace(here)) println("$here: output result '$result'")
+    exiting(here)
     return result
 }
 
@@ -93,7 +102,8 @@ fun isKeywordOfString(str: String, caller: String): Boolean {
     if (isTrace(here)) println("$here: input str '$str'")
     val result = str.startsWith('$') && str.endsWith(':')
 
-    exiting(here + " with result '$result'")
+    if (isTrace(here)) println("$here: output result '$result'")
+    exiting(here)
     return result
 }
 
@@ -103,7 +113,9 @@ fun isKeywordWithQmHashOfLexeme(lex: Lexeme, caller: String): Boolean {
 
     println("$here: input lex '$lex'")
     val result = lex is KeywordWithQmHash
-    exiting(here + " with result '$result'")
+
+    if (isTrace(here)) println("$here: output result '$result'")
+    exiting(here)
     return result
 }
 
@@ -115,7 +127,8 @@ fun isNextNameOfString(str: String, caller: String): Boolean {
     val pattern = Regex("""\w[a-zA-Z_0-9]*""")
     val result = pattern.matches(str)
 
-    exiting(here + " with result '$result'")
+    if (isTrace(here)) println("$here: output result '$result'")
+    exiting(here)
     return result
 }
 
@@ -127,7 +140,8 @@ fun isQmHashOfString(str: String, caller: String): Boolean {
     if (isTrace(here)) println("$here: input str '$str'")
     val result = pattern.matches(str)
 
-    exiting(here + " with result '$result'")
+    if (isTrace(here)) println("$here: output result '$result'")
+    exiting(here)
     return result
 }
 
@@ -139,7 +153,8 @@ fun isSignatureOfString(str: String, caller: String): Boolean {
     if (isTrace(here)) println("$here: input str '$str'")
     val result = pattern.matches(str)
 
-    exiting(here + " with result '$result'")
+    if (isTrace(here)) println("$here: output result '$result'")
+    exiting(here)
     return result
 }
 
@@ -152,7 +167,8 @@ fun isSpotOfString(str: String, caller: String): Boolean {
     val pattern = Regex("""\d+""")
     val result = pattern.matches(str)
 
-    exiting(here + " with result '$result'")
+    if (isTrace(here)) println("$here: output result '$result'")
+    exiting(here)
     return result
 }
 
@@ -164,7 +180,8 @@ fun isTextVariableOfString(str: String, caller: String): Boolean {
     if (isTrace(here)) println("$here: input str '$str'")
     val result = pattern.matches(str)
 
-    exiting(here + " with result '$result'")
+    if (isTrace(here)) println("$here: output result '$result'")
+    exiting(here)
     return result
 }
 
@@ -189,7 +206,8 @@ fun isTicOfString(str: String, caller: String): Boolean {
     val pattern = Regex("""\d+""")
     val result = pattern.matches(str)
 
-    exiting(here + " with result '$result'")
+    if (isTrace(here)) println("$here: output result '$result'")
+    exiting(here)
     return result
 }
 
@@ -201,33 +219,9 @@ fun isZ2HashOfString(str: String, caller: String): Boolean {
     if (isTrace(here)) println("$here: input str '$str'")
     val result = pattern.matches(str)
 
-    exiting(here + " with result '$result'")
+    if (isTrace(here)) println("$here: output result '$result'")
+    exiting(here)
     return result
-}
-
-fun keywordAndStringOfSharpedLine__ (lin: String, caller: String) : pairString {
-// # $Source: /my/perl/script/kwextract.pl,v$
-    val here = functionName()
-    entering(here, caller)
-
-   if (isTrace(here)) println("$here: input lin '$lin'")
-   var wordStack = wordStackOfLine (lin)
-
-   var currentWord = ""
-   var nextWord = ""
-
-   try {
-      currentWord = wordStack.pop()
-      nextWord = wordStack.pop()
-      }
-      catch (e: java.util.EmptyStackException) {
-      }
-
-    println("$here: currentWord: '" + currentWord + "'")
-    println("$here: nextWord: '" + nextWord + "'")
-
-  exiting(here)
-  return pairString (currentWord, nextWord)
 }
 
 fun keywordNameOfString (str: String, caller: String): String {
@@ -239,7 +233,8 @@ fun keywordNameOfString (str: String, caller: String): String {
     assert (isKeywordNameOfString(str, here))
     var result = str.trimEnd({ c -> c.equals('$')})
 
-    exiting(here + " with result "+result)
+    if (isTrace(here)) println("$here: output result '$result'")
+    exiting(here)
     return result
 }
 
@@ -252,7 +247,8 @@ fun keywordOfString(str: String, caller: String): String {
     assert (isKeywordOfString(str, here))
     val result = (str.substring(1)).trimEnd({c -> c.equals(':')})
 
-    exiting(here + " with result '$result'")
+    if (isTrace(here)) println("$here: output result '$result'")
+    exiting(here)
     return result
 }
 
@@ -314,7 +310,7 @@ fun lexemeListFromUserKeywordValueOfStringDollared (str: String, caller: String)
 	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
 		   lexemeList.add (lex)
-	     	   if (isDebug(here)) println("$here: setting End Of Line")
+	     	   if (isLoop(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -463,7 +459,7 @@ fun lexemeListMetaOfDollarString (lin: String, caller: String) : Pair<List<Lexem
 	if (cha.equals('$')) {
 	  val lex = TokenEndOfLine
           lexemeList.add (lex)
-	  if (isDebug(here)) println("$here: setting End Of Line")
+	  if (isLoop(here)) println("$here: setting End Of Line")
 	    Done = true			
 	  }
 	  else {
@@ -528,7 +524,7 @@ fun lexemeListMetaValueOfStringDollared (lin: String, caller: String) : List<Lex
 	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
 		   lexemeList.add (lex)
-	     	   if (isDebug(here)) println("$here: setting End Of Line")
+	     	   if (isLoop(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -599,7 +595,7 @@ fun lexemeListOfAuthorLine (lin: String, caller: String) : Pair<List<Lexeme>, In
 	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
 		   lexemeList.add (lex)	
-	     	   if (isDebug(here)) println("$here: setting End Of Line")
+	     	   if (isLoop(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -684,7 +680,7 @@ fun lexemeListOfDateLine (lin: String, caller: String) : Pair<List<Lexeme>, Int>
 	  	if (cha.equals('$')) {
 	     	  val lex = TokenEndOfLine
 		  lexemeList.add (lex)
-	     	  if (isDebug(here)) println("$here: setting End Of Line")
+	     	  if (isLoop(here)) println("$here: setting End Of Line")
 	     	  Done = true			
 	     	}
 		else {
@@ -886,7 +882,7 @@ fun lexemeListOfMembersRemainderString (str: String, caller: String) : Pair<List
 	  if (cha_l.contains(cha)) { 
 	    val lex = TokenEndOfLine
             lexemeList.add (lex)
-	    if (isDebug(here)) println("$here: setting End Of Line")
+	    if (isLoop(here)) println("$here: setting End Of Line")
 	      Done = true			
 	   }
 	  else {
@@ -1032,7 +1028,7 @@ fun lexemeListOfNextLine (lin: String, caller: String) : Pair<List<Lexeme>, Int>
 	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
 		   lexemeList.add (lex)		
-	     	   if (isDebug(here)) println("$here: setting End Of Line")
+	     	   if (isLoop(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -1204,7 +1200,7 @@ fun lexemeListOfParentsLine (lin: String, caller: String) : Pair<List<Lexeme>, I
 	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
 		   lexemeList.add (lex)
-	     	   if (isDebug(here)) println("$here: setting End Of Line")
+	     	   if (isLoop(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -1220,7 +1216,6 @@ fun lexemeListOfParentsLine (lin: String, caller: String) : Pair<List<Lexeme>, I
 
    exiting(here)
    return result
-
 }
 
 fun lexemeListOfPreviousLine (lin: String, caller: String) : Pair<List<Lexeme>, Int> {
@@ -1420,16 +1415,18 @@ fun lexemeListOfSharpedLine (lin: String, caller: String) : List<Lexeme> {
       } // try
       catch (e: java.lang.StringIndexOutOfBoundsException) {
 	val cha = lin.get(position-1)
-	val cha_l = listOf('$', ' ', '\'', '"')
+	if (! cha.equals('$')) {
+	val cha_l = listOf(' ', '\'', '"')
 	if (cha_l.contains(cha)) { 
 	  val lex = TokenEndOfLine
           lexemeList.add (lex)
-	  if (isDebug(here)) println("$here: setting End Of Line")
-	    Done = true			
+	  if (isLoop(here)) println("$here: setting End Of Line")
 	  }
 	  else {
 	    fatalErrorPrint("last character '$cha' (position $position) should in list '$cha_l'", "string '$lin'", "Correct record", here)
 	  }
+	  }
+	    Done = true			
        } // catch
    } // while
 
@@ -1488,7 +1485,7 @@ fun lexemeListOfSignatureLine (lin: String, caller: String) : Pair<List<Lexeme>,
 	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
              	   lexemeList.add (lex)
-	     	   if (isDebug(here)) println("$here: setting End Of Line")
+	     	   if (isLoop(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -1635,7 +1632,7 @@ fun lexemeListOfSpotLine (lin: String, caller: String) : Pair<List<Lexeme>, Int>
 	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
              	   lexemeList.add (lex)
-	     	   if (isDebug(here)) println("$here: setting End Of Line")
+	     	   if (isLoop(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -1780,7 +1777,7 @@ fun lexemeListOfTicLine (lin: String, caller: String) : Pair<List<Lexeme>, Int> 
 	  	if (cha.equals('$')) {
 	     	   val lex = TokenEndOfLine
              	   lexemeList.add (lex)
-	     	   if (isDebug(here)) println("$here: setting End Of Line")
+	     	   if (isLoop(here)) println("$here: setting End Of Line")
 	     	   Done = true			
 	     	}
 		else {
@@ -1809,7 +1806,7 @@ fun lexemeListOfYmlFile (ymlFileName: String, caller: String): List<Lexeme> {
     var count = 0
     for (line in lineList) {
       count = count + 1
-      if (isDebug(here)) println("$here: for line # $count '$line'")
+      if (isLoop(here)) println("$here: for line # $count '$line'")
       if (line.startsWith('#'))  {
       	 val lex_l = lexemeListOfSharpedLine (line, here)
 	 lexemeList.addAll (lex_l)
