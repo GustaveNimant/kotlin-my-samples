@@ -27,37 +27,39 @@ data class Segment (val name: String, val origin: Point, val end: Point) {
 
 sealed class Triangle () {
 
+    	   abstract fun print ()
+	   
     sealed class TriangleIsoceles () {
 
     	   abstract fun print ()
 	   
-    	   data class TriangleIsocelesAcute (val name: String, val summit:Point, val basis: Segment): Triangle () {
-	   fun print () {
+    	   data class TriangleIsocelesAcute constructor (val name: String, val summit:Point, val basis: Segment): TriangleIsoceles () {
+	   final override fun print () {
 	       	  println ("\nTriangle "+name)
 	  	  summit.print()
 	  	  basis.print()
 		  }
 		  
     	   }
-	   data class TriangleIsocelesEquilateral (val name: String, val summit:Point, val basis: Segment): Triangle () {
-	   fun print () {
+	   data class TriangleIsocelesEquilateral constructor (val name: String, val summit:Point, val basis: Segment): TriangleIsoceles () {
+	   final override fun print () {
 	       	  println ("\nTriangle "+name)
 	  	  summit.print()
 	  	  basis.print()
 		  }
 		  
 	   }
-    	   data class TriangleIsocelesObtuse (val name: String, val summit:Point, val basis: Segment) : Triangle () {
-	   fun print () {
+    	   data class TriangleIsocelesObtuse constructor (val name: String, val summit:Point, val basis: Segment) : TriangleIsoceles () {
+	   final override fun print () {
 	       	  println ("\nTriangle "+name)
 	  	  summit.print()
 	  	  basis.print()
 		  }
 		  
     	   }
-    	   data class TriangleIsocelesRight (val name: String, val summit:Point, val basis: Segment): Triangle () {
+    	   data class TriangleIsocelesRight constructor (val name: String, val summit:Point, val basis: Segment): TriangleIsoceles () {
 
-	   fun print () {
+	   final override fun print () {
 	       	  println ("\nTriangle "+name)
 	  	  summit.print()
 	  	  basis.print()
@@ -72,24 +74,26 @@ sealed class Triangle () {
 
     sealed class TriangleScalene () {
 
-    	   data class TriangleScaleneAcute (val name: String, val summit:Point, val basis: Segment) : Triangle () {
-	   fun print () {
+    	   abstract fun print ()
+	   
+    	   data class TriangleScaleneAcute constructor (val name: String, val summit:Point, val basis: Segment) : TriangleScalene () {
+	   final override fun print () {
 	       	  println ("\nTriangle "+name)
 	  	  summit.print()
 	  	  basis.print()
 		  }
 		  
     	   }
-    	   data class TriangleScaleneObtuse (val name: String, val summit:Point, val basis: Segment) : Triangle () {
-	   fun print () {
+    	   data class TriangleScaleneObtuse constructor (val name: String, val summit:Point, val basis: Segment) : TriangleScalene () {
+	   final override fun print () {
 	       	  println ("\nTriangle "+name)
 	  	  summit.print()
 	  	  basis.print()
 		  }
 		  
     	   }
-    	   data class TriangleScaleneRight (val name: String, val summit:Point, val basis: Segment) : Triangle () {
-	   fun print () {
+    	   data class TriangleScaleneRight constructor (val name: String, val summit:Point, val basis: Segment) : TriangleScalene () {
+	   final override fun print () {
 	       	  println ("\nTriangle "+name)
 	  	  summit.print()
 	  	  basis.print()
@@ -118,20 +122,23 @@ fun main(args: Array<String>) {
 
     fun printOfTriangle (t:Triangle) =
     	when (t) {
-//	  is Triangle.TriangleIsoceles -> println ("\nTriangle Isisoceles:")
+	  is Triangle.TriangleIsoceles -> {ti -> 
 
-	  is Triangle.TriangleIsoceles.TriangleIsocelesAcute -> t.print()
-	  is Triangle.TriangleIsoceles.TriangleIsocelesEquilateral -> t.print()
-   	  is Triangle.TriangleIsoceles.TriangleIsocelesRight -> t.print()
-	  is Triangle.TriangleIsoceles.TriangleIsocelesObtuse -> t.print()
-
-//	  is Triangle.TriangleScalene -> println ("\nTriangle Scalene:")
-
-	  is Triangle.TriangleScalene.TriangleScaleneAcute -> t.print()
-	  is Triangle.TriangleScalene.TriangleScaleneObtuse -> t.print()
-     	  is Triangle.TriangleScalene.TriangleScaleneRight -> t.print()
+    	when (ti) {
+	  is Triangle.TriangleIsoceles.TriangleIsocelesAcute -> ti.print()
+	  is Triangle.TriangleIsoceles.TriangleIsocelesEquilateral -> ti.print()
+   	  is Triangle.TriangleIsoceles.TriangleIsocelesRight -> ti.print()
+	  is Triangle.TriangleIsoceles.TriangleIsocelesObtuse -> ti.print()
+	  }
+	  }	
+	  is Triangle.TriangleScalene -> { ts -> 
+    	when (ts) {
+	  is Triangle.TriangleScalene.TriangleScaleneAcute -> ts.print()
+	  is Triangle.TriangleScalene.TriangleScaleneObtuse -> ts.print()
+     	  is Triangle.TriangleScalene.TriangleScaleneRight -> ts.print()
      	  }
-
+	  }
+	  }
      printOfTriangle(abg)
      printOfTriangle(acf)
      printOfTriangle(adf)
